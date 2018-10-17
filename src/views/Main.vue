@@ -1,7 +1,4 @@
 <style>
-    html,body{
-        height: 100%;
-    }
     .amap-demo {
       height: 100%;
     }
@@ -9,9 +6,13 @@
 
 <template>
     <div style="height:100%;">
-        <!-- hello world! -->
-        <el-amap ref="map" vid="amapDemo" :amap-manager="amapManager" :center="center" :zoom="zoom" :plugin="plugin" :events="events" class="amap-demo">
-        </el-amap>
+        <el-amap vid="amap" 
+                 :zoom="zoom" 
+                 :center="center" 
+                 class="amap-demo"
+                 :amap-manager="amapManager">
+                 <!-- :events="events" -->
+      </el-amap>
     </div>
 </template>
 
@@ -21,33 +22,25 @@
         data () {
             return {
                 amapManager,
-                zoom: 12,
-                center: [121.59996, 31.197646],
+                zoom: 14,
+                center: [105.579225,32.219581],
                 events: {
-                    init: (o) => {
-                    console.log(o.getCenter())
-                    console.log(this.$refs.map.$$getInstance())
-                    o.getCity(result => {
-                        console.log(result)
-                    })
+                    init: (oMap) => {
+                        // console.log(oMap); // 高德地图对象实例
+                        // console.log(AMap); // 高德全局对象，用于实例化地图对象
+                        // let imageLayer = new AMap.ImageLayer({
+                        //     url: '/bg.jpg',
+                        //     bounds: new AMap.Bounds(
+                        //             [105.554561, 32.201035],
+                        //             [105.600952, 32.234801]
+                        //     ),
+                        //     zooms: [0, 19],
+                        //     zIndex: 100,
+                        //     opacity: 0.5
+                        // });
+                        // oMap.add(imageLayer);
                     },
-                    'moveend': () => {
-                    },
-                    'zoomchange': () => {
-                    },
-                    'click': () => {
-                       
-                    }
-                },
-                plugin: ['ToolBar', {
-                    pName: 'MapType',
-                    defaultType: 0,
-                    events: {
-                    init(o) {
-                        console.log(o);
-                    }
-                    }
-                }]
+                }
             }
         }
     }
