@@ -14,12 +14,6 @@ VueAMap.initAMapApiLoader({
     v: '1.4.4',
     uiVersion: '1.0.11' // 版本号
 });
-// lazyAMapApiLoaderInstance.load().then(() => {
-//     // your code ...
-//     this.map = new VueAMap.Map('amapContainer', {
-//         center: new VueAMap.LngLat(121.59996, 31.197646)
-//     });
-// });
 
 new Vue({
     router,

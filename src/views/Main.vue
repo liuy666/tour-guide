@@ -10,8 +10,9 @@
                  :zoom="zoom" 
                  :center="center" 
                  class="amap-demo"
-                 :amap-manager="amapManager">
-                 <!-- :events="events" -->
+                 :amap-manager="amapManager"
+                 :events="events">
+                 
       </el-amap>
     </div>
 </template>
@@ -28,17 +29,17 @@
                     init: (oMap) => {
                         // console.log(oMap); // 高德地图对象实例
                         // console.log(AMap); // 高德全局对象，用于实例化地图对象
-                        // let imageLayer = new AMap.ImageLayer({
-                        //     url: '/bg.jpg',
-                        //     bounds: new AMap.Bounds(
-                        //             [105.554561, 32.201035],
-                        //             [105.600952, 32.234801]
-                        //     ),
-                        //     zooms: [0, 19],
-                        //     zIndex: 100,
-                        //     opacity: 0.5
-                        // });
-                        // oMap.add(imageLayer);
+                        let imageLayer = new AMap.ImageLayer({
+                            url: '/bg.jpg',
+                            bounds: new AMap.Bounds(
+                                    [105.554561, 32.201035],
+                                    [105.600952, 32.234801]
+                            ),
+                            zooms: [0, 19],
+                            zIndex: 100,
+                            opacity: 0.5
+                        });
+                        oMap.add(imageLayer);
                     },
                 }
             }
