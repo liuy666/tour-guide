@@ -12,6 +12,7 @@
                  class="amap-demo"
                  :amap-manager="amapManager"
                  :events="events">
+                 
       </el-amap>
     </div>
 </template>
