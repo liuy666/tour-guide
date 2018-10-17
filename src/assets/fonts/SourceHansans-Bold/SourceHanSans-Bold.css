@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 @font-face {
-  font-family: "SourceHanSans-Bold";
+  font-family: "SBold";
   src: url("SourceHanSans-Bold.woff2") format("woff2"),
        url("SourceHanSans-Bold.woff") format("woff"),
        url("SourceHanSans-Bold.ttf") format("truetype"),
