@@ -4,6 +4,9 @@ import router from './router/index'
 import store from './store/store'
 import 'lib-flexible/flexible.js'
 import VueAMap from 'vue-amap'
+import '@/style/baseStyle.css'
+import '@/style/globalStyle.css'
+
 //import { lazyAMapApiLoaderInstance } from 'vue-amap'
 
 Vue.use(VueAMap);
