@@ -2,7 +2,6 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router/index'
 import store from './store/store'
-// import 'lib-flexible/flexible.js'
 import VueAMap from 'vue-amap';
 import QS from 'qs';
 
@@ -20,7 +19,6 @@ import utils from '@/libs/utils.js';
 
 Vue.config.productionTip = false;
 Vue.prototype.$tools = utils;
-Vue.prototype.$baseURL = process.env.NODE_ENV === "production" ? '' : '/api';
 Vue.prototype.$QS = QS;
 
 // 引入高德SDK
