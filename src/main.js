@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router/index'
 import store from './store/store'
-import 'lib-flexible/flexible.js'
+// import 'lib-flexible/flexible.js'
 import VueAMap from 'vue-amap';
 import QS from 'qs';
 

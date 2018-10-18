@@ -4,5 +4,9 @@ module.exports = {
             options: {},
             plugins: ['vux-ui']
         })
+    },
+    devServer: {
+        inline: false,
+        port: 8086
     }
 }

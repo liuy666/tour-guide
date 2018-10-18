@@ -23,7 +23,7 @@ export default {
                     // 如果遍历到的值是对象/数组，就继续递归遍历
                     if(Array.isArray(source[key]) || (source[key] instanceof Object && source[key].constructor === Object)) {
                         target[key] = source[key].constructor === Array ? [] : {};
-                        target[key] = deepClone(source[key]);
+                        target[key] = this.deepClone(source[key]);
                     } else {
                         target[key] = source[key];
                     }
