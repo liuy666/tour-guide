@@ -7,7 +7,6 @@ module.exports = {
         })
     },
     devServer: {
-        inline: false,
         port: 8086
     }
 }

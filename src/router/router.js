@@ -15,6 +15,11 @@ export const appRoutes = [
                 component: () => import('@/views/scenic-line.vue')
             }
         ]
+    },
+    {
+        path: '/use-camera',
+        name: 'use-camera',
+        component: () => import('@/views/use-camera.vue')
     }
 ]
 

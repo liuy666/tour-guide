@@ -19,6 +19,13 @@
             .main_view_header {
                 height: 60px;
                 background-color: #fff;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                .camera {
+                    display: flex;
+                    flex-direction: row;
+                }
             }
             .main_view_footer {
                 height: 100px;
@@ -53,7 +60,10 @@
         </section>
         <section class="main_view" v-show="isShow">
             <section class="main_view_header">
-                <section class="camera">不认识就扫一扫</section>
+                <section class="camera">
+                    <button @click="useCamera">智能识别</button>
+                    <span>不认识就扫一扫</span>
+                </section>
                 <section class="weather">空气指数</section>
                 <!-- 使用flex弹性布局 -->
             </section>
@@ -133,6 +143,10 @@
             },
             goto2() {
                 this.$router.push('scenic-line');
+            },
+            useCamera() {
+                console.log(1)
+                this.$router.push('use-camera');
             }
         }
     }
