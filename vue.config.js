@@ -1,4 +1,5 @@
 module.exports = {
+    baseUrl: process.env.NODE_ENV === "production" ? '' : 'development',
     configureWebpack: config => {
         require('vux-loader').merge(config, {
             options: {},
@@ -6,7 +7,6 @@ module.exports = {
         })
     },
     devServer: {
-        inline: false,
         port: 8086
     }
 }
