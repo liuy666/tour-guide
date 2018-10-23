@@ -103,6 +103,7 @@
 <script>
     import { amapManager } from 'vue-amap';
     import { XButton, Icon  } from 'vux';
+
     export default {
         components: {
             XButton,
@@ -116,6 +117,7 @@
                 center: [105.579225,32.219581],
                 events: {
                     init: (oMap) => {
+                        const _self = this;
                         //手绘地图图层
                         let imageLayer = new AMap.ImageLayer({
                             url: '/bg.jpg',
@@ -138,7 +140,7 @@
                                 "</div>",
                                 "<div class='btns-area' style='text-align:center;'>",
                                     "<button>解说</button>",
-                                    "<button>详情</button>",
+                                    "<button id='detail-btn'>详情</button>",
                                 "</div>",
                             "</div>"
                         ]
@@ -167,6 +169,14 @@
                             //·······
                             infoWindow.setContent(infoContent.join(""));
                             infoWindow.open(oMap, e.target.getPosition());
+                            
+                            _self.$nextTick(() => {
+                                let a = document.querySelector("#detail-btn");
+                                a.addEventListener('click',function(){
+                                    _self.$router.push('scenic-point-detail');
+                                })
+                            })
+                            
                         }
                     },
                 }
@@ -186,7 +196,11 @@
             useCamera() {
                 console.log(1)
                 this.$router.push('use-camera');
-            }
+            },
+            
+        },
+        mounted () {
+            
         }
     }
 </script>
