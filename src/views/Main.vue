@@ -43,6 +43,24 @@
             height: 80px;
             background-color: aqua;
         }
+        .introButton {
+            position: absolute;
+            right: 40px;
+            top: 40px;
+            width: 100px;
+            height: 100px;
+        }
+        .introDetail {
+            background-color: #ccc;
+            width: 100%;
+            height: 600px;
+            position: absolute;
+            bottom: 70px;
+            left: 30px;
+            p {
+                font-size: 30px;
+            }
+        }
     }
 </style>
 
@@ -97,6 +115,17 @@
         <section class="toolbars">
             <x-button @click.native="handleClick">点我</x-button>
         </section>
+        <section>
+            <button @click="seeIntroduce" class="introButton">简介</button>
+        </section>
+        <section v-show="isOpenDetail" class="introDetail">
+            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="qqmap://map/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（只能在App或手机浏览器中生效，微信内置浏览器也不行）</a></p>
+            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="https://apis.map.qq.com/uri/v1/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（h5调用）</a></p>
+            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="https://uri.amap.com/search?keyword=四川省广元市剑门关&city=310000&view=map&src=test&coordinate=gaode&callnative=1">试试打开高德地图App</a></p>
+            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="http://api.map.baidu.com/geocoder?address=四川省广元市剑门关&output=html&src=webapp.baidu.openAPIdemo">试试打开百度地图App--方式1：web端--地址解析</a></p>
+            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="bdapp://map/geocoder?src=andr.baidu.openAPIdemo&address=四川省广元市剑门关">试试打开百度地图App--方式2：安卓端--地址解析</a></p>
+            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="baidumap://map/geocoder?address=四川省广元市剑门关&src=ios.baidu.openAPIdemo">试试打开百度地图App--方式3：ios端--地址解析</a></p>
+        </section>
     </div>
 </template>
 
@@ -111,6 +140,7 @@
         data () {
             return {
                 isShow: false,
+                isOpenDetail: false,
                 amapManager,
                 zoom: 14,
                 center: [105.579225,32.219581],
@@ -147,6 +177,12 @@
             useCamera() {
                 console.log(1)
                 this.$router.push('use-camera');
+            },
+            seeIntroduce() {
+                this.isOpenDetail = !this.isOpenDetail;
+            },
+            openMap() {
+                console.log(6);
             }
         }
     }
