@@ -14,14 +14,14 @@ export default {
      * @returns {Object/Array}
      */
     deepClone(source) {
-        if(this.isHasSpecialKey(source)) {
+        if (this.isHasSpecialKey(source)) {
             // 判断待拷贝的源对象/数组是数组还是对象
             const target = source.constructor === Array ? [] : {};
             // 遍历源对象/数组
-            for(let key in source) { 
-                if(source.hasOwnProperty(key)) {
+            for (let key in source) {
+                if (source.hasOwnProperty(key)) {
                     // 如果遍历到的值是对象/数组，就继续递归遍历
-                    if(Array.isArray(source[key]) || (source[key] instanceof Object && source[key].constructor === Object)) {
+                    if (Array.isArray(source[key]) || (source[key] instanceof Object && source[key].constructor === Object)) {
                         target[key] = source[key].constructor === Array ? [] : {};
                         target[key] = this.deepClone(source[key]);
                     } else {
@@ -39,12 +39,12 @@ export default {
      */
 
     isHasSpecialKey(source) {
-        for(let key in source) {
-            if(source.hasOwnProperty(key)) {
-                if(Array.isArray(source[key]) || (source[key] instanceof Object && source[key].constructor === Object)) {
+        for (let key in source) {
+            if (source.hasOwnProperty(key)) {
+                if (Array.isArray(source[key]) || (source[key] instanceof Object && source[key].constructor === Object)) {
                     this.isHasSpecialKey(source[key]);
                 } else {
-                    if(typeof source[key] === 'undefined' || source[key] instanceof Function || typeof source[key] === 'symbol') {
+                    if (typeof source[key] === 'undefined' || source[key] instanceof Function || typeof source[key] === 'symbol') {
                         return true;
                     }
                 }
@@ -59,8 +59,8 @@ export default {
      * @param {string/number} id -- 给定的查找值
      * @return {boolean} true/false
      */
-    isExist(id,array) {
-        if(array.indexOf(id) > -1) {
+    isExist(id, array) {
+        if (array.indexOf(id) > -1) {
             return true;
         } else {
             return false;
@@ -73,8 +73,8 @@ export default {
      * @return {array} 去重后的新数组
      */
     removeRepeat(array) {
-        let result = array.sort().reduce((init, current)=>{
-            if(init.length===0 || init[init.length-1]!==current){
+        let result = array.sort().reduce((init, current) => {
+            if (init.length === 0 || init[init.length - 1] !== current) {
                 init.push(current);
             }
             return init;
@@ -97,5 +97,5 @@ export default {
             return reg.test(num) ? true : false;
         }
     },
-    
+
 }
