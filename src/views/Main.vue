@@ -39,7 +39,7 @@
             left: 0;
             right: 0;
             bottom: 40px;
-            width: 460px;
+            width: 90%;
             height: 80px;
             background-color: aqua;
         }
@@ -94,26 +94,16 @@
                 <icon type="success" is-msg></icon>
                 <icon type="success" is-msg></icon>
                 <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
                 <!-- 使用flex弹性布局 -->
             </section>
         </section>
         <section class="toolbars">
-            <x-button @click.native="handleClick">点我</x-button>
+            <div style="float:left;width: 100px;height: 100%;background-color:#ccc;" @click="handlePlay">播放/暂停</div>
+            <audio controls style="display:none;">
+                <source src="http://hqyatu-navigator.oss-cn-beijing.aliyuncs.com/20181023/e6586ba47dc44b2fb31be240ee7f14e8.mp3?Expires=1540287348&OSSAccessKeyId=LTAIuMC8xUilE1EZ&Signature=qDBw4yqLpye5KXJvsXHnaysFx8Y%3D" type="audio/mpeg" />
+                您的浏览器不支持 audio 元素
+            </audio>
+            <x-button style="float:right;" @click.native="handleClick" :mini="true">菜单</x-button>
         </section>
         <section>
             <button @click="seeIntroduce" class="introButton">简介</button>
@@ -141,6 +131,7 @@
             return {
                 isShow: false,
                 isOpenDetail: false,
+                isEnd: false,
                 amapManager,
                 zoom: 15,
                 center: [105.579225,32.219581],
@@ -222,6 +213,10 @@
             },
             openMap() {
                 console.log(6);
+            },
+            handlePlay() {
+                const au = document.querySelector('audio');
+                au.paused ? au.play() : au.pause();
             }
         }
     }
