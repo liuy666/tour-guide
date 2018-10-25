@@ -89,7 +89,7 @@
             </el-amap>
         </section>
         <!-- <img src="../assets/images/bg.jpg" alt=""  style="position:absolute;left:0;top:0;;height:80%;"/> -->
-        <section class="main_view" v-show="isShow">
+        <!-- <section class="main_view" v-show="isShow">
             <section class="main_view_header">
                 <section class="camera">
                     <button @click="useCamera">智能识别</button>
@@ -128,13 +128,14 @@
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="http://api.map.baidu.com/geocoder?address=四川省广元市剑门关&output=html&src=webapp.baidu.openAPIdemo">试试打开百度地图App--方式1：web端--地址解析</a></p>
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="bdapp://map/geocoder?src=andr.baidu.openAPIdemo&address=四川省广元市剑门关">试试打开百度地图App--方式2：安卓端--地址解析</a></p>
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="baidumap://map/geocoder?address=四川省广元市剑门关&src=ios.baidu.openAPIdemo">试试打开百度地图App--方式3：ios端--地址解析</a></p>
-        </section>
+        </section> -->
     </div>
 </template>
 
 <script>
     // import { amapManager } from 'vue-amap';
     import { XButton, Icon  } from 'vux';
+    
     export default {
         components: {
             XButton,
@@ -151,15 +152,14 @@
                 center: [105.570825,32.216881],
                 events: {
                     init: (oMap) => {
-                        const _self = this;
                         function showInfoDragend(){
                             console.log('拖拽地图结束');
                             console.log(oMap.getBounds());
                             console.log(oMap.getSize());
                         }
                         (function lockMapBounds() {
-                            var bounds = new AMap.Bounds([105.554561, 32.201035],[105.600952, 32.234801]);
-                            oMap.setLimitBounds(bounds);
+                        var bounds = new AMap.Bounds([105.554561, 32.201035],[105.600952, 32.234801]);
+                        oMap.setLimitBounds(bounds);
                         })()
                         oMap.on('dragend', showInfoDragend);
     
@@ -177,78 +177,45 @@
                         oMap.setFeatures([]);
                         oMap.setMapStyle("amap://styles/dark");
                         //景点标记+信息窗体 
-                        let infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
-                        let infoContent = [
-                            "<div class='info-container'>",
-                                "<div class='info-content' style='overflow:hidden;'>",
-                                    "<img src='/point.png' style='width:40px;height:40px;float:left;' />",
-                                    "<div style='float:left;'><div>景点名字</div><div>这里是景点的描述</div></div>",
-                                "</div>",
-                                "<div class='btns-area' style='text-align:center;'>",
-                                    "<button>解说</button>",
-                                    "<button id='detail-btn'>详情</button>",
-                                "</div>",
-                            "</div>"
-                        ]
-                        //发请求请求所有景点的经纬度信息
-                        //·····
-                        let pointArr = [[105.570578,32.204367],[105.56693,32.207417],[105.56723,32.209705],[105.562896,32.209051]];
-                        let nameArr = ['景点1','景点2','景点3','景点4'];
-                        let flagArr = ['1','2','3','4']; //景点的唯一标识
-                        function setPoint(point,index) { 
-                            let num = index + 1;
-                            let marker = new AMap.Marker({
-                                content: "<div class='marker-content' data-flag='"+flagArr[index]+"'><div style='width: 30px;height: 30px;background: url(/point.png) no-repeat center / 100% 100%;text-align: center;color: red;'>"+num+"</div><div>"+nameArr[index]+"</div></div>",
-                                position: point,
-                            });
-                            marker.on('click',markerClick);
-                            //marker.emit('click', {target: marker});
-                            oMap.add(marker);
-                        }
-                        pointArr.forEach(function(value,index){
-                            setPoint(value,index);
-                        })
-                        //点击弹出信息窗体
-                        function markerClick(e) {
-                            let flag = e.target.Uh.contentDom.children[0].getAttribute("data-flag");//当前景点的唯一标识
-                            //发请求请求景点详细数据
-                            //·······
-                            infoWindow.setContent(infoContent.join(""));
-                            infoWindow.open(oMap, e.target.getPosition());
-                            
-                            _self.$nextTick(() => {
-                                let a = document.querySelector("#detail-btn");
-                                a.addEventListener('click',function(){
-                                    _self.$router.push('scenic-point-detail');
-                                })
-                            })
-                        }
-
-                        //定位
-                        /*var options = {
-                            'showButton': true,//是否显示定位按钮
-                            'buttonPosition': 'LB',//定位按钮的位置
-                            'buttonOffset': new AMap.Pixel(10, 20),//定位按钮距离对应角落的距离
-                            'showMarker': true,//是否显示定位点
-                            'markerOptions':{//自定义定位点样式，同Marker的Options
-                                'offset': new AMap.Pixel(-18, -36),
-                                'content':'<img src="https://a.amap.com/jsapi_demos/static/resource/img/user.png" style="width:36px;height:36px"/>'
-                            },
-                            'showCircle': true,//是否显示定位精度圈
-                            'circleOptions': {//定位精度圈的样式
-                                'strokeColor': '#0093FF',
-                                'noSelect': true,
-                                'strokeOpacity': 0.5,
-                                'strokeWeight': 1,
-                                'fillColor': '#02B0FF',
-                                'fillOpacity': 0.25
-                            }
-                        }
-                        AMap.plugin(["AMap.Geolocation"], function() {
-                            var geolocation = new AMap.Geolocation(options);
-                            oMap.addControl(geolocation);
-                            geolocation.getCurrentPosition()
-                        });*/
+                        // let infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
+                        // let infoContent = [
+                        //     "<div class='info-container'>",
+                        //         "<div class='info-content' style='overflow:hidden;'>",
+                        //             "<img src='/point.png' style='width:40px;height:40px;float:left;' />",
+                        //             "<div style='float:left;'><div>景点名字</div><div>这里是景点的描述</div></div>",
+                        //         "</div>",
+                        //         "<div class='btns-area' style='text-align:center;'>",
+                        //             "<button>解说</button>",
+                        //             "<button>详情</button>",
+                        //         "</div>",
+                        //     "</div>"
+                        // ]
+                        // 发请求请求所有景点的经纬度信息
+                        // ·····
+                        // let pointArr = [[105.570578,32.204367],[105.56693,32.207417],[105.56723,32.209705],[105.562896,32.209051]];
+                        // let nameArr = ['景点1','景点2','景点3','景点4'];
+                        // let flagArr = ['1','2','3','4']; //景点的唯一标识
+                        // function setPoint(point,index) { 
+                        //     let num = index + 1;
+                        //     let marker = new AMap.Marker({
+                        //         content: "<div class='marker-content' data-flag='"+flagArr[index]+"'><div style='width: 30px;height: 30px;background: url(/point.png) no-repeat center / 100% 100%;text-align: center;color: red;'>"+num+"</div><div>"+nameArr[index]+"</div></div>",
+                        //         position: point,
+                        //     });
+                        //     marker.on('click',markerClick);
+                        //     //marker.emit('click', {target: marker});
+                        //     oMap.add(marker);
+                        // }
+                        // pointArr.forEach(function(value,index){
+                        //     setPoint(value,index);
+                        // })
+                        // 点击弹出信息窗体
+                        // function markerClick(e) {
+                        //     let flag = e.target.Uh.contentDom.children[0].getAttribute("data-flag");//当前景点的唯一标识
+                        //     //发请求请求景点详细数据
+                        //     //·······
+                        //     infoWindow.setContent(infoContent.join(""));
+                        //     infoWindow.open(oMap, e.target.getPosition());
+                        // }
                     },
                 }
             }

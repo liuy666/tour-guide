@@ -28,6 +28,12 @@ export const appRoutes = [{
         name: 'scenic-point-detail',
         component: () =>
             import ('@/views/scenic-point-detail.vue')
+    },
+    {
+        path: '/scenic-detail',
+        name: 'scenic-detail',
+        component: () =>
+            import ('@/views/scenic-detail.vue')
     }
 ]
 
