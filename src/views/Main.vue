@@ -200,7 +200,7 @@
                         }
 
                         //定位
-                        var options = {
+                        /*var options = {
                             'showButton': true,//是否显示定位按钮
                             'buttonPosition': 'LB',//定位按钮的位置
                             'buttonOffset': new AMap.Pixel(10, 20),//定位按钮距离对应角落的距离
@@ -223,7 +223,7 @@
                             var geolocation = new AMap.Geolocation(options);
                             oMap.addControl(geolocation);
                             geolocation.getCurrentPosition()
-                        });
+                        });*/
                     },
                 }
             }
