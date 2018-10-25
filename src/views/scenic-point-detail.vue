@@ -5,7 +5,9 @@
 <template>
     <div id="scenic-point-detail">
         <section>
-            <audio src="../assets/jbczj.ncm" id="audio" controls="controls"></audio>
+            <audio id="audio" controls="controls"  >
+                <source src="../assets/audio/111.mp3" type="audio/mpeg" />
+            </audio>
         </section>
     </div>
 </template>
