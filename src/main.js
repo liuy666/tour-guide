@@ -21,7 +21,7 @@ import https from '@/libs/http.js';
 
 Vue.config.productionTip = false;
 Vue.prototype.$QS = QS;
-Vue.prototype.$tools = utils;
+Vue.prototype.$tool = utils;
 Vue.prototype.$http = https;
 
 // 引入高德SDK

@@ -76,7 +76,7 @@
 <template>
     <div id="main">
         <section class="wrapper">
-            <!-- <el-amap 
+            <el-amap 
                 vid="amap" 
                 :zoom="zoom"
                 :zooms="zooms"
@@ -86,7 +86,7 @@
                 :touchZoomCenter="1"
                 :rotateEnable="false"
                 :events="events">
-            </el-amap> -->
+            </el-amap>
         </section>
         <!-- <img src="../assets/images/bg.jpg" alt=""  style="position:absolute;left:0;top:0;;height:80%;"/> -->
         <!-- <section class="main_view" v-show="isShow">
@@ -158,8 +158,8 @@
                             console.log(oMap.getSize());
                         }
                         (function lockMapBounds() {
-                            var bounds = new AMap.Bounds([105.554561, 32.201035],[105.600952, 32.234801]);
-                            oMap.setLimitBounds(bounds);
+                        var bounds = new AMap.Bounds([105.554561, 32.201035],[105.600952, 32.234801]);
+                        oMap.setLimitBounds(bounds);
                         })()
                         oMap.on('dragend', showInfoDragend);
     

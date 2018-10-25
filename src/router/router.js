@@ -20,6 +20,11 @@ export const appRoutes = [
         path: '/use-camera',
         name: 'use-camera',
         component: () => import('@/views/use-camera.vue')
+    },
+    {
+        path: '/scenic-detail',
+        name: 'scenic-detail',
+        component: () => import('@/views/scenic-detail.vue')
     }
 ]
 
