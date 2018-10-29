@@ -3,7 +3,7 @@
         height:100%;
         width: 100%;
         position: relative;
-        .wrapper {
+        #wrapper {
             width: 100%;
             height: 100%;
             // .amap-demo {
@@ -75,19 +75,7 @@
 
 <template>
     <div id="main">
-        <section class="wrapper">
-            <el-amap 
-                vid="amap" 
-                :zoom="zoom"
-                :zooms="zooms"
-                :center="center" 
-                class="amap-demo"
-                viewMode="3D"
-                :touchZoomCenter="1"
-                :rotateEnable="false"
-                :events="events">
-            </el-amap>
-        </section>
+        <section id="wrapper"></section>
         <!-- <img src="../assets/images/bg.jpg" alt=""  style="position:absolute;left:0;top:0;;height:80%;"/> -->
         <!-- <section class="main_view" v-show="isShow">
             <section class="main_view_header">
@@ -133,91 +121,122 @@
 </template>
 
 <script>
-    // import { amapManager } from 'vue-amap';
     import { XButton, Icon  } from 'vux';
-    
+    import { setTimeout } from 'timers';
     export default {
         components: {
             XButton,
             Icon
         },
+        mounted() {
+
+            const imageLayer = new AMap.ImageLayer({
+                url: './bg.jpg',
+                bounds: new AMap.Bounds(
+                    [105.554561, 32.201035],
+                    [105.600952, 32.234801]
+                ),
+                zooms:[14,16],
+                zIndex: 100
+            });
+            const map = new AMap.Map('wrapper', {
+                showBuildingBlock: true,
+                pitchEnable: false,
+                buildingAnimation: true,
+                rotateEnable: false,
+                touchZoomCenter: 1,
+                center: [105.570825,32.216881],
+                zoom: 15,
+                zooms:[14,16],
+                viewMode: '3D',
+                layers: [
+                    new AMap.TileLayer(),
+                    imageLayer
+                ]
+            });
+            // map.setFeatures([]);
+            // map.setMapStyle("amap://styles/dark");
+            // function lockMapBounds() {
+            //     const bounds = new AMap.Bounds([105.554561, 32.201035],[105.600952, 32.234801]);
+            //     map.setLimitBounds(bounds);
+            // }
+            // lockMapBounds();
+            function showInfoDragging(e) {
+                const bounds = map.getBounds();
+                console.log(bounds)
+                const southWest = lnglat2container(105.554561, 32.201035);
+                const northEast = lnglat2container(105.600952, 32.234801);
+                const c1 = lnglat2container(bounds.bounds[0].O, bounds.bounds[0].N);
+                const c2 = lnglat2container(bounds.bounds[1].O, bounds.bounds[1].N);
+                const c3 = lnglat2container(bounds.bounds[2].O, bounds.bounds[2].N);
+                const c4 = lnglat2container(bounds.bounds[3].O, bounds.bounds[3].N);
+                const c5 = lnglat2container(bounds.bounds[4].O, bounds.bounds[4].N);
+                const containerWidth = document.querySelector('#wrapper').clientWidth;
+                const containerHeight = document.querySelector('#wrapper').clientHeight;
+                const imgWidth = northEast.x - southWest.x;
+                const imgHeight = southWest.y - northEast.y;
+                console.log(southWest, northEast);
+                // if()
+                if (southWest.x >= 30) {
+                    if (northEast.y >= 30) {
+                        move(-southWest.x, -northEast.y);
+                        return;
+                    } else if (southWest.y <= containerHeight - 30) {
+                        move(-southWest.x, containerHeight - southWest.y);
+                        return;
+                    }
+                } else if (northEast.x <= containerWidth - 30) {
+                    if (northEast.y >= 30) {
+                        move(containerWidth - northEast.x, -northEast.y);
+                        return;
+                    } else if (southWest.y <= containerHeight - 30) {
+                        move(containerWidth - northEast.x, containerHeight - southWest.y);
+                        return;
+                    }
+                }
+            }
+            function move(x, y) {
+                map.setStatus({
+                    dragEnable: false
+                });
+                map.panBy(x, y);
+                setTimeout(() => {
+                    map.setStatus({
+                        dragEnable: true
+                    });
+                },500);
+            }
+            function lnglat2container(long, lati) {
+                const lnglat = new AMap.LngLat(long, lati);
+                const pixel = map.lnglatTocontainer(lnglat);
+                return pixel.round();
+            }
+            map.on('dragging', showInfoDragging);
+
+            // const swipe = new Hammer(document.querySelector('#wrapper'));
+            // swipe.on('pan', function(e) {
+            //     console.log(e)
+            // });
+
+            // swipe.on('panleft', function(e) {
+            //     map.panBy(-10, 0);
+            // });
+            // swipe.on('panright', function(e) {
+            //     map.panBy(10, 0);
+            // });
+            // swipe.on('panup', function(e) {
+            //     map.panBy(0, -10);
+            // });
+            // swipe.on('pandown', function(e) {
+            //     map.panBy(0, 10);
+            // });
+
+        },
         data () {
             return {
                 isShow: false,
                 isOpenDetail: false,
-                isEnd: false,
-                // amapManager,
-                zoom: 14.54,
-                zooms:[14.54,16],
-                center: [105.570825,32.216881],
-                events: {
-                    init: (oMap) => {
-                        function showInfoDragend(){
-                            console.log('拖拽地图结束');
-                            console.log(oMap.getBounds());
-                            console.log(oMap.getSize());
-                        }
-                        (function lockMapBounds() {
-                        var bounds = new AMap.Bounds([105.554561, 32.201035],[105.600952, 32.234801]);
-                        oMap.setLimitBounds(bounds);
-                        })()
-                        oMap.on('dragend', showInfoDragend);
-    
-                        //手绘地图图层
-                        let imageLayer = new AMap.ImageLayer({
-                            url: '/bg.jpg',
-                            bounds: new AMap.Bounds(
-                                    [105.554561, 32.201035],
-                                    [105.600952, 32.234801]
-                            ),
-                            zooms:[14.54,16],
-                            zIndex: 100
-                        });
-                        oMap.add(imageLayer);
-                        oMap.setFeatures([]);
-                        oMap.setMapStyle("amap://styles/dark");
-                        //景点标记+信息窗体 
-                        // let infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
-                        // let infoContent = [
-                        //     "<div class='info-container'>",
-                        //         "<div class='info-content' style='overflow:hidden;'>",
-                        //             "<img src='/point.png' style='width:40px;height:40px;float:left;' />",
-                        //             "<div style='float:left;'><div>景点名字</div><div>这里是景点的描述</div></div>",
-                        //         "</div>",
-                        //         "<div class='btns-area' style='text-align:center;'>",
-                        //             "<button>解说</button>",
-                        //             "<button>详情</button>",
-                        //         "</div>",
-                        //     "</div>"
-                        // ]
-                        // 发请求请求所有景点的经纬度信息
-                        // ·····
-                        // let pointArr = [[105.570578,32.204367],[105.56693,32.207417],[105.56723,32.209705],[105.562896,32.209051]];
-                        // let nameArr = ['景点1','景点2','景点3','景点4'];
-                        // let flagArr = ['1','2','3','4']; //景点的唯一标识
-                        // function setPoint(point,index) { 
-                        //     let num = index + 1;
-                        //     let marker = new AMap.Marker({
-                        //         content: "<div class='marker-content' data-flag='"+flagArr[index]+"'><div style='width: 30px;height: 30px;background: url(/point.png) no-repeat center / 100% 100%;text-align: center;color: red;'>"+num+"</div><div>"+nameArr[index]+"</div></div>",
-                        //         position: point,
-                        //     });
-                        //     marker.on('click',markerClick);
-                        //     //marker.emit('click', {target: marker});
-                        //     oMap.add(marker);
-                        // }
-                        // pointArr.forEach(function(value,index){
-                        //     setPoint(value,index);
-                        // })
-                        // 点击弹出信息窗体
-                        // function markerClick(e) {
-                        //     let flag = e.target.Uh.contentDom.children[0].getAttribute("data-flag");//当前景点的唯一标识
-                        //     //发请求请求景点详细数据
-                        //     //·······
-                        //     infoWindow.setContent(infoContent.join(""));
-                        //     infoWindow.open(oMap, e.target.getPosition());
-                        // }
-                    },
-                }
+                isEnd: false
             }
         },
         methods: {

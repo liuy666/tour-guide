@@ -4,6 +4,8 @@ import App from './App.vue';
 import router from './router/index';
 import store from './store/store';
 import VueAMap from 'vue-amap';
+import hammer from 'hammerjs';
+
 
 // 引入全局样式和基础样式
 import '@/styles/baseStyle.css';
@@ -25,13 +27,13 @@ Vue.prototype.$tool = utils;
 Vue.prototype.$http = https;
 
 // 引入高德SDK
-Vue.use(VueAMap);
-VueAMap.initAMapApiLoader({
-    key: '377c450c3f9d31957eef1fa3e55100d7', // 和车无忌App用的是同一个key
-    plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
-    v: '1.4.4',
-    uiVersion: '1.0.11' // 版本号
-});
+// Vue.use(VueAMap);
+// VueAMap.initAMapApiLoader({
+//     key: '377c450c3f9d31957eef1fa3e55100d7', // 和车无忌App用的是同一个key
+//     plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
+//     v: '1.4.4',
+//     uiVersion: '1.0.11' // 版本号
+// });
 
 new Vue({
     router,
