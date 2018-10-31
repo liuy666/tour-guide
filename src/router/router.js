@@ -34,6 +34,14 @@ export const appRoutes = [{
         name: 'scenic-detail',
         component: () =>
             import ('@/views/scenic-detail.vue')
+    },
+    {
+        path: '/feedback',
+        name: 'feedback',
+        component: () => import('@/views/feedback.vue'),
+        meta: {
+            title: '反馈'
+        }
     }
 ]
 

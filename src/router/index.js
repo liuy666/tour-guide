@@ -18,5 +18,5 @@ router.beforeEach((to, from, next) => {
 
 // 路由后置守卫
 router.afterEach((to,from,next) => {
-    
+    console.log(document)
 });
