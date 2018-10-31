@@ -152,52 +152,10 @@
                 events: {
                     init: (oMap) => {
                         const _self = this;
-                        function showInfoDragend(){  debugger
-                            console.log('拖拽地图结束');
-                            console.log(oMap.getBounds());
-                            console.log(oMap.getSize());
-                            let bounds = oMap.getBounds();
-                            let x = oMap.getSize().width;
-                            let y = oMap.getSize().height;
-                            
-                            // //拖动后显示范围的右上角经纬度和像素
-                            // let rightTop_LngLat = new AMap.LngLat(bounds.bounds[3].lng,bounds.bounds[3].lat);
-                            // let rightTop_pixel = oMap.lngLatToContainer(rightTop_LngLat);  
-
-                            // //拖动后显示范围的右下角经纬度和像素
-                            // let rightBottom_LngLat = new AMap.LngLat(bounds.bounds[2].lng,bounds.bounds[2].lat);
-                            // let rightBottom_pixel = oMap.lngLatToContainer(rightBottom_LngLat);  
-
-                            //图片图层右上角的经纬度和像素
-                            let img_rightTop_LngLat = new AMap.LngLat(105.600952, 32.234801);
-                            let img_rightTop_pixel = oMap.lngLatToContainer(img_rightTop_LngLat);  
-
-                            debugger
-
-                            if(x - img_rightTop_pixel.x > 5 || img_rightTop_pixel.y > 5) { debugger
-                                //找到新的显示范围的左下角
-                                let leftBottom_pixel = new AMap.Pixel(img_rightTop_pixel.x-x, img_rightTop_pixel.y+y);
-                                let leftBottom_lnglat = oMap.containerToLngLat(leftBottom_pixel);
-
-                                let newBounds = new AMap.Bounds([leftBottom_lnglat.lng,leftBottom_lnglat.lat],[105.600952, 32.234801])
-                                oMap.setBounds(newBounds);
-                            }
-
-                        }
-                        
                         function mapMoveend(){ debugger
                             let bounds = oMap.getBounds();
-
                             let x = oMap.getSize().width;
                             let y = oMap.getSize().height;
-                            
-                            // //拖动后显示范围的右上角经纬度和像素
-                            // let rightTop_LngLat = new AMap.LngLat(bounds.bounds[3].lng,bounds.bounds[3].lat);
-                            // let rightTop_pixel = oMap.lngLatToContainer(rightTop_LngLat);  
-
-                            // //拖动后显示范围的右下角经纬度和像素
-                            // let rightBottom_LngLat = new AMap.LngLat(bounds.bounds[2].lng,bounds.bounds[2].lat);
-                            // let rightBottom_pixel = oMap.lngLatToContainer(rightBottom_LngLat);  
 
                             //图片图层左上角的经纬度和像素
                             let img_leftTop_LngLat = new AMap.LngLat(105.554561, 32.234801);
@@ -225,21 +183,6 @@
                                     oMap.panBy(x-img_rightTop_pixel.x,-img_rightTop_pixel.y)
                                 }
                             }
-
-                            //下边
-                            // if(img_rightBottom_LngLat.y < y){ 
-                            //     if(img_leftTop_pixel.x > 0)
-                            // }
-
-
-                            /*if(x - img_rightTop_pixel.x > 5 || img_rightTop_pixel.y > 5) { 
-                                //找到新的显示范围的左下角
-                                let leftBottom_pixel = new AMap.Pixel(img_rightTop_pixel.x-x, img_rightTop_pixel.y+y);
-                                let leftBottom_lnglat = oMap.containerToLngLat(leftBottom_pixel);
-
-                                let newBounds = new AMap.Bounds([leftBottom_lnglat.lng,leftBottom_lnglat.lat],[105.600952, 32.234801])
-                                oMap.setBounds(newBounds);
-                            }*/
                         }
 
                         //oMap.on('dragend', showInfoDragend);
@@ -256,8 +199,8 @@
                             zIndex: 100
                         });
                         oMap.add(imageLayer);
-                        // oMap.setFeatures([]);
-                        // oMap.setMapStyle("amap://styles/dark");
+                        oMap.setFeatures([]);
+                        oMap.setMapStyle("amap://styles/dark");
                         //景点标记+信息窗体 
                         let infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
                         let infoContent = [
