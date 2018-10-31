@@ -6,7 +6,7 @@
             position: relative;
             width: 140px;
             height: 150px;
-            background: url('../assets/images/test-camera.png');
+            // background: url('../assets/images/test-camera.png');
             background-size: 140px 150px;
             #camera {
                 width: 140px;
@@ -34,7 +34,7 @@
         </section>
         <input type="file" id="camera" accept="image/*" @change="selectFile" />
         <section id="img-container">
-            <img src="../assets/images/timg.jpg" alt="网络可能不太给力~" id="photo" />   
+            <!-- <img src="../assets/images/timg.jpg" alt="网络可能不太给力~" id="photo" />    -->
         </section>
         <p>dddddd</p>
         <p>wqwqw</p>
