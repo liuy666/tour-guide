@@ -190,18 +190,27 @@ export default {
     },
     methods: {
         // 点击添加图片
-        addImg(changeEvent) {
+        async addImg(changeEvent) {
             // console.dir(changeEvent);
-            const filesList = changeEvent.target.files, // 返回一个FileList对象,类数组类型
-                  sectionDom = document.createElement('section'), // 创建预览容器元素
+            const file = changeEvent.target.files[0], // 返回一个FileList对象,类数组类型
+                  imgType = file.type;
+
+            // 上传图片至服务器
+            if (imgType === 'image/png' || imgType === 'image/jpeg') {
+                const formData = new FormData();
+                formData.append('file', file);
+                const res = await this.$http.post(this.$base + '/hqyatu-navigator/sys/oss/upload', {}, formData, 'multipart/form-data');
+                console.log(res);
+            }
+            
+            const sectionDom = document.createElement('section'), // 创建预览容器元素
                   imgDom = document.createElement('img'), // 创建图片元素
                   containerDom = document.querySelector('.wrapper-upload-120'), // 获取包含框元素
                   uploadDom = document.querySelector('.upload-hasBackground'), // 获取上传按钮元素
                   closeDom = document.createElement('span');
-            
+
             // 添加类名 渲染标签
             closeDom.classList.add('close-btn');
-            // imgDom.classList.add('preview-image');
             imgDom.style.width = '100%';
             imgDom.style.height = '100%';
             imgDom.style.borderRadius = '5px';
@@ -222,10 +231,10 @@ export default {
 
             // 异步读取文件
             const fileReader = new FileReader();
-            fileReader.readAsDataURL(filesList[0]); // 返回一个基于Base64编码的data-url对象
+            fileReader.readAsDataURL(file); // 返回一个基于Base64编码的data-url对象
             fileReader.onload = (loadEvent) => {
                 imgDom.src = loadEvent.target.result;
-                imgDom.file = filesList[0];
+                imgDom.file = file;
                 sectionDom.appendChild(imgDom);
                 sectionDom.appendChild(closeDom);
                 containerDom.insertBefore(sectionDom, uploadDom);

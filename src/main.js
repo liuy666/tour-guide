@@ -5,6 +5,7 @@ import router from './router/index';
 import store from './store/store';
 import VueAMap from 'vue-amap';
 import hammer from 'hammerjs';
+import axios from 'axios';
 
 
 // 引入全局样式和基础样式
@@ -25,6 +26,7 @@ Vue.config.productionTip = false;
 Vue.prototype.$QS = QS;
 Vue.prototype.$tool = utils;
 Vue.prototype.$http = https;
+Vue.prototype.$base = process.env.NODE_ENV === "production" ? '' : '/api',
 
 // 引入高德SDK
 // Vue.use(VueAMap);

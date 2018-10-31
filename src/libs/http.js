@@ -158,17 +158,19 @@ export default {
 		.then(checkCode)
 		.catch(checkStatus);
 	},
-	post(url, urlParams, bodyParams) {
-		urlParams = Object.assign({}, urlParams, {
-			// 'access_token': sessionStorage.getItem('token_key')
-		});
-        url += '?' + Qs.stringify(urlParams);
+	post(url, urlParams, bodyParams, contentType) {
+		// urlParams = Object.assign({}, urlParams, {
+		// 	'access_token': sessionStorage.getItem('token_key')
+		// });
+        if (Object.keys(urlParams).length) {
+			url += '?' + Qs.stringify(urlParams);
+		}
 		return axios({
 			method: 'post',
 			url,
 			data: JSON.stringify(bodyParams),
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': contentType || 'application/json'
 			}
 		})
 		.then(checkCode)
@@ -178,7 +180,9 @@ export default {
 		urlParams = Object.assign({}, urlParams, {
 			// 'access_token': sessionStorage.getItem('token_key')
 		});
-		url += '?' + Qs.stringify(urlParams);
+		if (Object.keys(urlParams).length) {
+			url += '?' + Qs.stringify(urlParams);
+		}
 		return axios({
 			method: 'put',
 			url,

@@ -15,6 +15,15 @@ module.exports = {
         })
     },
     devServer: {
-        port: 8086
+        port: 8086,
+        proxy: {
+            '/api': {
+                target: 'http://192.168.0.180:8080',
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/api': '/'
+                }
+            },
+        }
     }
 }
