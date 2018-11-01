@@ -312,7 +312,7 @@
             }else if(containerWidth > 500 && containerWidth < 800){
                 zoom = 15.5;
             }else if(containerWidth > 800){
-                zoom = 15.8;
+                zoom = 15.9;
             }
 
             let offsetx = 4;//信息窗体偏移
