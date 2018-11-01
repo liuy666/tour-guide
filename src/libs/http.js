@@ -23,25 +23,12 @@ axios.interceptors.response.use((res) => {
 
 /**
  * 单一请求--检查http状态码
- * @param {object} response -- 异步请求返回的数据对象
+ * @param {object} err -- 请求异常后返回的数据对象
  * @return {object}  请求正常则返回数据对象data，否则返回自定义错误提示信息对象
  */
-function checkStatus(response) {
+function checkStatus(err) {
 	console.log('------ 检查 Http 状态码 ------');
-	// 如果http状态码正常，则直接返回数据 暂时不考虑304 400的情况
-    // if(response.status === 200) {
-	// 	// 这里不需要除了data之外的数据，所以直接 return response.data
-	// 	// console.log(response.status);
-	// 	return {
-	// 		status: 200,
-	// 		data: response.data
-	// 	};
-	// }
-	// console.log(response.status);
-	// return {
-	// 	status: -400,
-	// 	msg: '请确认您的网络连接正常，然后点击刷新重试'
-	// };
+	console.log(err.response);
 }
 
 /**
@@ -51,35 +38,16 @@ function checkStatus(response) {
  */
 function checkCode(res) {
 	console.log('------ 检查 Code 信息码 ------');
-    // if(res.status === -400) {
-	// 	iView.Modal.error({
-    //         title: '温馨提示',
-    //         width: 500,
-    //         content: res.msg
-    //     });
-	// 	return false;
-	// }
-	// // 如果code异常，可以弹出一个错误提示，告诉用户
-    // if(res.data.code&&res.data.code !== 200) {
-    //     iView.Modal.error({
-    //         title: '温馨提示',
-    //         width: 500,
-    //         content: res.data.msg
-
-    //     });
-    //     // console.log('错误信息:\ncode:' + res.data.code + '\nmsg:' + res.data.msg);
-    //     return false;
-    //     // console.log('**** 这里是数据 ****');
-    // } else if (res.data.return_code&&res.data.return_code !== 200&&res.data.return_code !== 'SUCCESS'){
-    //     iView.Modal.error({
-    //         title: '温馨提示',
-    //         width: 500,
-    //         content: res.data.return_msg
-
-    //     });
-    // }else {
-    //     return res.data;
-    // }
+	console.log(res);
+	if (res.status === 200) {
+		if (res.data.code === 0) {
+			console.log('**** 这里是数据 ****');
+			return res.data;
+		} else {
+			console.log('错误信息:\ncode:' + res.data.code + '\nmsg:' + res.data.msg);
+			return false;
+		}
+	}
 }
 
 /**
@@ -158,17 +126,15 @@ export default {
 		.then(checkCode)
 		.catch(checkStatus);
 	},
-	post(url, urlParams, bodyParams, contentType) {
-		// urlParams = Object.assign({}, urlParams, {
-		// 	'access_token': sessionStorage.getItem('token_key')
-		// });
+	post(url, bodyParams, contentType, urlParams) {
+		urlParams = urlParams || {};
         if (Object.keys(urlParams).length) {
 			url += '?' + Qs.stringify(urlParams);
 		}
 		return axios({
 			method: 'post',
 			url,
-			data: JSON.stringify(bodyParams),
+			data: contentType ? bodyParams : JSON.stringify(bodyParams),
 			headers: {
 				'Content-Type': contentType || 'application/json'
 			}
