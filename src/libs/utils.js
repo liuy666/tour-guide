@@ -67,6 +67,7 @@ export default {
         }
     },
 
+
     /**
      * 从数组去重
      * @param {array} array -- 待去重的数组
@@ -81,6 +82,7 @@ export default {
         }, []);
         return result;
     },
+
 
     /**
      * 正则验证

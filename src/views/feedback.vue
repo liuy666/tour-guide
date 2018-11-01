@@ -199,49 +199,85 @@ export default {
             if (imgType === 'image/png' || imgType === 'image/jpeg') {
                 const formData = new FormData();
                 formData.append('file', file);
-                const res = await this.$http.post(this.$base + '/hqyatu-navigator/sys/oss/upload', {}, formData, 'multipart/form-data');
+                const res = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/upload', formData, 'multipart/form-data');
                 console.log(res);
-            }
-            
-            const sectionDom = document.createElement('section'), // 创建预览容器元素
-                  imgDom = document.createElement('img'), // 创建图片元素
-                  containerDom = document.querySelector('.wrapper-upload-120'), // 获取包含框元素
-                  uploadDom = document.querySelector('.upload-hasBackground'), // 获取上传按钮元素
-                  closeDom = document.createElement('span');
 
-            // 添加类名 渲染标签
-            closeDom.classList.add('close-btn');
-            imgDom.style.width = '100%';
-            imgDom.style.height = '100%';
-            imgDom.style.borderRadius = '5px';
-            sectionDom.classList.add('upload-120-120-base', 'upload-hasImage');
+                if (!res) {
+                    this.tipsText = res.msg;
+                    this.isTips = true;
+                    return;
+                }
 
-            // 给关闭按钮添加点击关闭事件，开发调试用click，真机测试改用tap
-            closeDom.addEventListener('click', (e) => {
-                const eventSrc = e.target,
-                      parentNode = eventSrc.parentNode,
-                      grandparentNode = parentNode.parentNode;
-                if (eventSrc.className === 'close-btn') {
-                    grandparentNode.removeChild(parentNode);
-                    if (containerDom.children.length <= 3) {
-                        this.isCanAddImage = true;
+                // 本地预览图片
+                const sectionDom = document.createElement('section'), // 创建预览容器元素
+                      imgDom = document.createElement('img'), // 创建图片元素
+                      containerDom = document.querySelector('.wrapper-upload-120'), // 获取包含框元素
+                      uploadDom = document.querySelector('.upload-hasBackground'), // 获取上传按钮元素
+                      closeDom = document.createElement('span');
+
+                // 新建标签初始化
+                closeDom.classList.add('close-btn');
+                imgDom.style.width = '100%';
+                imgDom.style.height = '100%';
+                imgDom.style.borderRadius = '8.3%';
+                sectionDom.dataset.imgId = res.ossEntity.id;
+                sectionDom.classList.add('upload-120-120-base', 'upload-hasImage');
+
+                // 给关闭按钮添加点击关闭事件，开发调试用click，真机测试改用tap
+                closeDom.addEventListener('click', async (e) => {
+                    const eventSrc = e.target,
+                        parentNode = eventSrc.parentNode,
+                        grandparentNode = parentNode.parentNode;
+ 
+                    if (eventSrc.className === 'close-btn') {
+                        // 获取当前事件源的图片id
+                        const _ID = parentNode.dataset.imgId;
+                        const del = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/delete', [_ID]);
+                        console.log(del);
+                        if (!del) {
+                            this.tipsText = res.msg;
+                            this.isTips = true;
+                            return;
+                        }
+                        let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
+                        const delIndex = imgUrlList.forEach((element, idx) => {
+                            if (element.id === _ID) {
+                                return idx;
+                            }
+                        });
+                        imgUrlList.splice(delIndex, 1);
+                        sessionStorage.setItem('imgUrlList', JSON.stringify(imgUrlList));
+                        grandparentNode.removeChild(parentNode);
+                        if (containerDom.children.length <= 3) {
+                            this.isCanAddImage = true;
+                        }
+                    } else {
+                        return;
+                    }
+                });
+
+                // 异步读取文件
+                const fileReader = new FileReader();
+                fileReader.readAsDataURL(file); // 返回一个基于Base64编码的data-url对象
+                fileReader.onload = (loadEvent) => {
+                    imgDom.src = loadEvent.target.result;
+                    imgDom.file = file;
+                    let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList')) || [];
+                    imgUrlList.push({
+                        id: res.ossEntity.id,
+                        url: loadEvent.target.result
+                    });
+                    sessionStorage.setItem('imgUrlList', JSON.stringify(imgUrlList)); // 存储上传图片的id和本地览的base64-src
+                    sectionDom.appendChild(imgDom);
+                    sectionDom.appendChild(closeDom);
+                    containerDom.insertBefore(sectionDom, uploadDom);
+                    changeEvent.target.value = '';
+                    if(containerDom.children.length > 3) {
+                        this.isCanAddImage = false;
                     }
                 }
-            });
-
-            // 异步读取文件
-            const fileReader = new FileReader();
-            fileReader.readAsDataURL(file); // 返回一个基于Base64编码的data-url对象
-            fileReader.onload = (loadEvent) => {
-                imgDom.src = loadEvent.target.result;
-                imgDom.file = file;
-                sectionDom.appendChild(imgDom);
-                sectionDom.appendChild(closeDom);
-                containerDom.insertBefore(sectionDom, uploadDom);
-                changeEvent.target.value = '';
-                if(containerDom.children.length > 3) {
-                    this.isCanAddImage = false;
-                }
+            } else {
+                return;
             }
         },
         // 多选框输入事件
@@ -254,7 +290,7 @@ export default {
         // 验证电话号码格式是否正确
         validateTel() {
             if (this.yourTel.length >= 11) {
-                if (!this.$tool.validateReg.phoneNumber(Number(this.yourTel.length))) {
+                if (!this.$tool.validateReg.phoneNumber(Number(this.yourTel))) {
                     this.tipsText = '手机号码无效啦 ~';
                     this.isTips = true;
                     this.yourTel = this.yourTel.slice(0, 11);
@@ -275,10 +311,28 @@ export default {
             }
         },
         // 提交反馈
-        handleSubmit() {
+        async handleSubmit() {
             if (!this.textareaValue || !this.yourName || !this.isCorrent) {
                 this.tipsText = '请填写完整反馈信息';
                 this.isTips = true;
+                return;
+            } else {
+                const imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
+                let imgList = {};
+                imgUrlList.forEach((element, idx) => {
+                    imgList = Object.assign({}, imgList, {
+                        [`img${idx + 1}`] : element.id,
+                    });
+                });
+                const bodyParams = {
+                    content: this.textareaValue,
+                    contacts: this.yourName,
+                    mobile: this.yourTel,
+                    sceneryId: '1057570712933412865',
+                    ...imgList
+                }
+                const submitFeedback = await this.$http.post(this.$base + '/hqyatu-navigator/app/sys/saveSuggestion', bodyParams);
+                console.log(submitFeedback);
                 return;
             }
         }

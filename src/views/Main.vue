@@ -584,7 +584,9 @@
         methods: {
             handleClick() {
                 this.isShow = !this.isShow;
-                this.$router.push('scenic-spot');
+                this.$router.push({
+                    name: this.isShow ? 'scenic-spot' : 'main'
+                });
             },
             goto1() {
                 this.$router.push('scenic-spot');
