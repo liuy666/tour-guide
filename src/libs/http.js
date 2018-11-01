@@ -115,9 +115,7 @@ function checkAllCode(resObj) {
  */
 export default {
 	get(url, params) {
-		params = Object.assign({},params,{
-			// 'access_token': sessionStorage.getItem('token_key')
-		});
+		params = params || {};
 		return axios({
 			method: 'get',
 			url,

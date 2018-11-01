@@ -328,10 +328,10 @@ export default {
                     content: this.textareaValue,
                     contacts: this.yourName,
                     mobile: this.yourTel,
-                    sceneryId: 1057570712933412865,
+                    sceneryId: '1057570712933412865',
                     ...imgList
                 }
-                const submitFeedback = await this.$http.post(this.$base + '/app/sys/saveSuggestion', bodyParams);
+                const submitFeedback = await this.$http.post(this.$base + '/hqyatu-navigator/app/sys/saveSuggestion', bodyParams);
                 console.log(submitFeedback);
                 return;
             }
