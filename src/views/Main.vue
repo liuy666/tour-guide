@@ -13,6 +13,7 @@
         .main_view {
             width: 720px;
             height: 500px;
+            z-index: 10;
             background-color: orange;
             position: absolute;
             left: 0;
@@ -36,7 +37,9 @@
                 white-space: nowrap;
             }
         }
+        //底部景点播放
         .toolbars {
+            display: flex;
             position: absolute;
             left: 0;
             right: 0;
@@ -45,45 +48,85 @@
             width: 520px;
             height: 148px;
             box-sizing: border-box;
-            padding: 10px;
             background: url("../assets/images/bg_player@3x.png") no-repeat center / 100% 100%;
 
             .vux-circle-content{
                 height: 100%;
                 box-sizing: border-box;
             }
-
             .player-control-btn-area{
-                width: 130px;
-                height: 130px;
+                width: 124px;
+                height: 124px;
                 position: relative;
+                margin-top: 12px;
+                margin-left: 12px;
+                .player-img-area{
+                    width: 112px;
+                    height: 112px;
+                    margin-top: 6px;
+                    margin-left: 6px;
+                }
+                .player-control-btn{
+                    position: absolute;
+                }
             }
-            .player-img{
-                width: 118px;
-                height: 118px;
-                border-radius: 100%;
-                margin-top: 6px;
+            .scenic-point-name-area{
+                width: 300px;
+                height: 100px;
+                line-height: 100px;
+                text-align: center;
+                margin-top: 24px;
+                background: url('../assets/images/icon_down@3x.png') no-repeat 50% 80px;
+                background-size: 24px 8px;
             }
-            .player-control-btn{
-                position: absolute;
+            .list-btn{
+                width: 44px;
+                height: 100px;
+                margin-top: 24px;
+                background: url('../assets/images/icon_list@3x.png') no-repeat center center / 32px 26px;
             }
         }
-        .introButton {
+        //地图页功能键区域
+        .function-area-left,.function-area-right{
             position: absolute;
-            right: 40px;
-            top: 40px;
-            width: 100px;
-            height: 100px;
+            width: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-        .introDetail {
-            background-color: #ccc;
-            width: 100%;
-            height: 600px;
-            position: absolute;
-            bottom: 70px;
+        .function-area-right{
+            height: 250px;
+            top: 26px;
+            right: 30px;
+        }
+        .function-area-left{
+            height: 160px;
             left: 30px;
-            p {
-                font-size: 30px;
+            bottom: 186px;
+        }
+        .function-btn{
+            width: 70px;
+            height: 70px;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 100% 100%;
+            &.FK{
+                background-image: url('../assets/images/icon_feedback@3x.png');
+            }
+            &.DW{
+                background-image: url('../assets/images/icon_static@3x.png');
+            }
+            &.JJ{
+                background-image: url('../assets/images/icon_intro@3x.png');
+            }
+            &.QJ{
+                background-image: url('../assets/images/icon_panorama@3x.png');
+            }
+            &.ZD{
+                background-image: url('../assets/images/icon_auto@3x.png');
+                &.NO{
+                    background-image: url('../assets/images/icon_auto_no@3x.png');
+                }
             }
         }
         .xxx {
@@ -128,9 +171,13 @@
         }
         .info-content {
             display: flex;
-            .info-scenic-img{
+            .info-scenic-img-area{
                 width: 200px;
                 height: 200px;
+            }
+            .info-scenic-img{
+                width: 100%;
+                height: 100%;
                 border-radius: 100px;
             }
             .info-scenic-info{
@@ -210,16 +257,22 @@
                     :trail-width="6"
                     :stroke-color="'#FE5100'"
                     trail-color="#ffffff">
-                    <img class="player-img" :src="scenicImg" />
+                    <div class="player-img-area"><img style="width:100%;height:100%;border-radius: 100%;" :src="scenicImg" /></div>
                 </x-circle>
             </div>
-            <x-button style="float:right;" @click.native="handleClick" :mini="true">菜单</x-button> -->
+            <div class="scenic-point-name-area">
+                {{scenicPointName}}
+            </div>
+            <div class="list-btn" @click="handleClick" ></div> 
         </section>
-        <section>
-            <button @click="seeIntroduce" class="introButton">简介</button>
+        <section class="function-area-left">
+            <div class="function-btn FK"></div>
+            <div class="function-btn DW"></div>
         </section>
-        <section>
-            <button @click="gotodetail" class="xxx">测试连播</button>
+        <section class="function-area-right">
+            <div class="function-btn JJ"></div>
+            <div class="function-btn QJ"></div>
+            <div class="function-btn ZD" :class="isAuto ? '' : 'NO'"></div>
         </section>
         <section v-show="isOpenDetail" class="introDetail">
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="qqmap://map/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（只能在App或手机浏览器中生效，微信内置浏览器也不行）</a></p>
@@ -326,19 +379,17 @@
             })
             //点击弹出信息窗体
             function markerClick(e) { 
-                if(infoWindow.getIsOpen()){
-                    infoWindow.close();
+                if(infoWindow.getPosition() !== undefined &&  infoWindow.getPosition().N == e.target.getPosition().N) {
+                    if(infoWindow.getIsOpen()){
+                        infoWindow.close();
+                    }else{
+                        openInfoWindow(e);
+                    }
                 }else{
-                    let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前景点的唯一标识
-                    //发请求请求景点详细数据
-                    //·······景点名称 景点图片 景点解说  景点音频标识
-                    //景点信息数组
-                    let infoArr = ["平襄侯祠","http://tpc.googlesyndication.com/simgad/5843493769827749134","汶川大地震第一个地震遗址保护纪念地，位于四川省广元市青川县。","001"];
-                    //自定义信息窗体内容
-                    infoWindow.setContent(creatInfoWindow(infoArr));
-                    infoWindow.open(oMap, e.target.getPosition());
+                    openInfoWindow(e);
                 }
             }
+            //自定义信息窗体内容
             function creatInfoWindow(infoArr) {
                 var info = document.createElement("div");
                 info.className = "info-contanir";
@@ -346,7 +397,7 @@
                 var middle = document.createElement("div");
                 middle.className = "info-content";
 
-                var htmlStr = ` <img class='info-scenic-img' src='${infoArr[1]}' />
+                var htmlStr = ` <div class='info-scenic-img-area'><img style="width:100%;height:100%;border-radius:100%;" src='${infoArr[1]}' /></div>
                                 <div class='info-scenic-info'>
                                     <div class='info-scenic-name'>${infoArr[0]}</div>
                                     <div class='info-scenic-dec'>${infoArr[2]}</div>
@@ -374,11 +425,24 @@
                 return info;
 
             }
+            //景点弹窗播放
             function toPlay() {
                 
             }
+            //景点弹窗详情
             function toDetail() {
                 _self.$router.push('scenic-point-detail');
+            }
+            //请求数据展示对应信息窗体内容
+            function openInfoWindow(e) {
+                 let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前景点的唯一标识
+                //发请求请求景点详细数据
+                //·······景点名称 景点图片 景点解说  景点音频标识
+                //景点信息数组
+                let infoArr = ["平襄侯祠","http://tpc.googlesyndication.com/simgad/5843493769827749134","汶川大地震第一个地震遗址保护纪念地，位于四川省广元市青川县。","001"];
+                //自定义信息窗体内容
+                infoWindow.setContent(creatInfoWindow(infoArr));
+                infoWindow.open(oMap, e.target.getPosition());
             }
             //拖动中事件 没用
             /*function showInfoDragging(e) {
@@ -510,9 +574,11 @@
                 isShow: false,
                 isOpenDetail: false,
                 isEnd: false,
-                isPlay: false,
+                isAuto: false,//是否自动播放
+                isPlay: false,//是否播放状态
                 audiopercent: 100,
-                scenicImg: 'http://tpc.googlesyndication.com/simgad/5843493769827749134',
+                scenicImg: 'https://tpc.googlesyndication.com/simgad/5843493769827749134',
+                scenicPointName: '1.平襄侯祠'
             }
         },
         methods: {
