@@ -7,6 +7,16 @@
             width: 100%;
             height: 100%;
         }
+        .weui-icon_toast.weui-icon-success-no-circle:before {
+            font-size: 100px;
+            content: "\EA0D";
+        }
+        .weui-icon_toast{
+            margin-top: 40px;
+        }
+        .weui-toast__content{
+            margin-top: 20px;
+        }
     }
 
     .marker-content{
@@ -32,17 +42,25 @@
         background: rgba(0,0,0,0.3);
         color: rgba(255,255,255,0.8);
     }
+    
+    
 </style>
 
 <template>
     <div id="home">
         <section id="wrapper_home"></section>
+
+        <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true" width="8.2em"></toast>
     </div>
 </template>
 
 <script>
-    import { setTimeout } from 'timers';
+    import { setTimeout } from 'timers'
+    import { Toast } from 'vux'
     export default {
+        components: {
+            Toast
+        },
         mounted() {
             const _self  = this;
             //获取屏幕大小 动态设置不同手机的地图zoom
@@ -98,35 +116,45 @@
                     imageLayer
                 ]
             });
-
-            this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list')
-            .then(res => {
-                debugger
-            })
-            
-            let pointArr = [[104.838736,32.458672]];
-            let nameArr = ['青溪古镇'];
-            let flagArr = ['1','2','3','4']; //景点的唯一标识
-            function setPoint(point,index) { 
-                let num = index + 1;
-                let marker = new AMap.Marker({
-                    content: "<div class='marker-content' data-flag='"+flagArr[index]+"'><div class='point-icon'>"+num+"</div><div class='point-name'>"+nameArr[index]+"</div></div>",
-                    position: point,
-                });
-                
-                oMap.add(marker);
-            }
-            pointArr.forEach(function(value,index){
-                setPoint(value,index);
-            })
+            this.oMap_home = oMap;
+            this.getScenicList();
         },
         data () {
             return {
-                
+                oMap_home : {},
+                isTips : false,
+                tipsText : '请求失败'
             }
         },
         methods: {
-            
+            async getScenicList () {
+                let _self = this;
+                const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list')
+                if(!scenicList){
+                    this.isTips = true;
+                    return;
+                }
+                let scenicLnglat = [], scenicName = [], secnicflag = [];
+                if(scenicList.data && scenicList.data.length && scenicList.data.length>0){
+                    scenicList.data.forEach(v => {
+                        scenicLnglat.push([v.longitude,v.latitude])
+                        scenicName.push(v.name)
+                        secnicflag.push(v.scenery_id)
+                    })
+                }
+                function setPoint(point,index) { 
+                    let num = index + 1;
+                    let marker = new AMap.Marker({
+                        content: "<div class='marker-content' data-flag='"+secnicflag[index]+"'><div class='point-icon'>"+num+"</div><div class='point-name'>"+scenicName[index]+"</div></div>",
+                        position: point,
+                    });
+                    
+                    _self.oMap_home.add(marker);
+                }
+                scenicLnglat.forEach(function(value,index){
+                    setPoint(value,index);
+                })
+            }
         }
     }
 </script>
