@@ -2,6 +2,11 @@ export const appRoutes = [{
         path: '/',
         name: 'index',
         component: () =>
+            import ('@/views/home.vue')
+    }, {
+        path: '/main',
+        name: 'main',
+        component: () =>
             import ('@/views/Main.vue'),
         children: [{
                 path: 'scenic-spot',
@@ -38,7 +43,8 @@ export const appRoutes = [{
     {
         path: '/feedback',
         name: 'feedback',
-        component: () => import('@/views/feedback.vue'),
+        component: () =>
+            import ('@/views/feedback.vue'),
         meta: {
             title: '反馈'
         }
