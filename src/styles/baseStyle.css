@@ -14,6 +14,11 @@ i, em, strong {
     font-style: normal;
 }
 
+input, textarea {
+    border: 0;
+    outline: none;
+}
+
 body {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;

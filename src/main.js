@@ -28,20 +28,20 @@ Vue.prototype.$tool = utils;
 Vue.prototype.$http = https;
 Vue.prototype.$base = process.env.NODE_ENV === "production" ? '' : '/api',
 
-    // 引入高德SDK
-    // Vue.use(VueAMap);
-    // VueAMap.initAMapApiLoader({
-    //     key: '377c450c3f9d31957eef1fa3e55100d7', // 和车无忌App用的是同一个key
-    //     plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
-    //     v: '1.4.4',
-    //     uiVersion: '1.0.11' // 版本号
-    // });
+// 引入高德SDK
+// Vue.use(VueAMap);
+// VueAMap.initAMapApiLoader({
+//     key: '377c450c3f9d31957eef1fa3e55100d7', // 和车无忌App用的是同一个key
+//     plugin: ['AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
+//     v: '1.4.4',
+//     uiVersion: '1.0.11' // 版本号
+// });
 
-    new Vue({
-        router,
-        store,
-        render: h => h(App),
-        mounted() {
+new Vue({
+    router,
+    store,
+    render: h => h(App),
+    mounted() {
 
-        }
-    }).$mount('#app');
+    }
+}).$mount('#app');

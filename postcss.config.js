@@ -8,9 +8,10 @@ module.exports = {
         //     "propList": ['*'] // 需要做转化处理的属性，如`hight`、`width`、`margin`等，`*`表示全部
         // },
         "cssnano": { 
-            "preset": "advanced", 
-            "autoprefixer": false, // 重复调用
-            "postcss-zindex": false // 启用了这个插件，z-index的值就会重置为1,天坑
+            "cssnano-preset-advanced" : {
+                "autoprefixer": false, // 重复调用
+                "zindex": false // 启用了这个插件，z-index的值就会重置为1,天坑
+            }
         },
         "postcss-preset-env": {
             "autoprefixer": false // 重复调用
