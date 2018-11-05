@@ -10,7 +10,7 @@ import axios from 'axios';
 
 // 引入全局样式和基础样式
 import '@/styles/baseStyle.css';
-import '@/styles/globalStyle.css';
+import '@/styles/globalStyle.less';
 
 // 引入自定义字体 @font-face
 import '@/assets/fonts/SourceHansans-Bold/SourceHanSans-Bold.css'; // font-family: "sBold";

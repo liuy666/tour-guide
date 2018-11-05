@@ -160,63 +160,7 @@
             background: rgba(0,0,0,0.3);
             color: rgba(255,255,255,0.8);
         }
-        //信息窗体
-        .info-contanir {
-            width: 524px;
-            height: 276px;
-            padding: 30px 20px;
-            box-sizing: border-box;
-            background: url(/bg_pop_up@3x.png) no-repeat center / 100% 100%;
-            position: relative;
-        }
-        .info-content {
-            display: flex;
-            .info-scenic-img-area{
-                width: 200px;
-                height: 200px;
-            }
-            .info-scenic-img{
-                width: 100%;
-                height: 100%;
-                border-radius: 100px;
-            }
-            .info-scenic-info{
-                width: calc(~'100% - 220px');
-                margin-left: 20px;
-                .info-scenic-name {
-                    font-size: 30px;
-                    color: #333333;
-                    font-weight:bold;
-                }
-                .info-scenic-dec{
-                    font-size : 24px;
-                    line-height: 32px;
-                    margin-top: 4px;
-                }
-            }
-        }
         
-        .info-scenic-btns{
-            position: absolute;
-            right: 24px;
-            bottom: 36px;
-            button {
-                width: 110px;
-                height: 56px;
-                text-align: center;
-                border: none;
-                border-radius: 10px;
-                color: rgba(255,255,255,0.9);
-                font-size: 30px;
-                &.toPlay{
-                     background: #FE5100;
-                }
-                &.toDetail{
-                    background: #FF8B00;
-                    margin-left: 42px;
-                }
-            }
-        }
         
     }
 </style>
@@ -282,38 +226,53 @@
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="bdapp://map/geocoder?src=andr.baidu.openAPIdemo&address=四川省广元市剑门关">试试打开百度地图App--方式2：安卓端--地址解析</a></p>
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="baidumap://map/geocoder?address=四川省广元市剑门关&src=ios.baidu.openAPIdemo">试试打开百度地图App--方式3：ios端--地址解析</a></p>
         </section>
+
+        <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true" width="8.2em"></toast>
     </div>
 </template>
 
 <script>
-    import { XButton, Icon, XCircle } from 'vux';
+    import { XButton, Icon, XCircle, Toast } from 'vux';
     import { setTimeout } from 'timers';
     export default {
         components: {
             XButton,
             Icon,
-            XCircle
+            XCircle,
+            Toast
         },
         mounted() {
+            //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
+            const scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
+            this.sceneryId = scenicInfo.scenery_id;
+            const scenicImg = './qxgz.jpg',
+                  imgRightTop = [scenicInfo.northeast_lng,scenicInfo.northeast_lat],
+                  imgLeftBottom = [scenicInfo.southwest_lng,scenicInfo.southwest_lat],
+                  mapZoom = scenicInfo.zoom,
+                  centerPoint = [scenicInfo.longitude,scenicInfo.latitude];
+
+            console.log('右上：'+imgRightTop+'左下:'+imgLeftBottom);
             const _self  = this;
             //获取屏幕大小 动态设置不同手机的地图zoom
             const containerWidth = document.querySelector('#wrapper').clientWidth;
             const containerHeight = document.querySelector('#wrapper').clientHeight; 
-            let zoom = 0; //地图缩放
-            let centerPoint = [105.56826,32.216186];
+            let zoom = 0,maxZoom = 0; //地图缩放
             if(containerHeight<600){
-                zoom = 14.6;
+                zoom = mapZoom;
             }else if(containerHeight<700){
-                zoom = 14.8;
+                zoom = mapZoom+0.2;
             }else if(containerHeight<800){
-                zoom = 15;
+                zoom = mapZoom+0.4;
             }else if(containerHeight<900){
-                zoom = 15.1;
+                zoom = mapZoom+0.5;
             }else if(containerWidth > 500 && containerWidth < 800){
-                zoom = 15.5;
+                zoom = mapZoom+0.9;
             }else if(containerWidth > 800){
-                zoom = 15.9;
+                zoom = mapZoom+1.3;
             }
+            maxZoom = zoom+2;
+            if(zoom>17) maxZoom=19;
+            if(zoom>19) zoom=19;
 
             let offsetx = 4;//信息窗体偏移
             if(containerWidth > 600 && containerWidth < 800){
@@ -326,12 +285,12 @@
 
             //地图图片图层
             const imageLayer = new AMap.ImageLayer({
-                url: './bg.jpg',
+                url: scenicImg,
                 bounds: new AMap.Bounds(
-                    [105.554561, 32.201035],
-                    [105.600952, 32.234801]
+                    imgLeftBottom,
+                    imgRightTop
                 ),
-                zooms:[zoom,17],
+                zooms:[zoom,19],
                 zIndex: 100
             });
             //地图
@@ -341,9 +300,9 @@
                 buildingAnimation: true,
                 rotateEnable: false,
                 touchZoomCenter: 1,
-                center: [105.56826,32.216186],
+                center: centerPoint,
                 zoom: zoom,
-                zooms:[zoom,17],
+                zooms:[zoom,19],
                 viewMode: '3D',
                 layers: [
                     new AMap.TileLayer(),
@@ -359,91 +318,11 @@
                 offset: new AMap.Pixel(offsetx, -30)
             });
 
-            //发请求请求所有景点的经纬度信息
-            //·····
-            let pointArr = [[105.570578,32.204367],[105.56693,32.207417],[105.56723,32.209705],[105.562896,32.209051]];
-            let nameArr = ['景点1','平襄侯祠','姜维神像','景点4'];
-            let flagArr = ['1','2','3','4']; //景点的唯一标识
-            function setPoint(point,index) { 
-                let num = index + 1;
-                let marker = new AMap.Marker({
-                    content: "<div class='marker-content' data-flag='"+flagArr[index]+"'><div class='point-icon'>"+num+"</div><div class='point-name'>"+nameArr[index]+"</div></div>",
-                    position: point,
-                });
-                marker.on('click',markerClick);
-                //marker.emit('click', {target: marker});
-                oMap.add(marker);
-            }
-            pointArr.forEach(function(value,index){
-                setPoint(value,index);
-            })
-            //点击弹出信息窗体
-            function markerClick(e) { 
-                if(infoWindow.getPosition() !== undefined &&  infoWindow.getPosition().N == e.target.getPosition().N) {
-                    if(infoWindow.getIsOpen()){
-                        infoWindow.close();
-                    }else{
-                        openInfoWindow(e);
-                    }
-                }else{
-                    openInfoWindow(e);
-                }
-            }
-            //自定义信息窗体内容
-            function creatInfoWindow(infoArr) {
-                var info = document.createElement("div");
-                info.className = "info-contanir";
+            this.oMap_main = oMap;
+            this.infoWindow_main = infoWindow;
 
-                var middle = document.createElement("div");
-                middle.className = "info-content";
-
-                var htmlStr = ` <div class='info-scenic-img-area'><img style="width:100%;height:100%;border-radius:100%;" src='${infoArr[1]}' /></div>
-                                <div class='info-scenic-info'>
-                                    <div class='info-scenic-name'>${infoArr[0]}</div>
-                                    <div class='info-scenic-dec'>${infoArr[2]}</div>
-                                </div>`
-                middle.innerHTML = htmlStr;
-
-                info.appendChild(middle);
-
-                var btnArea = document.createElement('div');
-                btnArea.className = "info-scenic-btns";
-
-                var btn1 = document.createElement('button');
-                btn1.className = "toPlay";
-                btn1.innerHTML = "解说";
-                btn1.onclick = toPlay;
-                btnArea.appendChild(btn1);
-
-                var btn2 = document.createElement('button');
-                btn2.className = "toDetail";
-                btn2.innerHTML = "详情";
-                btn2.onclick = toDetail;
-                btnArea.appendChild(btn2);
-                
-                info.appendChild(btnArea);
-                return info;
-
-            }
-            //景点弹窗播放
-            function toPlay() {
-                
-            }
-            //景点弹窗详情
-            function toDetail() {
-                _self.$router.push('scenic-point-detail');
-            }
-            //请求数据展示对应信息窗体内容
-            function openInfoWindow(e) {
-                 let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前景点的唯一标识
-                //发请求请求景点详细数据
-                //·······景点名称 景点图片 景点解说  景点音频标识
-                //景点信息数组
-                let infoArr = ["平襄侯祠","http://tpc.googlesyndication.com/simgad/5843493769827749134","汶川大地震第一个地震遗址保护纪念地，位于四川省广元市青川县。","001"];
-                //自定义信息窗体内容
-                infoWindow.setContent(creatInfoWindow(infoArr));
-                infoWindow.open(oMap, e.target.getPosition());
-            }
+            this.getScenicPointList();
+            
             //拖动中事件 没用
             /*function showInfoDragging(e) {
                 const bounds = oMap.getBounds();
@@ -566,11 +445,17 @@
                 const pixel = oMap.lnglatTocontainer(lnglat);
                 return pixel.round();
             }
-            oMap.on('moveend', mapDragged);
+            //oMap.on('moveend', mapDragged);
 
         },
         data () {
             return {
+                sceneryId: '',
+                oMap_main: {},
+                infoWindow_main: {},
+                resourceType: 1,//景区资源类型 默认1位景点
+                isTips: false,
+                tipsText: '请求失败',
                 isShow: false,
                 isOpenDetail: false,
                 isEnd: false,
@@ -610,6 +495,117 @@
             },
             gotodetail() {
                 this.$router.push('scenic-detail');
+            },
+
+
+            //地图相关方法
+            //请求景区资源列表
+            async getScenicPointList() {
+                let _self = this;
+                const hostname = window.location.hostname;
+                const pointList = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${this.resourceType}&url=www.qxgz.com`);
+                //const pointList = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${this.resourceType}&url=${hostname}`);
+                if(!pointList){
+                    this.isTips = true;
+                    return;
+                }
+                let pointLnglat = [], pointName = [], pointflag = [], pointSerial = [];
+                if(pointList.page.list && pointList.page.list.length && pointList.page.list.length>0){
+                    sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
+                    pointList.page.list.forEach((v,i) => {
+                        pointLnglat.push([v.longitude,v.latitude])
+                        pointName.push(v.name)
+                        pointflag.push(i)
+                        if(v.serial){
+                            pointSerial.push(v.serial)
+                        }
+                    })
+                }
+                let pointLnglat1 = [[104.839214,459624],[104.840214,32.459624]];
+                function setPoint(point,index) { 
+                    let num = _self.resourceType == 1 ? pointSerial[index] : '';
+                    let marker = new AMap.Marker({
+                        content: "<div class='marker-content' data-flag='"+pointflag[index]+"'><div class='point-icon'>"+num+"</div><div class='point-name'>"+pointName[index]+"</div></div>",
+                        position: point,
+                    });
+                    marker.on('click',_self.markerClick);
+                    _self.oMap_main.add(marker);
+                }
+                pointLnglat1.forEach(function(value,index){
+                    setPoint(value,index);
+                })
+                
+            },
+            markerClick(e) {
+                if(this.infoWindow_main.getPosition() !== undefined &&  this.infoWindow_main.getPosition().N == e.target.getPosition().N) {
+                    if(this.infoWindow_main.getIsOpen()){
+                        this.infoWindow_main.close();
+                    }else{
+                        this.openInfoWindow(e);
+                    }
+                }else{
+                    this.openInfoWindow(e);
+                }
+            },
+            openInfoWindow(e) {
+                let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前点在点列表数据中的下标
+                const pointInfo = JSON.parse(sessionStorage.getItem("pointList"))[flag];
+                sessionStorage.setItem('currentPoint',JSON.stringify(pointInfo));
+                if(this.resourceType == 1){
+                    this.infoWindow_main.setContent(this.createInfoWindow_scenicPoint(pointInfo));
+                }else{
+                    this.infoWindow_main.setContent(this.createInfoWindow(pointInfo));
+                }
+                this.infoWindow_main.open(this.oMap_main, e.target.getPosition());
+            },
+            //景点的弹窗内容
+            createInfoWindow_scenicPoint(pointInfo) {
+                var info = document.createElement("div");
+                info.className = "info-contanir";
+
+                var middle = document.createElement("div");
+                middle.className = "info-content";
+
+                var htmlStr = ` <div class='info-scenic-img-area'><img style="width:100%;height:100%;border-radius:100%;" src='${pointInfo.url}' /></div>
+                                <div class='info-scenic-info'>
+                                    <div class='info-scenic-name'>${pointInfo.name}</div>
+                                    <div class='info-scenic-dec'>${pointInfo.commentary}</div>
+                                </div>`
+                middle.innerHTML = htmlStr;
+
+                info.appendChild(middle);
+
+                var btnArea = document.createElement('div');
+                btnArea.className = "info-scenic-btns";
+
+                var btn1 = document.createElement('button');
+                btn1.className = "toPlay";
+                btn1.onclick = this.toPlay;
+                btnArea.appendChild(btn1);
+
+                var btn2 = document.createElement('button');
+                btn2.className = "toDetail";
+                btn2.onclick = this.toDetail;
+                btnArea.appendChild(btn2);
+                
+                info.appendChild(btnArea);
+                return info;
+            },
+            //除景点外的其他资源弹窗内容
+            createInfoWindow(pointInfo) {
+                var info_other = document.createElement("div");
+                info_other.className = "info-contanir-other";
+
+                var img_other = document.createElement("img");
+                img_other.style.width = "100%";
+                img_other.style.height = "100%";
+                img_other.src = pointInfo.url;
+            },
+            toPlay() {
+
+            },
+            toDetail() {
+                this.$router.push('scenic-point-detail');
             }
         }
     }

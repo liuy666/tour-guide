@@ -22,34 +22,20 @@
     .marker-content{
         font-size: 20px;
     }
-    .point-icon{
-        width: 100px;
-        height: 52px;
-        line-height: 45px;
-        margin-left: -24px;
-        background: url(/icon_scenic@3x.png) no-repeat center / auto 100%;
+    .scenic-icon{
+        width: 60px;
+        height: 50px;
+        margin-left: -30px;
+        background: url(/icon_scenic_home@3x.png) no-repeat center / auto 100%;
         text-align: center;
         color: #fff;
     }
-    .point-icon.player{
-        background: url(/icon_use@3x.png) no-repeat center / auto 100%;
-    }
-    .point-name{
-        white-space: nowrap;
-        margin-left: -45%;
-        text-align: center;
-        border-radius: 16px;
-        background: rgba(0,0,0,0.3);
-        color: rgba(255,255,255,0.8);
-    }
-    
     
 </style>
 
 <template>
     <div id="home">
         <section id="wrapper_home"></section>
-
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true" width="8.2em"></toast>
     </div>
 </template>
@@ -116,12 +102,19 @@
                     imageLayer
                 ]
             });
+            //地图信息窗体
+            let infoWindow = new AMap.InfoWindow({
+                isCustom: true,  //使用自定义窗体
+                offset: new AMap.Pixel(-10, -30)
+            });
             this.oMap_home = oMap;
+            this.oInfoWindow = infoWindow;
             this.getScenicList();
         },
         data () {
             return {
                 oMap_home : {},
+                oInfoWindow : {},
                 isTips : false,
                 tipsText : '请求失败'
             }
@@ -136,23 +129,75 @@
                 }
                 let scenicLnglat = [], scenicName = [], secnicflag = [];
                 if(scenicList.data && scenicList.data.length && scenicList.data.length>0){
-                    scenicList.data.forEach(v => {
+                    sessionStorage.setItem('scenicList',JSON.stringify(scenicList.data));
+                    scenicList.data.forEach((v,i) => {
                         scenicLnglat.push([v.longitude,v.latitude])
                         scenicName.push(v.name)
-                        secnicflag.push(v.scenery_id)
+                        secnicflag.push(i)
                     })
                 }
                 function setPoint(point,index) { 
                     let num = index + 1;
                     let marker = new AMap.Marker({
-                        content: "<div class='marker-content' data-flag='"+secnicflag[index]+"'><div class='point-icon'>"+num+"</div><div class='point-name'>"+scenicName[index]+"</div></div>",
+                        content: "<div class='marker-content' data-flag='"+secnicflag[index]+"'><div class='scenic-icon'></div></div>",
                         position: point,
                     });
-                    
+                    marker.on('click',_self.markerClick);
                     _self.oMap_home.add(marker);
                 }
                 scenicLnglat.forEach(function(value,index){
                     setPoint(value,index);
+                })
+            },
+            markerClick(e) {
+                if(this.oInfoWindow.getPosition() !== undefined &&  this.oInfoWindow.getPosition().N == e.target.getPosition().N) {
+                    if(this.oInfoWindow.getIsOpen()){
+                        this.oInfoWindow.close();
+                    }else{
+                        this.openInfoWindow(e);
+                    }
+                }else{
+                    this.openInfoWindow(e);
+                }
+            },
+            openInfoWindow(e) {
+                let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前景区在景区列表数据中的下标
+                const scenicInfo = JSON.parse(sessionStorage.getItem("scenicList"))[flag];
+                sessionStorage.setItem('currentScenic',JSON.stringify(scenicInfo));
+                this.oInfoWindow.setContent(this.createInfoWindow(scenicInfo));
+                this.oInfoWindow.open(this.oMap_home, e.target.getPosition());
+            },
+            createInfoWindow(scenicInfo) {
+                var info = document.createElement("div");
+                info.className = "info-contanir";
+
+                var middle = document.createElement("div");
+                middle.className = "info-content";
+
+                var htmlStr = ` <div class='info-scenic-img-area'><img style="width:100%;height:100%;border-radius:100%;" src='${scenicInfo.accessCoverUrl}' /></div>
+                                <div class='info-scenic-info'>
+                                    <div class='info-scenic-name'>${scenicInfo.name}</div>
+                                    <div class='info-scenic-dec'>${scenicInfo.introduce}</div>
+                                </div>`
+                middle.innerHTML = htmlStr;
+
+                info.appendChild(middle);
+
+                var btnArea = document.createElement('div');
+                btnArea.className = "info-scenic-btns";
+
+                var btn1 = document.createElement('button');
+                btn1.className = "toScenic";
+                btn1.onclick = this.toScenic;
+                btnArea.appendChild(btn1);
+
+                
+                info.appendChild(btnArea);
+                return info;
+            },
+            toScenic() {
+                this.$router.push({
+                    name : 'main'
                 })
             }
         }
