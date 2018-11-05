@@ -9,6 +9,16 @@
             // .amap-demo {
             //     height: 100%;
             // }
+            .amap-geolocation-con {
+                z-index: inherit !important;
+            }
+            .amap-geolocation-con .amap-geo{
+                background: #fff url(/icon_static@3x.png) no-repeat center center / 100% 100%;
+                border: none;
+            }
+            .amap-locate-loading .amap-geo {
+                background: #fff  url(https://webapi.amap.com/theme/v1.3/loading.gif) no-repeat center center / 50% 50%;
+            }
         }
         .main_view {
             width: 720px;
@@ -100,9 +110,9 @@
             right: 30px;
         }
         .function-area-left{
-            height: 160px;
+            height: 90px;
             left: 30px;
-            bottom: 186px;
+            bottom: 256px;
         }
         .function-btn{
             width: 70px;
@@ -113,9 +123,9 @@
             &.FK{
                 background-image: url('../assets/images/icon_feedback@3x.png');
             }
-            &.DW{
-                background-image: url('../assets/images/icon_static@3x.png');
-            }
+            // &.DW{
+            //     background-image: url('../assets/images/icon_static@3x.png');
+            // }
             &.JJ{
                 background-image: url('../assets/images/icon_intro@3x.png');
             }
@@ -129,6 +139,7 @@
                 }
             }
         }
+        
         .xxx {
             position: absolute;
             right: 40px;
@@ -160,8 +171,25 @@
             background: rgba(0,0,0,0.3);
             color: rgba(255,255,255,0.8);
         }
-        
-        
+        .introDetail{
+            position: absolute;
+            left: 30px;
+            bottom: 0;
+            background: #fff;
+            width: 690px;
+            height: 686px;
+            padding: 30px;
+            border-radius: 10px 10px 0 0 ;
+            box-sizing: border-box;
+            .scenic-detail-header{
+                display: flex;
+                .scenic-img{
+                    width: 220px;
+                    height: 220px;
+                    margin-top: -78px;
+                }
+            }
+        }
     }
 </style>
 
@@ -211,22 +239,28 @@
         </section>
         <section class="function-area-left">
             <div class="function-btn FK"></div>
-            <div class="function-btn DW"></div>
         </section>
         <section class="function-area-right">
-            <div class="function-btn JJ"></div>
+            <div class="function-btn JJ" @click="seeIntroduce"></div>
             <div class="function-btn QJ"></div>
             <div class="function-btn ZD" :class="isAuto ? '' : 'NO'"></div>
         </section>
         <section v-show="isOpenDetail" class="introDetail">
-            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="qqmap://map/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（只能在App或手机浏览器中生效，微信内置浏览器也不行）</a></p>
+            <div class="scenic-detail-header">
+                <div class="scenic-img"></div>
+                <div class="scenic-name"></div>
+                <div class="close-btn"></div>
+            </div>
+            <!-- <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="qqmap://map/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（只能在App或手机浏览器中生效，微信内置浏览器也不行）</a></p>
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="https://apis.map.qq.com/uri/v1/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（h5调用）</a></p>
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="https://uri.amap.com/search?keyword=四川省广元市剑门关&city=310000&view=map&src=test&coordinate=gaode&callnative=1">试试打开高德地图App</a></p>
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="http://api.map.baidu.com/geocoder?address=四川省广元市剑门关&output=html&src=webapp.baidu.openAPIdemo">试试打开百度地图App--方式1：web端--地址解析</a></p>
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="bdapp://map/geocoder?src=andr.baidu.openAPIdemo&address=四川省广元市剑门关">试试打开百度地图App--方式2：安卓端--地址解析</a></p>
-            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="baidumap://map/geocoder?address=四川省广元市剑门关&src=ios.baidu.openAPIdemo">试试打开百度地图App--方式3：ios端--地址解析</a></p>
+            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="baidumap://map/geocoder?address=四川省广元市剑门关&src=ios.baidu.openAPIdemo">试试打开百度地图App--方式3：ios端--地址解析</a></p> -->
         </section>
-
+        <section style="position:absolute;left:0;bottom:0;">
+            <input class="currentPosition"  />
+        </section>
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true" width="8.2em"></toast>
     </div>
 </template>
@@ -250,7 +284,7 @@
                   imgLeftBottom = [scenicInfo.southwest_lng,scenicInfo.southwest_lat],
                   mapZoom = scenicInfo.zoom,
                   centerPoint = [scenicInfo.longitude,scenicInfo.latitude];
-
+            console.log("中心点：" + centerPoint);
             console.log('右上：'+imgRightTop+'左下:'+imgLeftBottom);
             const _self  = this;
             //获取屏幕大小 动态设置不同手机的地图zoom
@@ -290,7 +324,7 @@
                     imgLeftBottom,
                     imgRightTop
                 ),
-                zooms:[zoom,19],
+                zooms:[zoom,maxZoom],
                 zIndex: 100
             });
             //地图
@@ -302,7 +336,7 @@
                 touchZoomCenter: 1,
                 center: centerPoint,
                 zoom: zoom,
-                zooms:[zoom,19],
+                zooms:[zoom,maxZoom],
                 viewMode: '3D',
                 layers: [
                     new AMap.TileLayer(),
@@ -311,6 +345,9 @@
             });
             // oMap.setFeatures([]);
             // oMap.setMapStyle("amap://styles/dark");
+            oMap.on('click',function(e){
+                console.log(e.lnglat.getLng()+','+e.lnglat.getLat());
+            })
 
             //地图信息窗体
             let infoWindow = new AMap.InfoWindow({
@@ -447,12 +484,41 @@
             }
             //oMap.on('moveend', mapDragged);
 
+            var options = {
+                'showButton': true,//是否显示定位按钮
+                'buttonPosition': 'LB',//定位按钮的位置
+                'buttonOffset': new AMap.Pixel(15, 93),//定位按钮距离对应角落的距离
+                'showMarker': true,//是否显示定位点
+                'markerOptions':{//自定义定位点样式，同Marker的Options
+                    'offset': new AMap.Pixel(-18, -36),
+                    'content':'<img src="https://a.amap.com/jsapi_demos/static/resource/img/user.png" style="width:36px;height:36px"/>'
+                },
+                'showCircle': true,//是否显示定位精度圈
+                'circleOptions': {//定位精度圈的样式
+                    'strokeColor': '#0093FF',
+                    'noSelect': true,
+                    'strokeOpacity': 0.5,
+                    'strokeWeight': 1,
+                    'fillColor': '#02B0FF',
+                    'fillOpacity': 0.25
+                }
+            }
+            AMap.plugin(["AMap.Geolocation"], function() {
+                var geolocation = new AMap.Geolocation(options);
+                _self.oMap_main.addControl(geolocation);
+                //geolocation.getCurrentPosition()
+                geolocation.on('complete',function(GeolocationResult) {
+                    document.querySelector(".currentPosition").value = GeolocationResult.position;
+                })
+            });
+
         },
         data () {
             return {
                 sceneryId: '',
                 oMap_main: {},
                 infoWindow_main: {},
+                pointGroups: {},
                 resourceType: 1,//景区资源类型 默认1位景点
                 isTips: false,
                 tipsText: '请求失败',
@@ -511,6 +577,11 @@
                 }
                 let pointLnglat = [], pointName = [], pointflag = [], pointSerial = [];
                 if(pointList.page.list && pointList.page.list.length && pointList.page.list.length>0){
+                    //设置默认显示(第一个景点的图片和名字)
+                    if(this.resourceType == 1) {
+                        this.scenicImg = pointList.page.list[0].url;
+                        this.scenicPointName = pointList.page.list[0].serial + '.' + pointList.page.list[0].name;
+                    }
                     sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
                     pointList.page.list.forEach((v,i) => {
                         pointLnglat.push([v.longitude,v.latitude])
@@ -521,7 +592,9 @@
                         }
                     })
                 }
-                let pointLnglat1 = [[104.839214,459624],[104.840214,32.459624]];
+                //地图画点
+                let pointLnglat1 = [[104.839214,32.459624],[104.840214,32.459624]];
+                let markers = [];//用覆盖物群组的方式添加多个点标记 方便移除
                 function setPoint(point,index) { 
                     let num = _self.resourceType == 1 ? pointSerial[index] : '';
                     let marker = new AMap.Marker({
@@ -529,15 +602,18 @@
                         position: point,
                     });
                     marker.on('click',_self.markerClick);
-                    _self.oMap_main.add(marker);
+                    //_self.oMap_main.add(marker);
+                    markers.push(marker);
                 }
                 pointLnglat1.forEach(function(value,index){
                     setPoint(value,index);
                 })
-                
+                let overlayGroups = new AMap.OverlayGroup(markers);
+                this.pointGroups = overlayGroups;
+                this.oMap_main.add(overlayGroups);
             },
             markerClick(e) {
-                if(this.infoWindow_main.getPosition() !== undefined &&  this.infoWindow_main.getPosition().N == e.target.getPosition().N) {
+                if(this.infoWindow_main.getPosition() !== undefined && this.infoWindow_main.getPosition().O == e.target.getPosition().O && this.infoWindow_main.getPosition().N == e.target.getPosition().N) {
                     if(this.infoWindow_main.getIsOpen()){
                         this.infoWindow_main.close();
                     }else{
@@ -551,7 +627,10 @@
                 let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前点在点列表数据中的下标
                 const pointInfo = JSON.parse(sessionStorage.getItem("pointList"))[flag];
                 sessionStorage.setItem('currentPoint',JSON.stringify(pointInfo));
+                
                 if(this.resourceType == 1){
+                    this.scenicImg = pointInfo.url;
+                    this.scenicPointName = pointInfo.serial+'.'+pointInfo.name;
                     this.infoWindow_main.setContent(this.createInfoWindow_scenicPoint(pointInfo));
                 }else{
                     this.infoWindow_main.setContent(this.createInfoWindow(pointInfo));
@@ -606,7 +685,8 @@
             },
             toDetail() {
                 this.$router.push('scenic-point-detail');
-            }
+            },
+        
         }
     }
 </script>

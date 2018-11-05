@@ -27,7 +27,7 @@
 <template>
     <div id="scenic-point-detail">
         <section>
-            <audio id="audio" controls="controls"  >
+            <audio id="audio"  controls="controls"  >
                 <source src="../assets/audio/111.mp3" type="audio/mpeg" />
             </audio>
         </section>
@@ -37,7 +37,9 @@
                 dots-position="center"
                 :auto="false"
                 :loop="true"
-                height="220px">
+                :show-dots="false"
+                :aspect-ratio='0.55'
+                >
             </swiper>
         </section>
         <section>
@@ -75,11 +77,13 @@ export default {
             imageList : [
                 {
                     url: 'javascript:',
-                    img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vvsr72j20p00gogo2.jpg'
+                    img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vvsr72j20p00gogo2.jpg',
+                    title : '1/2'
                 },
                 {
                     url: 'javascript:',
-                    img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw50iwj20ff0aaaci.jpg'
+                    img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw50iwj20ff0aaaci.jpg',
+                    title: '2/2'
                 }
             ]
         }
