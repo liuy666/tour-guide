@@ -3,6 +3,15 @@
         height:100%;
         width: 100%;
         position: relative;
+        .weui-toast {
+            height: 170px;
+            width: 228px;
+            i {
+                width: 60px;
+                height: 60px;
+                margin-top: 55px;
+            }
+        }
         #wrapper {
             width: 100%;
             height: 100%;
@@ -21,30 +30,91 @@
             }
         }
         .main_view {
-            width: 720px;
-            height: 500px;
+            width: 710px;
+            height: 714px;
             z-index: 10;
-            background-color: orange;
+            background: url("../assets/images/bg_liebiao@2x.png") no-repeat center center / 100% 100%;
             position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 140px;
+            bottom: 20.733vw;
+            left: calc(~"50% - 355px");
             .main_view_header {
-                height: 60px;
-                background-color: #fff;
+                height: 120px;
                 display: flex;
                 flex-direction: row;
                 justify-content: space-between;
+                position: relative;
+                box-sizing: border-box;
+                padding-left: 169px;
+                p {
+                    font-size:32px;
+                    font-weight:500;
+                    line-height:34px;
+                    margin-top: 41px;
+                }
                 .camera {
+                    width: 122px;
+                    height: 142px;
+                    background: url("../assets/images/icon_ai@2x.png") no-repeat center center / 100% 100%;
+                    position: absolute;
+                    left: 32px;
+                    top: -37px;
+                    overflow: hidden;
+                    #use-camera {
+                        width: 122px;
+                        height: 142px;
+                        opacity: 0;
+                    }
+                }
+                .weather {
+                    width: 191px;
+                    margin-right: 29px;
                     display: flex;
                     flex-direction: row;
+                    justify-content: space-between;
+                    img {
+                        width: 80px;
+                        height: 80px;
+                        margin-top: 24px;
+                    }
+                    .content {
+                        font-size: 24px;
+                        line-height: 34px;
+                        font-weight: 500;
+                        display: flex;
+                        flex-direction: column;
+                        margin-top: 31px;
+                    }
                 }
             }
-            .main_view_footer {
+            ul.main_view_footer {
                 height: 100px;
-                background-color: #fff;
-                overflow-x: scroll;
-                white-space: nowrap;
+                overflow-x: auto;
+                display: flex;
+                flex-direction: row;
+                box-sizing: border-box;
+                margin: 0 29px 0 30px;
+                border-top: 1px solid #f8f8f8;
+                li {
+                    margin-right: 54px;
+                    height: 100px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    text-align: center;
+                    &:last-of-type {
+                        margin-left: 0;
+                    }
+                    img {
+                        width: 42px;
+                        height: 42px;
+                        margin: 0 27px 5px;
+                    }
+                    span {
+                        font-size: 24px;
+                        line-height: 32px;
+                        width: 96px;
+                    }
+                }
             }
         }
         //底部景点播放
@@ -195,33 +265,36 @@
 
 <template>
     <div id="main">
+        <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <section id="wrapper"></section>
-        <!-- <img src="../assets/images/bg.jpg" alt=""  style="position:absolute;left:0;top:0;;height:80%;"/>  -->
-        <section class="main_view" v-show="isShow">
+        <section class="main_view " v-show="isShowMenu">
             <section class="main_view_header">
                 <section class="camera">
-                    <button @click="useCamera">智能识别</button>
-                    <span>不认识就扫一扫</span>
+                    <input type="file" capture="camera" id="use-camera" accept="image/*" @change="useCamera" />
                 </section>
-                <section class="weather">空气指数</section>
+                <p>遇见全世界的美</p>
+                <section class="weather">
+                    <section class="content">
+                        <span>22~15℃</span>
+                        <span>多云</span>
+                    </section>
+                    <span><img src="../assets/images/partly_cloudy_day@2x.png" alt="加载中..."></span>
+                </section>
             </section>
             <router-view />
-            <section class="main_view_footer">
-                <icon type="success" is-msg @click.native="goto1"></icon>
-                <icon type="success" is-msg @click.native="goto2"></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-                <icon type="success" is-msg></icon>
-            </section>
+            <ul class="main_view_footer">
+                <li v-for="menu in menuList" :key="menu.id" :data-remark="menu.remark" >
+                    <img :src="menu.graySrc" alt="" />
+                    <span>{{ menu.name }}</span>
+                </li>
+            </ul>
         </section>
         <section class="toolbars">
             <!-- <div style="float:left;width: 100px;height: 100%;background-color:#ccc;" @click="handlePlay">播放/暂停</div> -->
             <!-- <audio controls style="display:none;">
                 <source src="http://hqyatu-navigator.oss-cn-beijing.aliyuncs.com/20181023/e6586ba47dc44b2fb31be240ee7f14e8.mp3?Expires=1540287348&OSSAccessKeyId=LTAIuMC8xUilE1EZ&Signature=qDBw4yqLpye5KXJvsXHnaysFx8Y%3D" type="audio/mpeg" />
                 您的浏览器不支持 audio 元素
-            </audio>
-            <x-button style="float:right;" @click.native="handleClick" :mini="true">菜单</x-button> -->
+            </audio> -->
             <div class="player-control-btn-area">
                 <x-circle
                     :percent="audiopercent"
@@ -235,7 +308,7 @@
             <div class="scenic-point-name-area">
                 {{scenicPointName}}
             </div>
-            <div class="list-btn" @click="handleClick" ></div> 
+            <div class="list-btn" @click="openMenu" ></div> 
         </section>
         <section class="function-area-left">
             <div class="function-btn FK"></div>
@@ -266,14 +339,15 @@
 </template>
 
 <script>
-    import { XButton, Icon, XCircle, Toast } from 'vux';
+    import { XButton, Icon, XCircle, Toast, Loading} from 'vux';
     import { setTimeout } from 'timers';
     export default {
         components: {
             XButton,
             Icon,
             XCircle,
-            Toast
+            Toast,
+            Loading
         },
         mounted() {
             //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
@@ -522,22 +596,49 @@
                 resourceType: 1,//景区资源类型 默认1位景点
                 isTips: false,
                 tipsText: '请求失败',
-                isShow: false,
+                isShowMenu: false,
                 isOpenDetail: false,
                 isEnd: false,
                 isAuto: false,//是否自动播放
                 isPlay: false,//是否播放状态
                 audiopercent: 100,
                 scenicImg: 'https://tpc.googlesyndication.com/simgad/5843493769827749134',
-                scenicPointName: '1.平襄侯祠'
+                scenicPointName: '1.平襄侯祠',
+                menuList: [],
+                loadText: '',
+                isShowLoading: false,
             }
         },
         methods: {
-            handleClick() {
-                this.isShow = !this.isShow;
+            // 打开图标菜单
+            async openMenu() {
+                if (!this.isShowMenu) {
+                    this.isShowLoading = true;
+                    const getMenu = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/getSelectMenue', {
+                        sceneryId: '1057570712933412865'
+                    });
+                    if (!getMenu) {
+                        this.isShowLoading = false;
+                        return;
+                    }
+                    // console.log(getMenu);
+                    let menuList = [];
+                    getMenu.menue.forEach(item => {
+                        menuList.push({
+                            name: item.remark,
+                            id: item.id,
+                            remark: item.paramKey,
+                            colorSrc: item.iconUrl,
+                            graySrc: item.iconUrl1
+                        });
+                    });
+                    this.menuList = [].concat(menuList);
+                }
+                this.isShowMenu = !this.isShowMenu;
                 this.$router.push({
-                    name: this.isShow ? 'scenic-spot' : 'main'
+                    name: this.isShowMenu ? 'scenic-spot' : 'main'
                 });
+                this.isShowLoading = false;
             },
             goto1() {
                 this.$router.push('scenic-spot');
