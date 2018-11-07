@@ -248,7 +248,7 @@
             background: #fff;
             width: 690px;
             height: 686px;
-            padding: 30px;
+            padding: 20px 30px;
             border-radius: 10px 10px 0 0 ;
             box-sizing: border-box;
             .scenic-detail-header{
@@ -256,8 +256,69 @@
                 .scenic-img{
                     width: 220px;
                     height: 220px;
-                    margin-top: -78px;
+                    margin-top: -100px;
                 }
+                .scenic-name-level{
+                    width: 360px;
+                    margin-left: 22px;
+                    .scenic-name{
+                        font-size: 36px;
+                        font-weight: bold;
+                    }
+                    .scenic-level{
+                        display: inline-block;
+                        padding: 10px;
+                        line-height: 20px;
+                        border-radius: 20px;
+                        border: 1px solid #FEA32B;
+                        color: #FEA32B;
+                        font-size: 24px;
+                        margin-top: 16px;
+                    }
+                }
+                .close-btn{
+                    width: 34px;
+                    height: 34px;
+                    position: absolute;
+                    right: 10px;
+                    top: 10px;
+                    background: url('../assets/images/icon_close_black@2x.png') no-repeat center center / 100% 100%;
+                }
+            }
+            .scenic-address-time{
+                padding: 40px 0;
+                font-size: 30px;
+                line-height: 34px;
+                background: url('../assets/images/xian@3x.png') no-repeat center bottom;
+                .scenic-address{
+                    text-indent: 44px;
+                    background: url('../assets/images/icon_black_site@3x.png') no-repeat left top;
+                    background-size: 32px 40px;
+                }
+                .scenic-time{
+                    text-indent: 44px;
+                    background: url('../assets/images/icon_black_time@3x.png') no-repeat left center;
+                    background-size: 32px 32px;
+                    margin-top: 20px;
+                }
+            }
+            .dec-title{
+                text-indent: 24px;
+                font-size: 30px;
+                padding: 20px 0;
+                background: url('../assets/images/kuai@3x.png') no-repeat left center;
+                background-size: 10px 30px;
+                line-height: 30px;
+            }
+            .dec-content{
+                height: 210px;
+                font-size: 24px;
+                line-height: 36px;
+                overflow: hidden;
+                word-break: break-all;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
         }
     }
@@ -302,7 +363,7 @@
                     :trail-width="6"
                     :stroke-color="'#FE5100'"
                     trail-color="#ffffff">
-                    <div class="player-img-area"><img style="width:100%;height:100%;border-radius: 100%;" :src="scenicImg" /></div>
+                    <div class="player-img-area"><img style="width:100%;height:100%;border-radius: 100%;" :src="scenicPointImg" /></div>
                 </x-circle>
             </div>
             <div class="scenic-point-name-area">
@@ -320,9 +381,24 @@
         </section>
         <section v-show="isOpenDetail" class="introDetail">
             <div class="scenic-detail-header">
-                <div class="scenic-img"></div>
-                <div class="scenic-name"></div>
-                <div class="close-btn"></div>
+                <div class="scenic-img"><img style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/></div>
+                <div class="scenic-name-level">
+                    <div class="scenic-name">{{scenicName}}</div>
+                    <span class="scenic-level">{{scenicLevel+"级风景区"}}</span>
+                </div>
+                <div class="close-btn" @click="seeIntroduce"></div>
+            </div>
+            <div class="scenic-address-time">
+                <div class="scenic-address">
+                    景区地址： <span class="font-color-666">{{scenicAddress}}</span>
+                </div>
+                <div class="scenic-time">
+                    开放时间： <span class="font-color-666">{{scenicOpenTime}}</span>
+                </div>
+            </div>
+            <div class="scenic-dec">
+                <div class="dec-title">景区介绍</div>
+                <div class="dec-content font-color-888">{{scenicDec}}</div>
             </div>
             <!-- <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="qqmap://map/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（只能在App或手机浏览器中生效，微信内置浏览器也不行）</a></p>
             <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="https://apis.map.qq.com/uri/v1/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（h5调用）</a></p>
@@ -353,7 +429,7 @@
             //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
             const scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
             this.sceneryId = scenicInfo.scenery_id;
-            const scenicImg = './qxgz.jpg',
+            const scenicBgImg = './qxgz.jpg',
                   imgRightTop = [scenicInfo.northeast_lng,scenicInfo.northeast_lat],
                   imgLeftBottom = [scenicInfo.southwest_lng,scenicInfo.southwest_lat],
                   mapZoom = scenicInfo.zoom,
@@ -393,7 +469,7 @@
 
             //地图图片图层
             const imageLayer = new AMap.ImageLayer({
-                url: scenicImg,
+                url: scenicBgImg,
                 bounds: new AMap.Bounds(
                     imgLeftBottom,
                     imgRightTop
@@ -589,7 +665,14 @@
         },
         data () {
             return {
+                //景区信息
                 sceneryId: '',
+                scenicImg: JSON.parse(sessionStorage.getItem("currentScenic")).accessCoverUrl,
+                scenicName: JSON.parse(sessionStorage.getItem("currentScenic")).name,
+                scenicLevel: JSON.parse(sessionStorage.getItem("currentScenic")).level,
+                scenicAddress: JSON.parse(sessionStorage.getItem("currentScenic")).address,
+                scenicOpenTime: JSON.parse(sessionStorage.getItem("currentScenic")).opening_time,
+                scenicDec: JSON.parse(sessionStorage.getItem("currentScenic")).introduce,
                 oMap_main: {},
                 infoWindow_main: {},
                 pointGroups: {},
@@ -602,13 +685,13 @@
                 isAuto: false,//是否自动播放
                 isPlay: false,//是否播放状态
                 audiopercent: 100,
-                scenicImg: 'https://tpc.googlesyndication.com/simgad/5843493769827749134',
-                scenicPointName: '1.平襄侯祠',
+                scenicPointImg: '',
+                scenicPointName: '',
                 menuList: [],
                 loadText: '',
                 isShowLoading: false,
             }
-        },
+        },        
         methods: {
             // 打开图标菜单
             async openMenu() {
@@ -680,8 +763,9 @@
                 if(pointList.page.list && pointList.page.list.length && pointList.page.list.length>0){
                     //设置默认显示(第一个景点的图片和名字)
                     if(this.resourceType == 1) {
-                        this.scenicImg = pointList.page.list[0].url;
+                        this.scenicPointImg = pointList.page.list[0].url;
                         this.scenicPointName = pointList.page.list[0].serial + '.' + pointList.page.list[0].name;
+                        sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
                     }
                     sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
                     pointList.page.list.forEach((v,i) => {
@@ -730,7 +814,7 @@
                 sessionStorage.setItem('currentPoint',JSON.stringify(pointInfo));
                 
                 if(this.resourceType == 1){
-                    this.scenicImg = pointInfo.url;
+                    this.scenicPointImg = pointInfo.url;
                     this.scenicPointName = pointInfo.serial+'.'+pointInfo.name;
                     this.infoWindow_main.setContent(this.createInfoWindow_scenicPoint(pointInfo));
                 }else{
