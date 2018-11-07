@@ -1,20 +1,10 @@
 <style lang="less" scoped>
     #scenic-spot {
-        .circle {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: red;
-            position: absolute;
-            left: 60%;
-            bottom: -6px;
-        }
         .seach {
             position: relative;
             width:650px;
             height:60px;
-            margin: 0 30px;
-            margin-bottom: 20px;
+            margin: 0 30px 20px;
             input::-webkit-input-placeholder { 
                 font-size:24px;
                 font-weight:500;
@@ -98,75 +88,46 @@
         </section>
         <section class="spot-list">
             <ul>
-                <li>
+                <!-- <li>
                     <section class="img-left">
                         <img src="../assets/images/fj.jpg" alt="" />
                         <span>1.北伐军行图</span>
                     </section>
                     <section class="img-right">
                         <img src="../assets/images/icon_big_stop@2x.png" alt="" />
-                        <!-- <img src="" alt="" /> -->
                     </section>
-                </li>
-                <li>
+                </li> -->
+                <li v-for="point of pointsList" :key="point.id">
                     <section class="img-left">
-                        <img src="../assets/images/fj.jpg" alt="" />
-                        <span>1.北伐军行图</span>
+                        <img :src="point.src" alt="加载中..." />
+                        <span>{{ point.id + '. ' +point.name }}</span>
                     </section>
                     <section class="img-right">
-                        <img src="../assets/images/icon_big_stop@2x.png" alt="" />
-                        <!-- <img src="" alt="" /> -->
-                    </section>
-                </li>
-                <li>
-                    <section class="img-left">
-                        <img src="../assets/images/fj.jpg" alt="" />
-                        <span>1.北伐军行图</span>
-                    </section>
-                    <section class="img-right">
-                        <img src="../assets/images/icon_big_stop@2x.png" alt="" />
-                        <!-- <img src="" alt="" /> -->
-                    </section>
-                </li>
-                <li>
-                    <section class="img-left">
-                        <img src="../assets/images/fj.jpg" alt="" />
-                        <span>1.北伐军行图</span>
-                    </section>
-                    <section class="img-right">
-                        <img src="../assets/images/icon_big_stop@2x.png" alt="" />
-                        <!-- <img src="" alt="" /> -->
-                    </section>
-                </li>
-                <li>
-                    <section class="img-left">
-                        <img src="../assets/images/fj.jpg" alt="" />
-                        <span>1.北伐军行图</span>
-                    </section>
-                    <section class="img-right">
-                        <img src="../assets/images/icon_big_stop@2x.png" alt="" />
-                        <!-- <img src="" alt="" /> -->
+                        <img src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
                     </section>
                 </li>
             </ul>
         </section>
-        <!-- <section style="position:relative;">
-            <x-progress :percent="60" :show-cancel="false"></x-progress>
-            <div class="circle"></div>
-        </section> -->
     </div>
 </template>
 
 <script>
-import { XProgress } from 'vux'; 
 export default {
-    components: {
-        XProgress
-    },
     data() {
         return {
-
+            pointsList: []
         }
+    },
+    created() {
+        let pointList = JSON.parse(sessionStorage.getItem('pointList'));
+        pointList.sort((a, b) => a.serial - b.serial);
+        pointList.forEach(element => {
+            this.pointsList.push({
+                src: element.url,
+                name: element.name,
+                id: element.serial
+            });
+        });
     }
 }
 </script>

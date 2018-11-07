@@ -9,16 +9,24 @@ export const appRoutes = [
         name: 'main',
         component: () => import ('@/views/Main.vue'),
         children: [
+            // 景点
             {
                 path: 'scenic-spot',
                 name: 'scenic-spot',
                 component: () => import ('@/views/scenic-spot.vue')
             },
+            // 路线
             {
                 path: 'scenic-line',
                 name: 'scenic-line',
                 component: () => import ('@/views/scenic-line.vue')
-            }
+            },
+            // 其他景区资源
+            {
+                path: 'scenic-resource',
+                name: 'scenic-resource',
+                component: () => import ('@/views/scenic-resource.vue')
+            },
         ]
     },
     {

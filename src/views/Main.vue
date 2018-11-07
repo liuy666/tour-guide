@@ -15,9 +15,6 @@
         #wrapper {
             width: 100%;
             height: 100%;
-            // .amap-demo {
-            //     height: 100%;
-            // }
             .amap-geolocation-con {
                 z-index: inherit !important;
             }
@@ -96,7 +93,6 @@
                 border-top: 1px solid #f8f8f8;
                 li {
                     margin-right: 54px;
-                    height: 100px;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -145,6 +141,21 @@
                     height: 112px;
                     margin-top: 6px;
                     margin-left: 6px;
+                    .control {
+                        position: absolute;
+                        left: 50%;
+                        top: 50%; 
+                    }
+                    .img-16-26 {
+                        width: 16px;
+                        height: 26px;
+                        transform: translate(-8px, -13px);
+                    }
+                    .img-20-24 {
+                        width: 20px;
+                        height: 24px;
+                        transform: translate(-10px, -12px);
+                    }
                 }
                 .player-control-btn{
                     position: absolute;
@@ -283,26 +294,30 @@
             </section>
             <router-view />
             <ul class="main_view_footer">
-                <li v-for="menu in menuList" :key="menu.id" :data-remark="menu.remark" >
+                <li v-for="menu in menuList" :key="menu.id" :data-mark="menu.mark" @click="gotoWhere(menu.mark)">
                     <img :src="menu.graySrc" alt="" />
                     <span>{{ menu.name }}</span>
                 </li>
             </ul>
         </section>
         <section class="toolbars">
-            <!-- <div style="float:left;width: 100px;height: 100%;background-color:#ccc;" @click="handlePlay">播放/暂停</div> -->
-            <!-- <audio controls style="display:none;">
-                <source src="http://hqyatu-navigator.oss-cn-beijing.aliyuncs.com/20181023/e6586ba47dc44b2fb31be240ee7f14e8.mp3?Expires=1540287348&OSSAccessKeyId=LTAIuMC8xUilE1EZ&Signature=qDBw4yqLpye5KXJvsXHnaysFx8Y%3D" type="audio/mpeg" />
-                您的浏览器不支持 audio 元素
+            <!-- <audio controls id="main-audio" name="au1">
+                <source :src="audioSrc" type="audio/mpeg" />
             </audio> -->
             <div class="player-control-btn-area">
                 <x-circle
-                    :percent="audiopercent"
+                    :percent="audioPercent"
                     :stroke-width="2"
                     :trail-width="6"
                     :stroke-color="'#FE5100'"
                     trail-color="#ffffff">
-                    <div class="player-img-area"><img style="width:100%;height:100%;border-radius: 100%;" :src="scenicImg" /></div>
+                    <div class="player-img-area">
+                        <img style="width:100%; height:100%; border-radius: 50%;" :src="scenicImg" />
+                        <!-- 播放图标-暂停中状态 -->
+                        <img v-show="!isPlayed" @click="playAudio()" class="control img-16-26" src="../assets/images/icon_small_pause@3x.png" alt="" />
+                        <!-- 暂停图标-播放中状态 -->
+                        <img v-show="isPlayed" @click="pauseAudio" class="control img-20-24" src="../assets/images/icon_suspend@3x.png" alt="" />
+                    </div>
                 </x-circle>
             </div>
             <div class="scenic-point-name-area">
@@ -340,7 +355,6 @@
 
 <script>
     import { XButton, Icon, XCircle, Toast, Loading} from 'vux';
-    import { setTimeout } from 'timers';
     export default {
         components: {
             XButton,
@@ -600,13 +614,40 @@
                 isOpenDetail: false,
                 isEnd: false,
                 isAuto: false,//是否自动播放
-                isPlay: false,//是否播放状态
-                audiopercent: 100,
+                audioPercent: 0,
                 scenicImg: 'https://tpc.googlesyndication.com/simgad/5843493769827749134',
                 scenicPointName: '1.平襄侯祠',
                 menuList: [],
                 loadText: '',
                 isShowLoading: false,
+                isPlayed: false,
+                timer: '',
+                totalTime: '',
+            }
+        },
+        watch: {
+            audioPercent(val) {
+                if (val >= 100) {
+                    const au = document.querySelector('.main-audio');
+                    clearInterval(this.timer);
+                    if (!au.paused || !au.ended) {
+                        au.pause();
+                    }
+                    let hasPlayList = JSON.parse(sessionStorage.getItem('hasPlayList'));
+                    hasPlayList.push(au.dataset.id);
+                    sessionStorage.setItem('hasPlayList', JSON.stringify(hasPlayList));
+                    this.audioPercent = 0;
+                    this.timer = '';
+                    if (this.isAuto) {
+                        const currentAudioContainer = document.querySelector('.toolbars');
+                        currentAudioContainer.removeChild(au);
+                        let sortList = this.getPlayList();
+                        this.playAudio({
+                            src: sortList[0].guideUrl,
+                            id: sortList[0].resource_id
+                        });
+                    }
+                }
             }
         },
         methods: {
@@ -614,6 +655,8 @@
             async openMenu() {
                 if (!this.isShowMenu) {
                     this.isShowLoading = true;
+
+                    // 获取 menu 菜单列表
                     const getMenu = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/getSelectMenue', {
                         sceneryId: '1057570712933412865'
                     });
@@ -622,29 +665,141 @@
                         return;
                     }
                     // console.log(getMenu);
-                    let menuList = [];
+
+                    // 渲染页面并存储至 sessionStorage
+                    let menuList = [],
+                        colorSrcList = [];
                     getMenu.menue.forEach(item => {
                         menuList.push({
                             name: item.remark,
                             id: item.id,
-                            remark: item.paramKey,
-                            colorSrc: item.iconUrl,
+                            mark: item.paramKey,
                             graySrc: item.iconUrl1
                         });
+                        colorSrcList.push({
+                            mark: item.paramKey,
+                            colorSrc: item.iconUrl,
+                            graySrc: item.iconUrl1
+                        })
                     });
                     this.menuList = [].concat(menuList);
+                    sessionStorage.setItem('colorSrcList', JSON.stringify(colorSrcList));
+
+                    // 初始化默认第一个图标为彩色图片
+                    this.$nextTick(() => {
+                        const lis = document.querySelectorAll('.main_view_footer li');
+                        for (let li of lis) {
+                            if (li.dataset.mark === 'resource_point') {
+                                li.firstElementChild.src = colorSrcList.filter(item => item.mark === 'resource_point')[0].colorSrc;
+                            }
+                        }
+                    })
+                } else {
+                    // 菜单页面关闭后所有图标重置为灰色图片
+                    const _lis = document.querySelectorAll('.main_view_footer li'),
+                          _colorSrcList = JSON.parse(sessionStorage.getItem('colorSrcList'));
+                    for (let li of _lis) {
+                        const _graySrc = _colorSrcList.filter(item => item.mark === li.dataset.mark)[0].graySrc;
+                        li.firstElementChild.src = _graySrc;
+                    }
                 }
                 this.isShowMenu = !this.isShowMenu;
+
+                // 默认跳转到景点列表
                 this.$router.push({
                     name: this.isShowMenu ? 'scenic-spot' : 'main'
                 });
                 this.isShowLoading = false;
             },
-            goto1() {
-                this.$router.push('scenic-spot');
+            // 点击图标加载对应景区资源
+            gotoWhere(remark) {
+                console.log(remark);
+                switch (remark) {
+                    case 'resource_point':
+                        this.$router.push({name: 'scenic-spot'});
+                        break;
+                    case 'resource_line':
+                        this.$router.push({name: 'scenic-line'});
+                        break;
+                    default:
+                        this.$router.push({
+                            name: 'scenic-resource',
+                            params: {
+                                remark
+                            }
+                        });
+                        break;
+                }
             },
-            goto2() {
-                this.$router.push('scenic-line');
+            // 初始化音频播放
+            playAudio(options) {
+                const mainAudio = document.querySelector('.main-audio');
+                if (mainAudio && mainAudio.paused) {
+                    console.log(1)
+                    console.log(mainAudio.currentTime);
+                    console.dir(mainAudio.played);
+                    mainAudio.play();
+                } else {
+                    console.log(2)
+                    let src = '',
+                        id = '';
+                    if (options) {
+                        src = options.src;
+                        id = options.id;
+                    } else {
+                        // let sortList = JSON.parse(sessionStorage.getItem('pointList'));
+                        // sortList.sort((a, b) => a.serial - b.serial);
+                        let sortList = this.getPlayList();
+                        src = sortList[0].guideUrl;
+                        id = sortList[0].resource_id;
+                    }
+                    const audioContainer = document.querySelector('.toolbars');
+                    let audioDom = document.createElement('audio'),
+                        sourceDom = document.createElement('source');
+                    sourceDom.type = 'audio/mpeg';
+                    sourceDom.src = src;
+                    sourceDom.dataset.id = id;
+                    audioDom.appendChild(sourceDom);
+                    audioDom.classList.add('main-audio');
+                    audioDom.style.display = 'none';
+                    audioContainer.appendChild(audioDom);
+                    audioDom.oncanplay = (e) => {
+                        const _audioDom = e.target;
+                        this.totalTime = _audioDom.duration;
+                        console.log(this.totalTime)
+                        _audioDom.play();
+                    }
+                    audioDom.onplay = (e) => {
+                        this.changeProgress();
+                    }
+                }
+                this.isPlayed = true;
+            },
+            // 暂停播放
+            pauseAudio() {
+                console.log(this.timer)
+                clearInterval(this.timer);
+                this.timer = '';
+                document.querySelector('.main-audio').pause();
+                this.isPlayed = false;
+            },
+            // 获取未播放过的音频列表
+            getPlayList() {
+                let _sortList = JSON.parse(sessionStorage.getItem('pointList')),
+                    _hasPlayList = JSON.parse(sessionStorage.getItem('hasPlayList'));
+                _sortList.sort((a, b) => a.serial - b.serial);
+                let notPlayList = _sortList.filter(item => {
+                    return !this.$tool.isExist(item.resource_id, _hasPlayList);
+                });
+                return notPlayList;
+            },
+            changeProgress() {
+                this.timer = setInterval(() => {
+                    let mid = this.audioPercent * 10;
+                    mid += 1;
+                    mid = mid / 10;
+                    this.audioPercent = mid;
+                },this.totalTime);
             },
             useCamera() {
                 console.log(1)
@@ -676,6 +831,7 @@
                     this.isTips = true;
                     return;
                 }
+
                 let pointLnglat = [], pointName = [], pointflag = [], pointSerial = [];
                 if(pointList.page.list && pointList.page.list.length && pointList.page.list.length>0){
                     //设置默认显示(第一个景点的图片和名字)
@@ -683,7 +839,9 @@
                         this.scenicImg = pointList.page.list[0].url;
                         this.scenicPointName = pointList.page.list[0].serial + '.' + pointList.page.list[0].name;
                     }
+
                     sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
+                    sessionStorage.setItem('hasPlayList',JSON.stringify([]));
                     pointList.page.list.forEach((v,i) => {
                         pointLnglat.push([v.longitude,v.latitude])
                         pointName.push(v.name)
