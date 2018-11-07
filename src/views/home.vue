@@ -19,13 +19,13 @@
         }
     }
 
-    .marker-content{
+    #wrapper_home .marker-content{
         width: 60px;
         height: 50px;
         margin-left: -30px;
         font-size: 20px;
     }
-    .scenic-icon{
+    #wrapper_home .scenic-icon{
         width: 100%;
         height: 100%;
         background: url(/icon_scenic_home@3x.png) no-repeat center / auto 100%;
