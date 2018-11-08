@@ -47,7 +47,6 @@
                     display: flex;
                     flex-direction: row;
                     justify-content: space-between;
-                    background: #f8f8f8;
                     .img-left {
                         display: flex;
                         flex-direction: row;
@@ -87,20 +86,11 @@
             <img src="../assets/images/icon_close@2x.png" alt="" class="img-34-34" />
         </section>
         <section class="spot-list">
-            <ul>
-                <!-- <li>
-                    <section class="img-left">
-                        <img src="../assets/images/fj.jpg" alt="" />
-                        <span>1.北伐军行图</span>
-                    </section>
-                    <section class="img-right">
-                        <img src="../assets/images/icon_big_stop@2x.png" alt="" />
-                    </section>
-                </li> -->
-                <li v-for="point of pointsList" :key="point.id">
+            <ul class="list">
+                <li v-for="point of pointsList" :key="point.id" :data-pid="point.id" @click="selectOne">
                     <section class="img-left">
                         <img :src="point.src" alt="加载中..." />
-                        <span>{{ point.id + '. ' +point.name }}</span>
+                        <span>{{ point.index + '. ' +point.name }}</span>
                     </section>
                     <section class="img-right">
                         <img src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
@@ -125,9 +115,15 @@ export default {
             this.pointsList.push({
                 src: element.url,
                 name: element.name,
-                id: element.serial
+                index: element.serial,
+                id: element.resource_id
             });
         });
+    },
+    methods: {
+        selectOne(evnet) {
+            console.log(event);
+        }
     }
 }
 </script>
