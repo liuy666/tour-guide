@@ -207,18 +207,7 @@ export default {
             audioProgress: 60,
             currentTime: '2:00',
             totalTime: '5:30',
-            imageList : [
-                {
-                    url: 'javascript:',
-                    img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vvsr72j20p00gogo2.jpg',
-                    title : '1/2'
-                },
-                {
-                    url: 'javascript:',
-                    img: 'https://ww1.sinaimg.cn/large/663d3650gy1fq66vw50iwj20ff0aaaci.jpg',
-                    title: '2/2'
-                }
-            ]
+            imageList : []
         }
     },
     methods : {
@@ -230,8 +219,34 @@ export default {
 
         },
         //获取当前景点轮播图
-        getCurrentImgList() {
-
+        async getCurrentImgList() {
+            let _self = this;
+            this.imageList = [];
+            const imgList = await this.$http.get(this.$base + 'hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
+            debugger
+            if(!imgList){
+                return
+            }
+            if(imgList.sowingPictures && imgList.sowingPictures.length>0){
+                let len = imgList.sowingPictures.length;
+                let list = [];
+                imgList.sowingPictures.forEach((v,i) => {
+                    let title = (i+1)+'/'+len;
+                    let obj = {
+                        url : 'javascript:',
+                        img : v,
+                        title : title
+                    }
+                    list.push(obj);
+                })
+                this.imageList = list;
+            }else{
+                this.imageList.push({
+                    url : 'javascript:',
+                    img : '../assets/images/fj.jpg',
+                    title : ''
+                })
+            }
         },
         //切换景点
         changePointInfo (index,ev) {
@@ -241,8 +256,11 @@ export default {
             this.pointImg = this.pointList[index].url;
             this.pointName = this.pointList[index].serial + '. ' + this.pointList[index].name;
             this.pointCaption = this.pointList[index].commentary;
-            
+            this.getCurrentImgList();
         }
+    },
+    created() {
+        this.getCurrentImgList();
     },
     mounted() {
         this.pointList.forEach((v,i) => {
