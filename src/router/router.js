@@ -2,54 +2,70 @@ export const appRoutes = [
     {
         path: '/',
         name: 'index',
-        component: () => import ('@/views/home.vue')
+        component: () => import('@/views/home.vue')
     }, 
     {
         path: '/main',
         name: 'main',
-        component: () => import ('@/views/Main.vue'),
+        component: () => import('@/views/Main.vue'),
         children: [
-            // 景点
+            // 景点资源
             {
                 path: 'scenic-spot',
                 name: 'scenic-spot',
-                component: () => import ('@/views/scenic-spot.vue')
+                component: () => import('@/views/scenic-spot.vue')
             },
-            // 路线
+            // 路线资源
             {
                 path: 'scenic-line',
                 name: 'scenic-line',
-                component: () => import ('@/views/scenic-line.vue')
+                component: () => import('@/views/scenic-line.vue')
             },
             // 其他景区资源
             {
                 path: 'scenic-resource',
                 name: 'scenic-resource',
-                component: () => import ('@/views/scenic-resource.vue')
+                component: () => import('@/views/scenic-resource.vue')
             },
         ]
     },
+    // 智能识别
     {
-        path: '/use-camera',
-        name: 'use-camera',
-        component: () => import ('@/views/use-camera.vue')
+        path: '/recognize',
+        name: 'recognize',
+        component: () => import('@/views/recognize.vue')
     },
+    // 景点详情
     {
         path: '/scenic-point-detail',
         name: 'scenic-point-detail',
-        component: () => import ('@/views/scenic-point-detail.vue')
+        component: () => import('@/views/scenic-point-detail.vue')
     },
-    {
-        path: '/scenic-detail',
-        name: 'scenic-detail',
-        component: () => import ('@/views/scenic-detail.vue')
-    },
+    // 新增反馈
     {
         path: '/feedback',
         name: 'feedback',
-        component: () => import ('@/views/feedback.vue'),
+        component: () => import('@/views/feedback.vue'),
         meta: {
             title: '反馈'
+        }
+    },
+    // 花草识别详情
+    {
+        path: '/recognize-detail',
+        name: 'recognize-detail',
+        component: () => import('@/views/recognize-detail.vue'),
+        meta: {
+            title: '识别详情'
+        }
+    },
+    // 查看景区全景图
+    {
+        path: '/full-view',
+        name: 'full-view',
+        component: () => import('@/views/full-view.vue'),
+        meta: {
+            title: '全景图'
         }
     }
 ]
