@@ -222,6 +222,13 @@ export default {
         }
     },
     methods : {
+        //播放
+        playAudio() {
+
+        },
+        pauseAudio() {
+
+        },
         //获取当前景点轮播图
         getCurrentImgList() {
 
