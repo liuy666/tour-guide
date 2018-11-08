@@ -459,6 +459,7 @@
             console.log(this.$route)
         },
         async mounted() {
+            const _self = this;
             const query = this.$route.query;
             if (query.sid) {
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list');
@@ -488,7 +489,7 @@
                   centerPoint = [scenicInfo.longitude,scenicInfo.latitude];
             console.log("中心点：" + centerPoint);
             console.log('右上：'+imgRightTop+'左下:'+imgLeftBottom);
-            const _self  = this;
+            
             //获取屏幕大小 动态设置不同手机的地图zoom
             const containerWidth = document.querySelector('#wrapper').clientWidth;
             const containerHeight = document.querySelector('#wrapper').clientHeight; 
@@ -526,7 +527,8 @@
                     imgLeftBottom,
                     imgRightTop
                 ),
-                zooms:[zoom,maxZoom],
+                //zooms:[zoom,maxZoom],
+                zooms:[16,19],
                 zIndex: 100
             });
             //地图
@@ -744,7 +746,8 @@
                 isPlayed: false,
                 timer: '',
                 totalTime: '',
-                currentScenicId: ''
+                currentScenicId: '',
+                markers: [],
             }
         },
         watch: {
@@ -992,7 +995,7 @@
                 let pointLnglat = [], pointName = [], pointflag = [], pointSerial = [];
                 if(pointList.page.list && pointList.page.list.length && pointList.page.list.length>0){
                     //设置默认显示(第一个景点的图片和名字) 如果通过二维码扫码进入页面则使用指定景点
-                    if(this.resourceType == 1) {
+                    if(resourceType == 1) {
                         if (query && query.pid) {
                           const qrcode_point = pointList.filter(item => item.resource_id === query.pid)[0];
                             this.scenicPointImg = qrcode_point.url;
@@ -1020,11 +1023,13 @@
                         if(v.serial){
                             pointSerial.push(v.serial)
                         }
+                        setPoint([v.longitude,v.latitude],i)
+
                     })
                 }
                 //地图画点
                 let pointLnglat1 = [[104.839214,32.459624],[104.840214,32.459624]];
-                let markers = [];//用覆盖物群组的方式添加多个点标记 方便移除
+                //用覆盖物群组的方式添加多个点标记 方便移除
                 function setPoint(point,index) { 
                     let num = _self.resourceType == 1 ? pointSerial[index] : '';
                     let marker = new AMap.Marker({
@@ -1033,12 +1038,12 @@
                     });
                     marker.on('click',_self.markerClick);
                     //_self.oMap_main.add(marker);
-                    markers.push(marker);
+                    _self.markers.push(marker);
                 }
                 pointLnglat1.forEach(function(value,index){
                     setPoint(value,index);
                 })
-                let overlayGroups = new AMap.OverlayGroup(markers);
+                let overlayGroups = new AMap.OverlayGroup(_self.markers);
                 this.pointGroups = overlayGroups;
                 this.oMap_main.add(overlayGroups);
             },
@@ -1114,7 +1119,9 @@
 
             },
             toDetail() {
-                this.$router.push('scenic-point-detail');
+                this.$router.push({
+                    name :  'scenic-point-detail'
+                });
             },
         
         }
