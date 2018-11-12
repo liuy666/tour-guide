@@ -1178,7 +1178,10 @@
                     name :  'scenic-point-detail'
                 });
             },
-        
+            //画路线
+            drawLine() {
+
+            }
         }
     }
 </script>
