@@ -54,7 +54,7 @@
                         border-radius: 50%;
                         background: #fff;
                         position: absolute;
-                        left: 60%;
+                        left: -16px;
                         top: -2px;
                         box-shadow:0px 1px 3px 0px rgba(129,28,0,0.15);
                     }
@@ -66,6 +66,9 @@
             margin-top: 24px;
             .vux-slider{
                 border-radius: 20px;
+            }
+            .vux-swiper-desc{
+                text-align: right;
             }
         }
         .captiom-area , .point-list-area{
@@ -143,12 +146,12 @@
             <div class="audio-area-name">
                 <span class="point-name">{{pointName}}</span>
                 <div style="display:flex;margin-top:6px;">
-                    <div class="audio-time">{{currentTime}}</div>
+                    <div class="audio-time">{{currentTimeStr}}</div>
                     <div class="audio-progress">
                         <x-progress :percent="audioProgress" :show-cancel="false"></x-progress>
                         <div class="circle"></div>
                     </div>
-                    <div class="audio-time">{{totalTime}}</div>
+                    <div class="audio-time">{{totalTimeStr}}</div>
                 </div>
             </div>
         </section>
@@ -204,28 +207,119 @@ export default {
             pointList: JSON.parse(sessionStorage.getItem("pointList")),
 
             isPlayed: false,
-            audioProgress: 60,
-            currentTime: '2:00',
-            totalTime: '5:30',
-            imageList : []
+            audioProgress: 0,
+            currentTimeStr: '0:00',
+            totalTimeStr: '0:00',
+            currentTime : '',
+            totalTime:'',
+            imageList : [],
+            timer: ''
+        }
+    },
+    watch : {
+        audioProgress (v) {
+            if(v >= 100){
+                const dAudio = document.querySelector('.detail-audio');
+                clearInterval(this.timer);
+                if (!dAudio.paused || !dAudio.ended) {
+                    dAudio.pause();
+                }
+                this.isPlayed = false;
+            }
         }
     },
     methods : {
+        //初始化音频
+        setAudio(isChange) {
+            const audio = document.querySelector(".detail-audio");
+            if(audio){
+                document.querySelector(".audio-area").removeChild(audio);
+            }
+            const audioContainer = document.querySelector(".audio-area");
+            let audioDom = document.createElement("audio"),
+                sourceDom = document.createElement("source");
+            sourceDom.type = 'audio/mpeg';
+            sourceDom.src = JSON.parse(sessionStorage.getItem("currentPoint")).guideUrl;
+            audioDom.dataset.id = JSON.parse(sessionStorage.getItem("currentPoint")).resource_id;
+            audioDom.appendChild(sourceDom);
+            audioDom.classList.add('detail-audio');
+            audioDom.style.display = 'none';
+            audioContainer.appendChild(audioDom);
+            audioDom.oncanplay = (e) => {
+                const _audioDom = e.target;
+                this.totalTime = _audioDom.duration;
+                let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
+                this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
+            }
+            audioDom.onplay = (e) => {
+                this.changeProgress();
+            }
+            if(!isChange){//进页面的初始化
+                const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
+                if(playStatus){
+                    let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0),
+                        tm = (playStatus.totalTime%60).toFixed(0) < 10 ? '0'+(playStatus.totalTime%60).toFixed(0) : (playStatus.totalTime%60).toFixed(0);
+                    this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
+                    this.totalTimeStr = Math.floor(playStatus.totalTime/60) + ":" + tm;
+                    this.isPlayed = playStatus.status;
+                    audioDom.currentTime = playStatus.currentTime;
+                    if(!playStatus.status){//播放状态
+                        this.isPlayed = true;
+                        audioDom.play();
+                    }else{
+                        this.isPlayed = false;
+                    }   
+                }else{
+                    let tm1 = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
+                    this.currentTimeStr = '0:00';
+                    this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + tm1;
+                    this.isPlayed = false;
+                }
+            }else{//切换景点的初始化
+                let tm2 = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
+                this.currentTimeStr = '0:00';
+                this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + tm2;
+                this.isPlayed = false;
+            }
+        },
         //播放
         playAudio() {
-
+            const detailAudio = document.querySelector(".detail-audio");
+            if(detailAudio && detailAudio.paused){
+                this.isPlayed = true;
+                detailAudio.play();
+            }else{
+                console.log("****");
+            }
         },
         pauseAudio() {
+            clearInterval(this.timer);
+            this.timer = '';
+            document.querySelector('.detail-audio').pause();
+            this.isPlayed = false;
+        },
+        changeProgress() {
+            this.timer = setInterval(() => {
+                this.currentTime = document.querySelector('.detail-audio').currentTime;
+                let cf = Math.floor(this.currentTime/60);
+                let cm = (this.currentTime%60).toFixed(0) < 10 ? '0'+(this.currentTime%60).toFixed(0) : (this.currentTime%60).toFixed(0);
+                if(cm == 60) {
+                    cf = cf + 1;
+                    cm = "00";
+                }
+                this.currentTimeStr = cf + ":" + cm;
 
+                this.audioProgress = this.currentTime / this.totalTime * 100;
+                document.querySelector(".circle").style.left = "calc("+this.audioProgress+"% - 8px)";
+            },1000);
         },
         //获取当前景点轮播图
         async getCurrentImgList() {
             let _self = this;
             this.imageList = [];
             const imgList = await this.$http.get(this.$base + 'hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
-            debugger
             if(!imgList){
-                return
+                return;
             }
             if(imgList.sowingPictures && imgList.sowingPictures.length>0){
                 let len = imgList.sowingPictures.length;
@@ -257,6 +351,7 @@ export default {
             this.pointName = this.pointList[index].serial + '. ' + this.pointList[index].name;
             this.pointCaption = this.pointList[index].commentary;
             this.getCurrentImgList();
+            this.setAudio(true);
         }
     },
     created() {
@@ -270,6 +365,20 @@ export default {
             }
         });
         document.querySelector(".point-list").scrollLeft = 120 * this.currentIndex;
+
+        this.setAudio();
+    },
+    destroyed() {
+        if(this.timer){
+            let playStatus = {
+                currentTime: this.currentTime,
+                totalTime: this.totalTime,
+                status : this.isPlayed
+            }
+            sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
+            clearInterval(this.timer);
+        }
+
     }
 }
 </script>

@@ -56,17 +56,17 @@
             const containerHeight = document.querySelector('#wrapper_home').clientHeight; 
             let zoom = 0; //地图缩放
             if(containerHeight<600){
-                zoom = 10;
+                zoom = 9.5;
             }else if(containerHeight<700){
-                zoom = 10.1;
+                zoom = 9.6;
             }else if(containerHeight<800){
-                zoom = 10.3;
+                zoom = 9.8;
             }else if(containerHeight<900){
-                zoom = 10.4;
+                zoom = 9.8;
             }else if(containerWidth > 500 && containerWidth < 800){
-                zoom = 10.8;
+                zoom = 10.3;
             }else if(containerWidth > 800){
-                zoom = 11.2;
+                zoom = 10.8;
             }
 
             let offsetx = 4;//信息窗体偏移
@@ -80,10 +80,10 @@
 
             //地图图片图层
             const imageLayer = new AMap.ImageLayer({
-                url: './qingchuan.jpg',
+                url: './qcx.jpg',
                 bounds: new AMap.Bounds(
-                    [104.599752, 32.118127],
-                    [105.639333, 32.926354]  
+                    [104.49496, 31.459197],
+                    [105.725429, 33.573508]  
                 ),
                 zooms:[zoom,14],
                 zIndex: 100
@@ -96,7 +96,7 @@
                 rotateEnable: false,
                 touchZoomCenter: 1,
                 center: [105.019557,32.526044],
-                zoom: zoom,
+                zoom: 9,
                 zooms:[zoom,14],
                 viewMode: '3D',
                 layers: [
