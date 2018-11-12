@@ -33,6 +33,10 @@
             .amap-locate-loading .amap-geo {
                 background: #fff  url(https://webapi.amap.com/theme/v1.3/loading.gif) no-repeat center center / 50% 50%;
             }
+            .amap-icon img{
+                width: 50px;
+                height: 56px;
+            }
         }
         .main_view {
             width: 710px;
@@ -469,20 +473,19 @@
             Toast,
             Loading
         },
-        beforeRouteUpdate (to, from, next) {debugger
+        beforeRouteUpdate (to, from, next) {
             if(to.name == "main"){
                 this.isShowMenu = false;
                 if(from.name == "scenic-line" && to.params.lineId){
                     this.drawLine(to.params.lineId);
                 }
             }
-            
             next();
         },
-        created() {
+        created() { 
             console.log(this.$route)
         },
-        async mounted() {
+        async mounted() { 
             const _self = this;
             const query = this.$route.query;
             if (query.sid) {
@@ -753,7 +756,9 @@
                 scenicDec: '',
                 oMap_main: {},
                 infoWindow_main: {},
-                pointGroups: {},
+                pointGroups: {},//覆盖物群组
+                line: {},//路线
+                linePointGroups : {}, //路线起点终点的覆盖物群组
                 resourceType: 1, // 景区资源类型 默认 1 -- 景点
                 isTips: false,
                 tipsText: '请求失败',
@@ -924,6 +929,8 @@
                 switch (remark) {
                     case 'resource_point':
                         this.getScenicPointList(value);
+                        this.oMap_main.remove(this.line);
+                        this.oMap_main.remove(this.linePointGroups);
                         this.$router.push({
                             name: 'scenic-spot',
                             params: {
@@ -941,6 +948,8 @@
                         break;
                     default:
                         this.getScenicPointList(value);
+                        this.oMap_main.remove(this.line);
+                        this.oMap_main.remove(this.linePointGroups);
                         this.$router.push({
                             name: 'scenic-resource',
                             params: {
@@ -1006,7 +1015,7 @@
             },
             // 获取未播放过的音频列表
             getPlayList() {
-                let _sortList = JSON.parse(sessionStorage.getItem('pointList')),
+                let _sortList = JSON.parse(sessionStorage.getItem('audioList')),
                     _hasPlayList = JSON.parse(sessionStorage.getItem('hasPlayList'));
                 _sortList.sort((a, b) => a.serial - b.serial);
                 let notPlayList = _sortList.filter(item => {
@@ -1077,6 +1086,7 @@
                             sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
                         }
                         sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
+                        sessionStorage.setItem('audioList',JSON.stringify(pointList.page.list));
                     } else {
                         this.saveResourceList(pointList.page.list);
                     }
@@ -1205,7 +1215,6 @@
             drawLine(lineId) {
                 const lineList = this.$store.state.app.lineList;
                 let currentLine = lineList.filter(item => item.lineId === lineId)[0];
-                console.log(currentLine);
                 let path = currentLine.coordinatesList;
                 let mapPath = [];
                 path.forEach(v => {
@@ -1226,7 +1235,24 @@
                     lineCap: 'round',
                     zIndex: 150
                 });
+                this.line = polyline;
                 this.oMap_main.add(polyline);
+
+                //起点终点
+                let points = [mapPath[0],mapPath[mapPath.length-1]];
+                let linePoints = [];
+                points.forEach((v,i) => {
+                    let ic = i == 0 ? '/icon_rise@3x.png' : 'icon_end@3x.png';
+                    let linemarker = new AMap.Marker({
+                        icon : ic,
+                        position: v,
+                        offset: new AMap.Pixel(-12, -28),
+                    });
+                    linePoints.push(linemarker);
+                })
+                let groups = new AMap.OverlayGroup(linePoints);
+                this.linePointGroups = groups;
+                this.oMap_main.add(groups);
             }
         }
     }
