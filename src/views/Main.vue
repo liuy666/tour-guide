@@ -471,8 +471,8 @@
         },
         beforeRouteUpdate (to, from, next) {debugger
             if(to.name == "main"){
-                this.isShowMenu = false;
                 if(from.name == "scenic-line" && to.params.lineId){
+                    this.openMenu();
                     this.drawLine(to.params.lineId);
                 }
             }

@@ -65,7 +65,7 @@
                         </section>
                     </section>
                     <section class="img-right">
-                        <img src="../assets/images/icon_select@2x.png" alt="" />
+                        <img :data-lineid="line.lineId" src="../assets/images/icon_select@2x.png" alt="" />
                     </section>
                 </li>
             </ul>
@@ -85,6 +85,14 @@ export default {
     }),
     methods: {
         gotoMapLine(lineId) {
+            const imgs = document.querySelectorAll('.img-right img');
+            for (let img of imgs) {
+                if (img.dataset.lineid === lineId) {
+                    img.style.display = 'block';
+                } else {
+                    img.style.display = 'none';
+                }
+            }
             this.$router.push({
                 name: 'main',
                 params: {

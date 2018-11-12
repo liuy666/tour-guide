@@ -17,6 +17,19 @@
         .weui-toast__content{
             margin-top: 20px;
         }
+        .msg-70-70 {
+            width: 70px;
+            height: 70px;
+            position: absolute;
+            top: 21px;
+            left: 24px;
+        }
+        .has {
+            background: url("../assets/images/icon_news@3x.png") no-repeat center center / 70px 70px;
+        }
+        .no {
+            background: url("../assets/images/icon_news_no@3x.png") no-repeat center center / 70px 70px;
+        }
     }
 
     #wrapper_home .marker-content{
@@ -38,16 +51,42 @@
 <template>
     <div id="home">
         <section id="wrapper_home"></section>
+        <section class="msg-70-70" :class="[isHasMsg ? 'has' : 'no']" @click="gotoMsgList"></section>
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true" width="8.2em"></toast>
     </div>
 </template>
 
 <script>
     import { setTimeout } from 'timers'
-    import { Toast } from 'vux'
+    import { Toast, Badge } from 'vux'
     export default {
         components: {
-            Toast
+            Toast,
+            Badge
+        },
+        async created() {
+            const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
+                domainUrl: 'www.qxgz.com', // 上线改成获取域名
+                limit: 20
+            });
+
+            console.log(getMsgList)
+            if (!getMsgList) {
+                return;
+            }
+            const validList = getMsgList.page.list.filter(item => {
+                // 处理当天时间,获取失效时间和今天之间的间隔时间
+                const today1 = this.$tool.formatDate(new Date()), // 格式化当天时间，舍去时分秒
+                      today2 = new Date(today1 + 'T00:00:00'), // 重新转成日期标准格式
+                      today3 = today2.getTime(), // 得到具体毫秒值
+                      interval = item.passDate - today3 ;
+                return interval >= 0;
+            });
+            if (validList.length) {
+                this.isHasMsg = true;
+            } else {
+                this.isHasMsg = false;
+            }
         },
         mounted() {
             const _self  = this;
@@ -118,7 +157,8 @@
                 oMap_home : {},
                 oInfoWindow : {},
                 isTips : false,
-                tipsText : '请求失败'
+                tipsText : '请求失败',
+                isHasMsg: false,
             }
         },
         methods: {
@@ -203,6 +243,13 @@
                 this.$router.push({
                     name : 'main'
                 })
+            },
+            gotoMsgList() {
+                if (this.isHasMsg) {
+                    this.$router.push({
+                        name: 'message-list'
+                    });
+                }
             }
         }
     }
