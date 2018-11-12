@@ -120,7 +120,7 @@
                                     <span>{{ msg.date2 }}</span>
                                     <span>{{ msg.date3 }}</span>
                                 </p>
-                                <a href="" @click.prevent="gotoMsgDetail>阅读全文</a>
+                                <a href="javascript:void(0);">阅读全文</a>
                             </section>
                         </dd>
                     </dl>
@@ -186,16 +186,19 @@ export default {
                 id: item.articleId,
             }
         });
-        // 存储文章
-        this.saveContent(this.messageList);
     },
     methods: {
         ...mapMutations([
             'saveContent'
         ]),
-        gotoMsgDetail() {
-            console.log(1)
-        }
+        gotoMsgDetail(params) {
+            // 存储文章
+            this.saveContent(params.content);
+            this.$router.push({
+                name: 'msg-detail',
+                params
+            });
+        },
     }
 }
 </script>

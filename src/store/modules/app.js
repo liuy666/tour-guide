@@ -16,6 +16,10 @@ const app = {
         },
         saveContent(state, val) {
             state.content = val;
+            sessionStorage.setItem('msgContent', val);
+        },
+        initContent(state) {
+            state.content = sessionStorage.getItem('msgContent');
         }
     },
     actions: {

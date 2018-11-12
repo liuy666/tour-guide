@@ -42,7 +42,7 @@ const vm = new Vue({
     store,
     render: h => h(App),
     mounted() {
-
+        this.$store.commit('initContent');
     }
 }).$mount('#app');
 
