@@ -26,7 +26,7 @@ Vue.config.productionTip = false;
 Vue.prototype.$QS = QS;
 Vue.prototype.$tool = utils;
 Vue.prototype.$http = https;
-Vue.prototype.$base = process.env.NODE_ENV === "production" ? '' : '/api',
+Vue.prototype.$base = process.env.NODE_ENV === "production" ? '' : '/api';
 
 // 引入高德SDK
 // Vue.use(VueAMap);
@@ -37,7 +37,7 @@ Vue.prototype.$base = process.env.NODE_ENV === "production" ? '' : '/api',
 //     uiVersion: '1.0.11' // 版本号
 // });
 
-new Vue({
+const vm = new Vue({
     router,
     store,
     render: h => h(App),
@@ -45,3 +45,5 @@ new Vue({
 
     }
 }).$mount('#app');
+
+export default vm;

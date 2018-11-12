@@ -1,5 +1,15 @@
 <style lang="less" scoped>
     #scenic-spot {
+        .weui-loading_toast .weui-toast {
+            top: @toast-top;
+            height: 170px;
+            width: 228px;
+            i {
+                width: 60px;
+                height: 60px;
+                margin-top: 55px;
+            }
+        }
         .seach {
             position: relative;
             width:650px;
@@ -80,10 +90,12 @@
 
 <template>
     <div id="scenic-spot">
+        <!-- 网络请求loading层 -->
+        <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <section class="seach">
-            <input type="text" placeholder="请输入景点名称" />
-            <img src="../assets/images/icon_so@2x.png" alt=""  class="img-32-34" />
-            <img src="../assets/images/icon_close@2x.png" alt="" class="img-34-34" />
+            <input type="text" placeholder="请输入景点名称" v-model="val" />
+            <img src="../assets/images/icon_so@2x.png" alt=""  class="img-32-34" @click="searchInput" />
+            <img src="../assets/images/icon_close@2x.png" alt="" class="img-34-34" @click="clearInput" />
         </section>
         <section class="spot-list">
             <ul class="list">
@@ -102,27 +114,56 @@
 </template>
 
 <script>
+import { Loading } from 'vux';
 export default {
+    components: {
+        Loading
+    },
     data() {
         return {
-            pointsList: []
+            pointsList: [],
+            val: '',
+            isShowLoading: false,
+            loadText: '',
+            sceneryId: '',
         }
     },
     created() {
         let pointList = JSON.parse(sessionStorage.getItem('pointList'));
-        pointList.sort((a, b) => a.serial - b.serial);
-        pointList.forEach(element => {
-            this.pointsList.push({
-                src: element.url,
-                name: element.name,
-                index: element.serial,
-                id: element.resource_id
-            });
-        });
+        this.getList(pointList);
+        this.sceneryId = this.$route.params.sceneryId;
     },
     methods: {
         selectOne(evnet) {
             console.log(event);
+        },
+        clearInput() {
+            this.val = '';
+        },
+        async searchInput() {
+            this.isShowLoading = true;
+            const result = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/list', {
+                sceneryId: this.sceneryId,
+                resourceType: 1,
+                name: this.val
+            });
+            if (!result) {
+                this.isShowLoading = false;
+                return;
+            }
+            this.getList(result.page.list);
+            this.isShowLoading = false;
+        },
+        getList(pointList) {
+            pointList.sort((a, b) => a.serial - b.serial);
+            this.pointsList = pointList.map(element => {
+                return {
+                    src: element.url,
+                    name: element.name,
+                    index: element.serial,
+                    id: element.resource_id
+                };
+            });
         }
     }
 }

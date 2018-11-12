@@ -33,9 +33,9 @@
     <div id="scenic-resource">
         <section class="resource-list">
             <ul>
-                <li>
-                    <img src="../assets/images/fj.jpg" alt="" />
-                    <span>剑门关景区购物点</span>
+                <li v-for="res of resources" :key="res.resource_id">
+                    <img :src="res.url" alt="" />
+                    <span>{{res.name}}</span>
                 </li>
             </ul>
         </section> 
@@ -43,11 +43,15 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     data() {
         return {
-
+            
         }
-    }
+    },
+    computed: mapState({
+        resources: state => state.app.resourceList
+    }),
 }
 </script>

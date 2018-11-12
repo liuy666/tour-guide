@@ -43,6 +43,7 @@
                             width: 30px;
                             height: 24px;
                             margin-right: 28px;
+                            display: none;
                         }
                     }
                 }
@@ -55,12 +56,12 @@
     <div id="scenic-line">
         <section class="line-list">
             <ul>
-                <li>
+                <li v-for="line of lines" :key="line.lineId">
                     <section class="img-left">
-                        <img src="../assets/images/fj.jpg" alt="" />
+                        <img src="../assets/images/bg_select@2x.png" alt="" />
                         <section>
-                            <p class="font30">古道风情路线</p>
-                            <p class="font24">用时4小时</p>
+                            <p class="font30">{{line.name}}</p>
+                            <p class="font24">用时{{parseInt(line.playHour)}}小时</p>
                         </section>
                     </section>
                     <section class="img-right">
@@ -73,11 +74,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
     data() {
         return {
-
         }
-    }
+    },
+    computed: mapState({
+        lines: state => state.app.lineList,
+    }),
 }
 </script>

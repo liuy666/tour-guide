@@ -22,16 +22,6 @@ axios.interceptors.response.use((res) => {
 });
 
 /**
- * 单一请求--检查http状态码
- * @param {object} err -- 请求异常后返回的数据对象
- * @return {object}  请求正常则返回数据对象data，否则返回自定义错误提示信息对象
- */
-function checkStatus(err) {
-	console.log('------ 检查 Http 状态码 ------');
-	console.log(err.response);
-}
-
-/**
  * 单一请求--检查异步请求的后端返回信息码code
  * @param {object} res -- 异步请求返回的数据主体对象
  * @return {object}  code正常则返回数据对象数据主体对象，否则弹出对话框显示msg信息
@@ -51,12 +41,46 @@ function checkCode(res) {
 }
 
 /**
+ * 单一请求--检查http状态码
+ * @param {object} err -- 请求异常后返回的数据对象
+ * @return {object}  请求正常则返回数据对象data，否则返回自定义错误提示信息对象
+ */
+function checkStatus(err) {
+	console.log('------ 检查 Http 状态码 ------');
+	console.log(err.response);
+}
+
+/**
+ * 并发请求--检查异步请求的后端返回信息码code
+ * @param {object} resList
+ * @return {object/array}
+ */
+function checkAllCode(resList) {
+	console.log('------ 检查并发 Code 信息码 ------');
+	let isSuccess = resList.every(item => {
+		return item.data.code === 0;
+	});
+	if (isSuccess) {
+		console.log('**** 这里是并发请求数据 ****');
+		return resList.map(item => {
+			return item.data;
+		});
+	} else {
+		// title: '温馨提示',
+        // content: '当前服务不可用，请手动刷新后重试'
+		console.log(resList);
+        return false;
+	}
+}
+
+/**
  * 并发请求--检查http状态码
- * @param {array} resList
+ * @param {array} err
  * @return {object}
  */
-function checkAllStatus(resList) {
+function checkAllStatus(err) {
 	console.log('------ 检查并发 Http 状态码 ------');
+	console.log(err.response);
 	// let isSuccess = resList.every(item => {
 	// 	return item.status === 200;
 	// });
@@ -75,40 +99,6 @@ function checkAllStatus(resList) {
 	// 	};
 	// }
 }
-
-/**
- * 并发请求--检查异步请求的后端返回信息码code
- * @param {object} resObj
- * @return {object/array}
- */
-function checkAllCode(resObj) {
-	console.log('------ 检查并发 Code 信息码 ------');
-	// if(resObj.status === -400) {
-	// 	iView.Modal.error({
-    //         title: '温馨提示',
-    //         content: resObj.msg
-    //     });
-	// 	return false;
-	// }
-	// let isSuccess = resObj.data.every(item => {
-	// 	return item.code === 200;
-	// });
-	// if(isSuccess) {
-	// 	let dataList = resObj.data.map(item => {
-	// 		return item.data;
-	// 	});
-	// 	// console.log('**** 这里是数据 ****');
-	// 	return dataList;
-	// } else {
-	// 	iView.Modal.error({
-    //         title: '温馨提示',
-    //         content: '当前服务不可用，请手动刷新后重试'
-	// 	});
-	// 	// console.log(resObj);
-    //     return false;
-	// }
-}
-
 
 /*
  * Axios封装-get/post/put/delete/all
@@ -176,39 +166,14 @@ export default {
 	},
 	all(requestList) {
 		requestList = requestList.map(item => {
-			let queryParams = null,
-				urlParams = null;
-
-			// 设置get请求的token
-			if(item.queryParams) {
-				queryParams = Object.assign({},{
-					// 'access_token': sessionStorage.getItem('token_key')
-				},item.queryParams);
-			} else {
-				queryParams = {
-					// 'access_token': sessionStorage.getItem('token_key')
-				};
-			}
-
-			// 设置post请求的token
-			if(item.urlParams) {
-				urlParams = Object.assign({},{
-					// 'access_token': sessionStorage.getItem('token_key')
-				},item.urlParams);
-			} else {
-				urlParams = {
-					// 'access_token': sessionStorage.getItem('token_key')
-				};
-			}
 
 			// 发出请求
 			if(item.type === 'get') {
-				item.url += '?' + Qs.stringify(queryParams);
+				item.url += '?' + Qs.stringify(item.urlParams);
 				return axios.get(item.url);
 			}
             if(item.type === 'post') {
-				item.url += '?' + Qs.stringify(urlParams);
-				return axios.post(item.url,item.bodyParams,{
+				return axios.post(item.url, item.bodyParams, {
 					headers: {
 						'Content-Type': 'application/json'
 					}

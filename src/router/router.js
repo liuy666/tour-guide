@@ -23,7 +23,7 @@ export const appRoutes = [
             },
             // 其他景区资源
             {
-                path: 'scenic-resource',
+                path: 'scenic-resource/:type',
                 name: 'scenic-resource',
                 component: () => import('@/views/scenic-resource.vue')
             },

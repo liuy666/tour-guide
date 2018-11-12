@@ -1,4 +1,12 @@
 <style lang="less">
+    @keyframes rollup {
+        0% {
+            transform: translateY(0px);
+        }
+        100% {
+            transform: translateY(-160px);
+        }
+    }
     #main {
         height:100%;
         width: 100%;
@@ -68,12 +76,17 @@
                         margin-top: 24px;
                     }
                     .content {
-                        font-size: 24px;
-                        line-height: 34px;
+                        height: 80px;
                         font-weight: 500;
                         display: flex;
                         flex-direction: column;
                         margin-top: 31px;
+                        overflow: hidden;
+                        span {
+                            font-size: 24px;
+                            line-height: 41px;
+                            animation: rollup 8s linear 1s  infinite;
+                        }
                     }
                 }
             }
@@ -229,14 +242,6 @@
                 }
             }
         }
-        
-        .xxx {
-            position: absolute;
-            right: 40px;
-            top: 140px;
-            width: 100px;
-            height: 100px;
-        }
         //点标记
         .marker-content{
             font-size: 20px;
@@ -359,6 +364,12 @@
                     <section class="content">
                         <span>22~15℃</span>
                         <span>多云</span>
+                        <span>空气指数</span>
+                        <span>优:38</span>
+                        <span>22~15℃</span>
+                        <span>多云</span>
+                        <span>空气指数</span>
+                        <span>优:38</span>
                     </section>
                     <span><img src="../assets/images/partly_cloudy_day@2x.png" alt="加载中..."></span>
                 </section>
@@ -446,7 +457,8 @@
 </template>
 
 <script>
-    import { XButton, Icon, XCircle, Toast, Loading} from 'vux';
+    import { XButton, Icon, XCircle, Toast, Loading } from 'vux';
+    import { mapActions, mapMutations } from 'vuex';
     export default {
         components: {
             XButton,
@@ -791,20 +803,39 @@
                 if (!this.isShowMenu) {
                     this.isShowLoading = true;
 
-                    // 获取 menu 菜单列表
-                    const getMenu = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/getSelectMenue', {
-                        sceneryId: '1057570712933412865'
-                    });
-                    if (!getMenu) {
+                    // 获取当前景区经纬度
+                    const getCoordinate = JSON.parse(sessionStorage.getItem('currentScenic'));
+
+                    // 获取 menu 菜单列表 获取天气
+                    const getListAndWheather = await this.$http.all([
+                        {
+                            type: 'get',
+                            url: this.$base + '/hqyatu-navigator/app/resource/getSelectMenue',
+                            urlParams: {
+                                sceneryId: this.sceneryId
+                            }
+                        },
+                        {
+                            type: 'get',
+                            url: this.$base + '/hqyatu-navigator/app/weather/getWeatherData',
+                            urlParams: {
+                                longitude: getCoordinate.longitude,
+                                latitude: getCoordinate.latitude
+                            }
+                        }
+                    ]);
+
+                    console.log(getListAndWheather);
+
+                    if (!getListAndWheather) {
                         this.isShowLoading = false;
                         return;
                     }
-                    // console.log(getMenu);
 
                     // 渲染页面并存储至 sessionStorage
                     let menuList = [],
                         colorSrcList = [];
-                    getMenu.menue.forEach(item => {
+                    getListAndWheather[0].menue.forEach(item => {
                         menuList.push({
                             name: item.remark,
                             id: item.id,
@@ -841,9 +872,18 @@
                 this.isShowMenu = !this.isShowMenu;
 
                 // 默认跳转到景点列表
-                this.$router.push({
-                    name: this.isShowMenu ? 'scenic-spot' : 'main'
-                });
+                if (this.isShowMenu) {
+                    this.$router.push({
+                        name: 'scenic-spot',
+                        params: {
+                            sceneryId: this.sceneryId
+                        }
+                    });
+                } else {
+                    this.$router.push({
+                        name: 'main'
+                    });
+                }
                 this.isShowLoading = false;
             },
             // 点击图标加载对应景区资源
@@ -858,14 +898,23 @@
                         li.firstElementChild.src = colorSrcList.filter(item => item.mark === li.dataset.mark)[0].colorSrc;
                     }
                 }
-                // remove
+                this.oMap_main.remove(this.pointGroups);
                 switch (remark) {
                     case 'resource_point':
                         this.getScenicPointList(value);
-                        this.$router.push({name: 'scenic-spot'});
+                        this.$router.push({
+                            name: 'scenic-spot',
+                            params: {
+                                sceneryId: this.sceneryId
+                            }
+                        });
                         break;
                     case 'resource_line':
-                        // this.getScenicPointList(,);
+                        this.getScenicPointList(1);
+                        this.getLineList({
+                            _this: this,
+                            sceneryId: this.sceneryId
+                        });
                         this.$router.push({name: 'scenic-line'});
                         break;
                     default:
@@ -873,12 +922,18 @@
                         this.$router.push({
                             name: 'scenic-resource',
                             params: {
-                                remark
+                                type: remark
                             }
                         });
                         break;
                 }
             },
+            ...mapActions([
+                'getLineList'
+            ]),
+            ...mapMutations([
+                'saveResourceList'
+            ]),
             // 初始化音频播放
             playAudio(options) {
                 const mainAudio = document.querySelector('.main-audio');
@@ -972,19 +1027,13 @@
             changeAuto() {
                 this.isAuto = !this.isAuto;
             },
-            openMap() {
-                console.log(6);
-            },
-            gotodetail() {
-                this.$router.push('scenic-detail');
-            },
-
 
             //地图相关方法
             //请求景区资源列表
             async getScenicPointList(resourceType, query) {
                 resourceType = resourceType || this.resourceType;
                 let _self = this;
+                _self.markers = [];
                 const pointList = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${resourceType}`);
 
                 if(!pointList){
@@ -1012,7 +1061,7 @@
                         }
                         sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
                     } else {
-                        sessionStorage.setItem('otherPointList',JSON.stringify(pointList.page.list));
+                        this.saveResourceList(pointList.page.list);
                     }
 
                     sessionStorage.setItem('hasPlayList',JSON.stringify([]));
@@ -1023,9 +1072,8 @@
                         if(v.serial){
                             pointSerial.push(v.serial)
                         }
-                        setPoint([v.longitude,v.latitude],i)
 
-                    })
+                    });
                 }
                 //地图画点
                 let pointLnglat1 = [[104.839214,32.459624],[104.840214,32.459624]];
