@@ -368,17 +368,16 @@ export default {
 
         this.setAudio();
     },
-    destroyed() {
-        if(this.timer){
-            let playStatus = {
-                currentTime: this.currentTime,
-                totalTime: this.totalTime,
-                status : this.isPlayed
-            }
-            sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
-            clearInterval(this.timer);
+    beforeRouteLeave (to, from , next) {
+        const status = document.querySelector('.detail-audio').paused;
+        this.pauseAudio();
+        let playStatus = {
+            currentTime: document.querySelector('.detail-audio').currentTime,
+            totalTime: this.totalTime,
+            status : status
         }
-
+        sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
+        next();
     }
 }
 </script>

@@ -106,7 +106,7 @@ export default {
      * @return {string} newDate --  格式化后的日期字符串 yyyy-mm-dd
      */
     formatDate(date) {
-    	if(date instanceof Date) {
+        if (date instanceof Date) {
             let year = date.getFullYear(),
                 month = ('0' + (date.getMonth() + 1)).slice(-2),
                 day = ('0' + date.getDate()).slice(-2),
