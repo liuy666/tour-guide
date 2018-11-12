@@ -1217,11 +1217,11 @@
                     isOutline: false,
                     strokeColor: "#68A8FC", 
                     strokeOpacity: 1,
-                    strokeWeight: 6,
+                    strokeWeight: 4,
                     // 折线样式还支持 'dashed'
                     strokeStyle: "dashed",
                     // strokeStyle是dashed时有效
-                    strokeDasharray: [10, 5],
+                    strokeDasharray: [40, 10],
                     lineJoin: 'round',
                     lineCap: 'round',
                     zIndex: 150
