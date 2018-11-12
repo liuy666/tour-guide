@@ -1163,13 +1163,14 @@
             },
             toDetail() {
                 if(document.querySelector(".main-audio")){
+                    const status = document.querySelector('.main-audio').paused;
+                    this.pauseAudio();
                     let playStatus = {
                         currentTime: document.querySelector('.main-audio').currentTime,
                         totalTime: this.totalTime,
-                        status : document.querySelector('.main-audio').paused
+                        status : status
                     }
                     sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
-                    this.pauseAudio();
                     //sessionStorage.setItem("isPlayed",true);
                 }else{
                     //sessionStorage.setItem("isPlayed",false);
