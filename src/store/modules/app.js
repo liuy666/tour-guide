@@ -4,6 +4,7 @@ const app = {
     state: {
         lineList: [],
         resourceList: [],
+        content: '',
     },
     mutations: {
         getLineList(state, list) {
@@ -12,6 +13,9 @@ const app = {
         saveResourceList(state, rlist) {
             state.resourceList = rlist;
             sessionStorage.setItem('otherPointList',JSON.stringify(rlist));
+        },
+        saveContent(state, val) {
+            state.content = val;
         }
     },
     actions: {

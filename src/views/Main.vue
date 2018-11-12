@@ -362,16 +362,18 @@
                 <p>遇见全世界的美</p>
                 <section class="weather">
                     <section class="content">
-                        <span>22~15℃</span>
-                        <span>多云</span>
+                        <span>{{ temp }}</span>
+                        <span>{{ weather }}</span>
                         <span>空气指数</span>
-                        <span>优:38</span>
-                        <span>22~15℃</span>
-                        <span>多云</span>
+                        <span>{{ AQI }}</span>
+                        <span>{{ temp }}</span>
+                        <span>{{ weather }}</span>
                         <span>空气指数</span>
-                        <span>优:38</span>
+                        <span>{{ AQI }}</span>
                     </section>
-                    <span><img src="../assets/images/partly_cloudy_day@2x.png" alt="加载中..."></span>
+                    <span>
+                        <img :src="weatherImg" alt="加载中..." />
+                        </span>
                 </section>
             </section>
             <!-- <transition> 
@@ -770,6 +772,10 @@
                 totalTime: '',
                 currentScenicId: '',
                 markers: [],
+                temp: '',
+                AQI: '',
+                weather: '',
+                weatherImg: ''
             }
         },
         watch: {
@@ -841,6 +847,12 @@
                         this.isShowLoading = false;
                         return;
                     }
+
+                    // 初始化天气
+                    this.temp = getListAndWheather[1].data.temperature + '℃';
+                    this.AQI = getListAndWheather[1].data.airIndex;
+                    this.weather = getListAndWheather[1].data.skycon;
+                    this.weatherImg = getListAndWheather[1].data.iconUrl;
 
                     // 渲染页面并存储至 sessionStorage
                     let menuList = [],

@@ -67,6 +67,21 @@ export const appRoutes = [
         meta: {
             title: '全景图'
         }
+    },
+    // 消息列表
+    {
+        path: '/message-list',
+        name: 'message-list',
+        component: () => import('@/views/message-list.vue'),
+        meta: {
+            title: '消息'
+        }
+    },
+    // 消息详情页
+    {
+        path: '/msg-detail/:msgId',
+        name: 'msg-detail',
+        component: () => import('@/views/msg-detail.vue')
     }
 ]
 
