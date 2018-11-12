@@ -56,7 +56,7 @@
     <div id="scenic-line">
         <section class="line-list">
             <ul>
-                <li v-for="line of lines" :key="line.lineId">
+                <li v-for="line of lines" :key="line.lineId" @click="this.gotoMapLine(line.lineId)">
                     <section class="img-left">
                         <img src="../assets/images/bg_select@2x.png" alt="" />
                         <section>
@@ -83,5 +83,15 @@ export default {
     computed: mapState({
         lines: state => state.app.lineList,
     }),
+    methods: {
+        gotoMapLine(lineId) {
+            this.$router.push({
+                name: 'main',
+                params: {
+                    lineId
+                }
+            });
+        }
+    }
 }
 </script>
