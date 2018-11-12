@@ -469,6 +469,16 @@
             Toast,
             Loading
         },
+        beforeRouteUpdate (to, from, next) {debugger
+            if(to.name == "main"){
+                this.isShowMenu = false;
+                if(from.name == "scenic-line" && to.params.lineId){
+                    this.drawLine(to.params.lineId);
+                }
+            }
+            
+            next();
+        },
         created() {
             console.log(this.$route)
         },
@@ -1191,7 +1201,33 @@
                     name :  'scenic-point-detail'
                 });
             },
-        
+            //画路线
+            drawLine(lineId) {
+                const lineList = this.$store.state.app.lineList;
+                let currentLine = lineList.filter(item => item.lineId === lineId)[0];
+                console.log(currentLine);
+                let path = currentLine.coordinatesList;
+                let mapPath = [];
+                path.forEach(v => {
+                    let one = [v.longitude,v.latitude];
+                    mapPath.push(one);
+                })
+                let polyline = new AMap.Polyline({
+                    path: mapPath,
+                    isOutline: false,
+                    strokeColor: "#68A8FC", 
+                    strokeOpacity: 1,
+                    strokeWeight: 6,
+                    // 折线样式还支持 'dashed'
+                    strokeStyle: "dashed",
+                    // strokeStyle是dashed时有效
+                    strokeDasharray: [10, 5],
+                    lineJoin: 'round',
+                    lineCap: 'round',
+                    zIndex: 150
+                });
+                this.oMap_main.add(polyline);
+            }
         }
     }
 </script>

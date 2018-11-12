@@ -56,7 +56,7 @@
     <div id="scenic-line">
         <section class="line-list">
             <ul>
-                <li v-for="line of lines" :key="line.lineId" @click="this.gotoMapLine(line.lineId)">
+                <li v-for="line of lines" :key="line.lineId" @click="gotoMapLine(line.lineId)">
                     <section class="img-left">
                         <img src="../assets/images/bg_select@2x.png" alt="" />
                         <section>
