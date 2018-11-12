@@ -403,7 +403,7 @@
                     </div>
                 </x-circle>
             </div>
-            <div class="scenic-point-name-area" @click="gotoPage({name: 'scenic-point-detail'})">
+            <div class="scenic-point-name-area" @click="toDetail">
                 {{scenicPointName}}
             </div>
             <div class="list-btn" @click="openMenu" ></div> 
@@ -980,11 +980,6 @@
                 clearInterval(this.timer);
                 this.timer = '';
                 document.querySelector('.main-audio').pause();
-                let playStatus = {
-                    currentTime: document.querySelector('.main-audio').currentTime,
-                    totalTime: this.totalTime
-                }
-                sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
                 this.isPlayed = false;
             },
             // 获取未播放过的音频列表
@@ -1167,6 +1162,18 @@
 
             },
             toDetail() {
+                if(document.querySelector(".main-audio")){
+                    let playStatus = {
+                        currentTime: document.querySelector('.main-audio').currentTime,
+                        totalTime: this.totalTime,
+                        status : document.querySelector('.main-audio').paused
+                    }
+                    sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
+                    this.pauseAudio();
+                    //sessionStorage.setItem("isPlayed",true);
+                }else{
+                    //sessionStorage.setItem("isPlayed",false);
+                }
                 this.$router.push({
                     name :  'scenic-point-detail'
                 });
