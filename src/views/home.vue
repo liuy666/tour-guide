@@ -124,7 +124,9 @@
         methods: {
             async getScenicList () {
                 let _self = this;
-                const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list')
+                const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
+                    domainUrl: 'www.qxgz.com'
+                });
                 if(!scenicList){
                     this.isTips = true;
                     return;
