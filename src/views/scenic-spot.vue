@@ -103,13 +103,13 @@
         <section class="spot-list">
             <ul class="list">
                 <li v-for="point of pointsList" :key="point.id" :data-pid="point.id" @click="selectOne">
-                    <section class="img-left">
-                        <img class="left" :src="point.src" alt="加载中..." />
-                        <span>{{ point.index + '. ' +point.name }}</span>
+                    <section class="img-left" :data-pid="point.id">
+                        <img :data-pid="point.id" :src="point.src" alt="加载中..." />
+                        <span :data-pid="point.id">{{ point.index + '. ' +point.name }}</span>
                     </section>
-                    <section class="img-right">
-                        <img class="right stop" src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
-                        <img class="right play" src="../assets/images/icon_big_play@2x.png" alt="加载中..." />
+                    <section :data-pid="point.id" class="img-right">
+                        <img :data-pid="point.id" src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
+                        <img :data-pid="point.id" class="play" src="../assets/images/icon_big_play@2x.png" alt="加载中..." />
                     </section>
                 </li>
             </ul>
@@ -161,7 +161,7 @@ export default {
             'setRouteName'
         ]),
         selectOne(e) {
-            // console.log(e.target.className.split(' '))
+            console.log(1,e)
             const lis = document.querySelectorAll('.spot-list li'),
                   tagName = e.target.tagName;
 
@@ -169,39 +169,80 @@ export default {
                 li.style.backgroundColor = '#fff';
             }
             if (tagName === 'SECTION') {
-                e.target.parentNode.style.backgroundColor = '#f0f0f0';
-                this.gotoMain(e.target.parentNode.dataset.pid);
-                return;
-            } else if ((tagName === 'IMG' && e.target.className === 'left') || tagName === 'SPAN') {
-                e.target.parentNode.parentNode.style.backgroundColor = '#f0f0f0';
-                this.gotoMain(e.target.parentNode.parentNode.dataset.pid);
-                return;
-            } else if (tagName === 'LI') {
-                e.target.style.backgroundColor = '#f0f0f0';
-                this.gotoMain(e.target.dataset.pid);
-                return;
-            } else if (tagName === 'IMG' && e.target.className.split(' ')[0] === 'right') {
-                e.target.parentNode.parentNode.style.backgroundColor = '#f0f0f0';
-                const imgs = document.querySelectorAll('.spot-list .right');
-                for (let img of imgs) {
-                    if (img.className.split(' ')[1] === 'stop') {
-                        img.style.display = 'block';
+
+
+
+
+                if (e.target.parentNode.children[1].children[0] === 'rgb(240, 240, 240)') {
+                    
+                    if (e.target.className === 'img-left') {
+                        e.target.nextElementSibling.children[0].style.display = 'block';
+                        e.target.nextElementSibling.children[0].style.display = 'none';
+                    } else {
+                        e.target.children[0].style.display = 'block';
+                        e.target.children[0].style.display = 'none';
                     }
-                    if (img.className.split(' ')[1] === 'play') {
-                        img.style.display = 'none';
-                    }
+                    e.target.parentNode.style.backgroundColor = '#fff';
+                } else {
+                    e.target.parentNode.style.backgroundColor = '#f0f0f0';
+                    this.gotoMain(e.target.parentNode.dataset.pid);
                 }
-                if (e.target.className.split(' ')[1] === 'stop') {
+
+
+
+
+
+            } else if ((tagName === 'IMG' && e.target.className === 'left') || tagName === 'SPAN') {
+                if (e.target.parentNode.parentNode.style.backgroundColor === 'rgb(240, 240, 240)') {
+                    e.target.parentNode.nextElementSibling.children[0].style.display = 'block';
+                    e.target.parentNode.nextElementSibling.children[1].style.display = 'none';
+                    e.target.parentNode.parentNode.style.backgroundColor = '#fff';
+                } else {
+                    e.target.parentNode.parentNode.style.backgroundColor = '#f0f0f0';
+                    this.gotoMain(e.target.parentNode.parentNode.dataset.pid);
+                }
+            } else if (tagName === 'LI') {
+                console.log(e.target.children[1].children[0].style.display == 'none')
+                console.log(e.target.style.backgroundColor == 'rgb(240, 240, 240)')
+                if (e.target.style.backgroundColor === 'rgb(240, 240, 240)') {
+                    console.log(e.target.style.backgroundColor === 'rgb(240, 240, 240)')
+                    e.target.children[1].children[0].style.display = 'block';
+                    e.target.children[1].children[1].style.display = 'none';
+                    e.target.style.backgroundColor = '#fff';
+                } else {
+                    e.target.style.backgroundColor = '#f0f0f0';
+                    this.gotoMain(e.target.dataset.pid);
+                }
+            } else if (tagName === 'IMG' && e.target.className.split(' ')[0] === 'right') {
+                if (e.target.parentNode.parentNode.style.backgroundColor === 'rgb(240, 240, 240)') {
+                    e.target.parentNode.parentNode.style.backgroundColor = '#fff';
                     e.target.style.display = 'none';
                     e.target.nextElementSibling.style.display = 'block';
                 } else {
-                    e.target.style.display = 'none';
-                    e.target.previousElementSibling.style.display = 'block';
+                    e.target.parentNode.parentNode.style.backgroundColor = '#f0f0f0';
+                    this.gotoMain(e.target.parentNode.parentNode.dataset.pid);
                 }
-                this.gotoMain(e.target.parentNode.parentNode.dataset.pid);
+                // const imgs = document.querySelectorAll('.spot-list .right');
+                // for (let img of imgs) {
+                //     if (img.className.split(' ')[1] === 'stop') {
+                //         img.style.display = 'block';
+                //     }
+                //     if (img.className.split(' ')[1] === 'play') {
+                //         img.style.display = 'none';
+                //     }
+                // }
+                // if (e.target.className.split(' ')[1] === 'stop') {
+                //     e.target.style.display = 'none';
+                //     e.target.nextElementSibling.style.display = 'block';
+                // } else {
+                //     e.target.style.display = 'none';
+                //     e.target.previousElementSibling.style.display = 'block';
+                // }
+                
             }
         },
         gotoMain(pid) {
+            return;
             sessionStorage.setItem('selectedId', pid);
             this.$router.push({
                 name: 'main',

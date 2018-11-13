@@ -646,7 +646,7 @@
 
             // 获取默认景点列表
             this.getScenicPointList(null, query);
-            
+
             // 初始化图标菜单
             this.initMenu();
             
@@ -1095,6 +1095,11 @@
                 } else {
                     let src = ''; // 播放src
                     let id = ''; // 景点id
+                    options = options || {
+                        _src: '',
+                        _id: '',
+                        _type: 1
+                    }
                     let {_src, _id, _type} = options;
                     let isContinuePlay = false; // 是否需要续播，针对播放来源2
 
@@ -1121,6 +1126,8 @@
                     } else { // 扫码播放
 
                     }
+
+                    // 开始播放
                     if (isContinuePlay) {
 
                     } else {
