@@ -337,7 +337,7 @@ export default {
             }else{
                 this.imageList.push({
                     url : 'javascript:',
-                    img : '../assets/images/fj.jpg',
+                    img : './fj.jpg',
                     title : ''
                 })
             }

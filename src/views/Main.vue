@@ -249,27 +249,54 @@
         //点标记
         .marker-content{
             font-size: 20px;
+            .point-icon{
+                width: 100px;
+                height: 52px;
+                line-height: 45px;
+                margin-left: -24px;
+                text-align: center;
+                color: #fff;
+                &.type-point{
+                    background: url(/icon_scenic@3x.png) no-repeat center / auto 100%;
+                }
+                &.type-buy{
+                    background: url(/icon_gowu@3x.png) no-repeat center / auto 100%;
+                }
+                &.type-eat{
+                    background: url(/icon_to_food@3x.png) no-repeat center / auto 100%;
+                }
+                &.type-door{
+                    background: url(/icon_to_exit@3x.png) no-repeat center / auto 100%;
+                }
+                &.type-wc{
+                    background: url(/icon_to_wc@3x.png) no-repeat center / auto 100%;
+                }
+                &.type-park{
+                    background: url(/icon_to_shop@3x.png) no-repeat center / auto 100%;
+                }
+                &.type-hotel{
+                    background: url(/icon_to_hotel@3x.png) no-repeat center / auto 100%;
+                }
+                &.type-center{
+                    background: url(/icon_to_centre@3x.png) no-repeat center / auto 100%;
+                }
+                &.type-hospital{
+                    background: url(/icon_to_doctor@3x.png) no-repeat center / auto 100%;
+                }
+                &.player{
+                    background: url(/playing.gif) no-repeat center / auto 100%;
+                }
+            }
+            .point-name{
+                white-space: nowrap;
+                margin-left: -45%;
+                text-align: center;
+                border-radius: 16px;
+                background: rgba(0,0,0,0.3);
+                color: rgba(255,255,255,0.8);
+            }
         }
-        .point-icon{
-            width: 100px;
-            height: 52px;
-            line-height: 45px;
-            margin-left: -24px;
-            background: url(/icon_scenic@3x.png) no-repeat center / auto 100%;
-            text-align: center;
-            color: #fff;
-        }
-        .point-icon.player{
-            background: url(/icon_use@3x.png) no-repeat center / auto 100%;
-        }
-        .point-name{
-            white-space: nowrap;
-            margin-left: -45%;
-            text-align: center;
-            border-radius: 16px;
-            background: rgba(0,0,0,0.3);
-            color: rgba(255,255,255,0.8);
-        }
+        
         .introDetail{
             position: absolute;
             left: 30px;
@@ -473,7 +500,7 @@
             Toast,
             Loading
         },
-        beforeRouteUpdate (to, from, next) {debugger
+        beforeRouteUpdate (to, from, next) {
             if(to.name == "main"){
                 if(from.name == "scenic-line" && to.params.lineId){
                     this.openMenu();
@@ -810,7 +837,35 @@
                 temp: '',
                 AQI: '',
                 weather: '',
-                weatherImg: ''
+                weatherImg: '',
+                typeList : [{
+                    type:1,
+                    className:'type-point'
+                },{
+                    type:3,
+                    className:'type-buy'
+                },{
+                    type:4,
+                    className:'type-eat'
+                },{
+                    type:5,
+                    className:'type-door'
+                },{
+                    type:6,
+                    className:'type-wc'
+                },{
+                    type:7,
+                    className:'type-park'
+                },{
+                    type:8,
+                    className:'type-hotel'
+                },{
+                    type:9,
+                    className:'type-center'
+                },{
+                    type:10,
+                    className:'type-hospital'
+                }]
             }
         },
         watch: {
@@ -852,6 +907,7 @@
             // 打开图标菜单
             async openMenu() {
                 if (!this.isShowMenu) {
+                    this.infoWindow_main.close();
                     this.isShowLoading = true;
 
                     // 获取当前景区经纬度
@@ -956,6 +1012,7 @@
                     }
                 }
                 this.oMap_main.remove(this.pointGroups);
+                this.infoWindow_main.close();
                 switch (remark) {
                     case 'resource_point':
                         this.getScenicPointList(value);
@@ -1108,6 +1165,9 @@
              */
             async getScenicPointList(resourceType, query) {
                 resourceType = resourceType || this.resourceType;
+                if (resourceType) {
+                    this.resourceType = resourceType;
+                }
                 let _self = this;
                 _self.markers = [];
                 const pointList = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${resourceType}`);
@@ -1154,38 +1214,27 @@
                     } else {
                         this.saveResourceList(pointList.page.list);
                     }
-
+                    //地图画点
+                    
+                    let className = _self.typeList.filter(item => item.type == _self.resourceType)[0].className;
+                    console.log("***********"+className);
                     pointList.page.list.forEach((v,i) => {
-                        pointLnglat.push([v.longitude,v.latitude]); // ?
-                        pointName.push(v.name);
-                        pointflag.push(i);
-                        if(v.serial){
-                            pointSerial.push(v.serial);
-                        }
+                        let num = _self.resourceType == 1 ? v.serial : ''; 
+                        let marker = new AMap.Marker({
+                            content: "<div class='marker-content' data-flag='"+i+"'><div class='point-icon "+className+"'>"+num+"</div><div class='point-name'>"+v.name+"</div></div>",
+                            position: [v.longitude,v.latitude],
+                        });
+                        marker.on('click',_self.markerClick);
+                        _self.markers.push(marker);
 
                     });
                 }
-                //地图画点
-                let pointLnglat1 = [[104.839214,32.459624],[104.840214,32.459624]];
-                //用覆盖物群组的方式添加多个点标记 方便移除
-                function setPoint(point,index) { 
-                    let num = _self.resourceType == 1 ? pointSerial[index] : '';
-                    let marker = new AMap.Marker({
-                        content: "<div class='marker-content' data-flag='"+pointflag[index]+"'><div class='point-icon'>"+num+"</div><div class='point-name'>"+pointName[index]+"</div></div>",
-                        position: point,
-                    });
-                    marker.on('click',_self.markerClick);
-                    //_self.oMap_main.add(marker);
-                    _self.markers.push(marker);
-                }
-                pointLnglat1.forEach(function(value,index){
-                    setPoint(value,index);
-                })
+        
                 let overlayGroups = new AMap.OverlayGroup(_self.markers);
                 this.pointGroups = overlayGroups;
                 this.oMap_main.add(overlayGroups);
             },
-            markerClick(e) {
+            markerClick(e) { 
                 if(this.infoWindow_main.getPosition() !== undefined && this.infoWindow_main.getPosition().O == e.target.getPosition().O && this.infoWindow_main.getPosition().N == e.target.getPosition().N) {
                     if(this.infoWindow_main.getIsOpen()){
                         this.infoWindow_main.close();
@@ -1198,13 +1247,12 @@
             },
             openInfoWindow(e) {
                 let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前点在点列表数据中的下标
-                const pointInfo = JSON.parse(sessionStorage.getItem("pointList"))[flag];
-                sessionStorage.setItem('currentPoint',JSON.stringify(pointInfo));
-                
+                const pointInfo = this.resourceType == 1 ? JSON.parse(sessionStorage.getItem("pointList"))[flag] : JSON.parse(sessionStorage.getItem("otherPointList"))[flag];
                 if(this.resourceType == 1){
                     this.scenicPointImg = pointInfo.url;
                     this.scenicPointName = pointInfo.serial+'.'+pointInfo.name;
                     this.infoWindow_main.setContent(this.createInfoWindow_scenicPoint(pointInfo));
+                    sessionStorage.setItem('currentPoint',JSON.stringify(pointInfo));
                 }else{
                     this.infoWindow_main.setContent(this.createInfoWindow(pointInfo));
                 }
@@ -1251,10 +1299,16 @@
                 var img_other = document.createElement("img");
                 img_other.style.width = "100%";
                 img_other.style.height = "100%";
+                img_other.style.borderRadius = "10px";
                 img_other.src = pointInfo.url;
+                info_other.appendChild(img_other);
+                return info_other;
             },
-            toPlay() {
-
+            toPlay(e) {
+                debugger
+                e.currentTarget.className = "toPlay playing";
+                sessionStorage.setItem("currentSerial",JSON.parse(sessionStorage.getItem("currentPoint")).serial);
+                console.log(this.markers);
             },
             toDetail() {
                 if(document.querySelector(".main-audio")){
