@@ -507,7 +507,7 @@
                     this.drawLine(to.params.lineId);
                 }
                 if (from.name === 'scenic-point-detail') {
-                    
+                    console.log("****")
                 }
             }
             
@@ -1335,10 +1335,14 @@
                 return info_other;
             },
             toPlay(e) {
-                debugger
-                e.currentTarget.className = "toPlay playing";
-                sessionStorage.setItem("currentSerial",JSON.parse(sessionStorage.getItem("currentPoint")).serial);
-                console.log(this.markers);
+                e.currentTarget.classList.add("playing");
+                let currentSerial = JSON.parse(sessionStorage.getItem("currentPoint")).serial;
+                sessionStorage.setItem("currentSerial",currentSerial);
+                console.log(this.markers[currentSerial-1]);
+                let currentMarker = this.markers[currentSerial-1].Je.contentDom.children[0].children[0];
+                currentMarker.innerHTML = '';
+                currentMarker.classList.add('player');
+                //this.playAudio();
             },
             toDetail() {
                 if(document.querySelector(".main-audio")){
