@@ -5,6 +5,7 @@ const app = {
         lineList: [],
         resourceList: [],
         content: '',
+        routeName: '',
     },
     mutations: {
         getLineList(state, list) {
@@ -20,6 +21,10 @@ const app = {
         },
         initContent(state) {
             state.content = sessionStorage.getItem('msgContent');
+        },
+        setRouteName(state, val) {
+            state.routeName = val;
+            sessionStorage.setItem('routeName',val);
         }
     },
     actions: {

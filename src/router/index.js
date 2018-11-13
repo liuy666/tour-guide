@@ -13,7 +13,7 @@ export default router;
 
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
-    console.log(to, from);
+    // console.log(to, from);
     next();
     // if (from.name === 'scenic-point-detail') {
     //     next({
@@ -29,5 +29,5 @@ router.beforeEach((to, from, next) => {
 
 // 路由后置守卫
 router.afterEach((to,from) => {
-    console.log(document)
+    // console.log(document)
 });

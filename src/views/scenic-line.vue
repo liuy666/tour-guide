@@ -74,16 +74,22 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapMutations } from 'vuex';
 export default {
     data() {
         return {
         }
     },
+    created() {
+        this.setRouteName('scenic-line');
+    },
     computed: mapState({
         lines: state => state.app.lineList,
     }),
     methods: {
+        ...mapMutations([
+            'setRouteName'
+        ]),
         gotoMapLine(lineId) {
             const imgs = document.querySelectorAll('.img-right img');
             for (let img of imgs) {
