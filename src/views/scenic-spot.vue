@@ -119,7 +119,7 @@
 
 <script>
 import { Loading, XCircle  } from 'vux';
-import { mapMutations } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
 export default {
     components: {
         Loading,
@@ -156,100 +156,69 @@ export default {
             }
         }
     },
+    computed: mapState({
+        watchPlay: state => state.app.playStatus
+    }),
+    watch: {
+        watchPlay(val) {
+            if (val === 'play') {
+                const lis = document.querySelectorAll('.spot-list li');
+                for (let li of lis) {
+                    const selectedId = sessionStorage.getItem('selectedId');
+                    if (selectedId === li.dataset.pid) {
+                        li.style.backgroundColor = '#f0f0f0';
+                        li.children[1].children[0].style.display = 'none';
+                        li.children[1].children[1].style.display = 'block';
+                    }
+                }
+            }
+            if (val === 'pause') {
+                const lis = document.querySelectorAll('.spot-list li');
+                for (let li of lis) {
+                    const selectedId = sessionStorage.getItem('selectedId');
+                    if (selectedId === li.dataset.pid) {
+                        li.style.backgroundColor = '#fff';
+                        li.children[1].children[0].style.display = 'block';
+                        li.children[1].children[1].style.display = 'none';
+                    }
+                }
+            }
+        }
+    },
     methods: {
         ...mapMutations([
-            'setRouteName'
+            'setRouteName',
+            'pauseCurrentPlay'
         ]),
         selectOne(e) {
             console.log(1,e)
-            const lis = document.querySelectorAll('.spot-list li'),
-                  tagName = e.target.tagName;
+            const lis = document.querySelectorAll('.spot-list li');
 
             for (let li of lis) {
-                li.style.backgroundColor = '#fff';
-            }
-            if (tagName === 'SECTION') {
-
-
-
-
-                if (e.target.parentNode.children[1].children[0] === 'rgb(240, 240, 240)') {
-                    
-                    if (e.target.className === 'img-left') {
-                        e.target.nextElementSibling.children[0].style.display = 'block';
-                        e.target.nextElementSibling.children[0].style.display = 'none';
+                if (e.target.dataset.pid === li.dataset.pid) {
+                    if (li.style.backgroundColor === 'rgb(240, 240, 240)') {
+                        li.style.backgroundColor = '#fff';
+                        li.children[1].children[0].style.display = 'block';
+                        li.children[1].children[1].style.display = 'none';
+                        this.pauseCurrentPlay();
                     } else {
-                        e.target.children[0].style.display = 'block';
-                        e.target.children[0].style.display = 'none';
+                        li.style.backgroundColor = '#f0f0f0';
+                        li.children[1].children[0].style.display = 'none';
+                        li.children[1].children[1].style.display = 'block';
+                        sessionStorage.setItem('selectedId', li.dataset.pid);
+                        this.$router.push({
+                            name: 'main',
+                            params: {
+                                pid: li.dataset.pid
+                            }
+                        });
                     }
-                    e.target.parentNode.style.backgroundColor = '#fff';
                 } else {
-                    e.target.parentNode.style.backgroundColor = '#f0f0f0';
-                    this.gotoMain(e.target.parentNode.dataset.pid);
+                    li.style.backgroundColor = '#fff';
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
                 }
-
-
-
-
-
-            } else if ((tagName === 'IMG' && e.target.className === 'left') || tagName === 'SPAN') {
-                if (e.target.parentNode.parentNode.style.backgroundColor === 'rgb(240, 240, 240)') {
-                    e.target.parentNode.nextElementSibling.children[0].style.display = 'block';
-                    e.target.parentNode.nextElementSibling.children[1].style.display = 'none';
-                    e.target.parentNode.parentNode.style.backgroundColor = '#fff';
-                } else {
-                    e.target.parentNode.parentNode.style.backgroundColor = '#f0f0f0';
-                    this.gotoMain(e.target.parentNode.parentNode.dataset.pid);
-                }
-            } else if (tagName === 'LI') {
-                console.log(e.target.children[1].children[0].style.display == 'none')
-                console.log(e.target.style.backgroundColor == 'rgb(240, 240, 240)')
-                if (e.target.style.backgroundColor === 'rgb(240, 240, 240)') {
-                    console.log(e.target.style.backgroundColor === 'rgb(240, 240, 240)')
-                    e.target.children[1].children[0].style.display = 'block';
-                    e.target.children[1].children[1].style.display = 'none';
-                    e.target.style.backgroundColor = '#fff';
-                } else {
-                    e.target.style.backgroundColor = '#f0f0f0';
-                    this.gotoMain(e.target.dataset.pid);
-                }
-            } else if (tagName === 'IMG' && e.target.className.split(' ')[0] === 'right') {
-                if (e.target.parentNode.parentNode.style.backgroundColor === 'rgb(240, 240, 240)') {
-                    e.target.parentNode.parentNode.style.backgroundColor = '#fff';
-                    e.target.style.display = 'none';
-                    e.target.nextElementSibling.style.display = 'block';
-                } else {
-                    e.target.parentNode.parentNode.style.backgroundColor = '#f0f0f0';
-                    this.gotoMain(e.target.parentNode.parentNode.dataset.pid);
-                }
-                // const imgs = document.querySelectorAll('.spot-list .right');
-                // for (let img of imgs) {
-                //     if (img.className.split(' ')[1] === 'stop') {
-                //         img.style.display = 'block';
-                //     }
-                //     if (img.className.split(' ')[1] === 'play') {
-                //         img.style.display = 'none';
-                //     }
-                // }
-                // if (e.target.className.split(' ')[1] === 'stop') {
-                //     e.target.style.display = 'none';
-                //     e.target.nextElementSibling.style.display = 'block';
-                // } else {
-                //     e.target.style.display = 'none';
-                //     e.target.previousElementSibling.style.display = 'block';
-                // }
-                
             }
-        },
-        gotoMain(pid) {
-            return;
-            sessionStorage.setItem('selectedId', pid);
-            this.$router.push({
-                name: 'main',
-                params: {
-                    pid
-                }
-            });
         },
         clearInput() {
             this.val = '';

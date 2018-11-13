@@ -6,6 +6,8 @@ const app = {
         resourceList: [],
         content: '',
         routeName: '',
+        pauseStatus: false,
+        playStatus: '',
     },
     mutations: {
         getLineList(state, list) {
@@ -25,6 +27,12 @@ const app = {
         setRouteName(state, val) {
             state.routeName = val;
             sessionStorage.setItem('routeName',val);
+        },
+        pauseCurrentPlay(state) {
+            state.pauseStatus = !state.pauseStatus;
+        },
+        startCurrentPlay(state, val) {
+            state.playStatus = val;
         }
     },
     actions: {
