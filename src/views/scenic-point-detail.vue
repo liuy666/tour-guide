@@ -230,7 +230,7 @@ export default {
     },
     methods : {
         //初始化音频
-        setAudio(isChange) {
+        setAudio(isChange,isAuto) {
             const audio = document.querySelector(".detail-audio");
             if(audio){
                 document.querySelector(".audio-area").removeChild(audio);
@@ -280,6 +280,9 @@ export default {
                 this.currentTimeStr = '0:00';
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + tm2;
                 this.isPlayed = false;
+                if(isAuto){
+                    this.playAudio();
+                }
             }
         },
         //播放

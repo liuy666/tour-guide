@@ -500,7 +500,7 @@
             Toast,
             Loading
         },
-        beforeRouteUpdate (to, from, next) {
+        beforeRouteUpdate (to, from, next) { 
             if(to.name == "main"){
                 if(from.name == "scenic-line" && to.params.lineId){
                     this.openMenu();
@@ -513,7 +513,10 @@
             
             next();
         },
-        created() {
+        created() { 
+            if(this.timer){
+                clearInterval(this.timer);
+            }
             console.log(this.$route)
         },
         async mounted() {
@@ -1160,6 +1163,15 @@
                 this.timer = '';
                 document.querySelector('.main-audio').pause();
                 this.isPlayed = false;
+
+                //地图图标交互效果 
+                let serial = sessionStorage.getItem("currentSerial");
+                let cmarker = this.markers[serial-1].Ke.contentDom.children[0].children[0];
+                cmarker.classList.remove("player");
+                cmarker.innerHTML = serial;
+                if(document.querySelector(".info-scenic-btns")){
+                    document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
+                }
             },
             // 获取播放列表
             // getPlayList() {
@@ -1286,11 +1298,11 @@
                 }
             },
             openInfoWindow(e) {
-                let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前点在点列表数据中的下标
+                let flag = e.target.Ke.contentDom.children[0].getAttribute("data-flag");//当前点在点列表数据中的下标
                 const pointInfo = this.resourceType == 1 ? JSON.parse(sessionStorage.getItem("pointList"))[flag] : JSON.parse(sessionStorage.getItem("otherPointList"))[flag];
                 if(this.resourceType == 1){
-                    this.scenicPointImg = pointInfo.url;
-                    this.scenicPointName = pointInfo.serial+'.'+pointInfo.name;
+                    // this.scenicPointImg = pointInfo.url;
+                    // this.scenicPointName = pointInfo.serial+'.'+pointInfo.name;
                     this.infoWindow_main.setContent(this.createInfoWindow_scenicPoint(pointInfo));
                     sessionStorage.setItem('currentPoint',JSON.stringify(pointInfo));
                 }else{
@@ -1348,11 +1360,10 @@
                 e.currentTarget.classList.add("playing");
                 let currentSerial = JSON.parse(sessionStorage.getItem("currentPoint")).serial;
                 sessionStorage.setItem("currentSerial",currentSerial);
-                console.log(this.markers[currentSerial-1]);
-                let currentMarker = this.markers[currentSerial-1].Je.contentDom.children[0].children[0];
+                let currentMarker = this.markers[currentSerial-1].Ke.contentDom.children[0].children[0];
                 currentMarker.innerHTML = '';
                 currentMarker.classList.add('player');
-                //this.playAudio();
+                this.playAudio();
             },
             toDetail() {
                 if(document.querySelector(".main-audio")){
