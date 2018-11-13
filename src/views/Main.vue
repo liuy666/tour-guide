@@ -491,7 +491,7 @@
 
 <script>
     import { XButton, Icon, XCircle, Toast, Loading } from 'vux';
-    import { mapActions, mapMutations } from 'vuex';
+    import { mapActions, mapMutations, mapState } from 'vuex';
     export default {
         components: {
             XButton,
@@ -871,12 +871,13 @@
         watch: {
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 4) {
+                if (val >= 100) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     if (!au.paused || !au.ended) {
                         au.pause();
                     }
+                    return;
                     let hasPlayList = JSON.parse(sessionStorage.getItem('hasPlayList'));
                     console.log(au.dataset)
                     hasPlayList.push(au.dataset.id);
@@ -901,8 +902,24 @@
                     //     sessionStorage.setItem('currentPoint',JSON.stringify(playList[0]));
                     // }
                 }
+            },
+            '$route'(to, from) {
+                console.log(to, from);
+                // 关闭菜单并展开对应信息窗体
+                if (from.name === 'scenic-spot' && to.name === 'main' && to.params.pid) {
+                    const selectPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === to.params.pid)[0];
+                    sessionStorage.setItem('currentPoint', JSON.stringify(selectPoint));
+                    this.playAudio({
+                        _src: selectPoint.guideUrl,
+                        _id: to.params.pid,
+                        _type: 3
+                    });
+                    this.scenicPointImg = selectPoint.url;
+                    this.scenicPointName = selectPoint.serial + '. ' + selectPoint.name;
+                    this.isShowMenu = false;
+                }
             }
-        },        
+        },    
         methods: {
             // 打开图标菜单
             async initMenu() {
@@ -1059,7 +1076,8 @@
                 'getLineList'
             ]),
             ...mapMutations([
-                'saveResourceList'
+                'saveResourceList',
+                'setRouteName'
             ]),
             // 初始化音频播放
             playAudio(options) {
@@ -1146,11 +1164,9 @@
             // 播放进度圆环
             changeProgress() {
                 this.timer = setInterval(() => {
-                    let mid = this.audioPercent * 10;
-                    mid += 1;
-                    mid = mid / 10;
-                    this.audioPercent = mid;
-                },this.totalTime);
+                    let currentTime = document.querySelector('.main-audio').currentTime;
+                    this.audioPercent = currentTime / this.totalTime * 100;
+                },1000);
             },
             // 跳转其他页
             gotoPage(...params) {
