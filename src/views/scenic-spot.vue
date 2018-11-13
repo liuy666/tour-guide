@@ -81,6 +81,9 @@
                             height: 50px;
                         }
                     }
+                    .play {
+                        display: none;
+                    }
                 }
             }
         }
@@ -101,11 +104,12 @@
             <ul class="list">
                 <li v-for="point of pointsList" :key="point.id" :data-pid="point.id" @click="selectOne">
                     <section class="img-left">
-                        <img :src="point.src" alt="加载中..." />
+                        <img class="left" :src="point.src" alt="加载中..." />
                         <span>{{ point.index + '. ' +point.name }}</span>
                     </section>
                     <section class="img-right">
-                        <img src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
+                        <img class="right stop" src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
+                        <img class="right play" src="../assets/images/icon_big_play@2x.png" alt="加载中..." />
                     </section>
                 </li>
             </ul>
@@ -114,10 +118,12 @@
 </template>
 
 <script>
-import { Loading } from 'vux';
+import { Loading, XCircle  } from 'vux';
+import { mapMutations } from 'vuex';
 export default {
     components: {
-        Loading
+        Loading,
+        XCircle
     },
     data() {
         return {
@@ -132,10 +138,77 @@ export default {
         let pointList = JSON.parse(sessionStorage.getItem('pointList'));
         this.getList(pointList);
         this.sceneryId = this.$route.params.sceneryId;
+        this.setRouteName('scenic-spot');
+    },
+    mounted() {
+        const selectedId = sessionStorage.getItem('selectedId');
+        const lis = document.querySelectorAll('.spot-list li');
+
+        if (selectedId) {
+            for (let li of lis) {
+                if (li.dataset.pid === selectedId) {
+                    li.style.backgroundColor = '#f0f0f0';
+                    li.children[1].children[0].style.display = 'none';
+                    li.children[1].children[1].style.display = 'block';
+                } else {
+                    li.style.backgroundColor = '#fff';
+                }
+            }
+        }
     },
     methods: {
-        selectOne(evnet) {
-            console.log(event);
+        ...mapMutations([
+            'setRouteName'
+        ]),
+        selectOne(e) {
+            // console.log(e.target.className.split(' '))
+            const lis = document.querySelectorAll('.spot-list li'),
+                  tagName = e.target.tagName;
+
+            for (let li of lis) {
+                li.style.backgroundColor = '#fff';
+            }
+            if (tagName === 'SECTION') {
+                e.target.parentNode.style.backgroundColor = '#f0f0f0';
+                this.gotoMain(e.target.parentNode.dataset.pid);
+                return;
+            } else if ((tagName === 'IMG' && e.target.className === 'left') || tagName === 'SPAN') {
+                e.target.parentNode.parentNode.style.backgroundColor = '#f0f0f0';
+                this.gotoMain(e.target.parentNode.parentNode.dataset.pid);
+                return;
+            } else if (tagName === 'LI') {
+                e.target.style.backgroundColor = '#f0f0f0';
+                this.gotoMain(e.target.dataset.pid);
+                return;
+            } else if (tagName === 'IMG' && e.target.className.split(' ')[0] === 'right') {
+                e.target.parentNode.parentNode.style.backgroundColor = '#f0f0f0';
+                const imgs = document.querySelectorAll('.spot-list .right');
+                for (let img of imgs) {
+                    if (img.className.split(' ')[1] === 'stop') {
+                        img.style.display = 'block';
+                    }
+                    if (img.className.split(' ')[1] === 'play') {
+                        img.style.display = 'none';
+                    }
+                }
+                if (e.target.className.split(' ')[1] === 'stop') {
+                    e.target.style.display = 'none';
+                    e.target.nextElementSibling.style.display = 'block';
+                } else {
+                    e.target.style.display = 'none';
+                    e.target.previousElementSibling.style.display = 'block';
+                }
+                this.gotoMain(e.target.parentNode.parentNode.dataset.pid);
+            }
+        },
+        gotoMain(pid) {
+            sessionStorage.setItem('selectedId', pid);
+            this.$router.push({
+                name: 'main',
+                params: {
+                    pid
+                }
+            });
         },
         clearInput() {
             this.val = '';

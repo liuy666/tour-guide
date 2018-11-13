@@ -464,7 +464,7 @@
 
 <script>
     import { XButton, Icon, XCircle, Toast, Loading } from 'vux';
-    import { mapActions, mapMutations } from 'vuex';
+    import { mapActions, mapMutations, mapState } from 'vuex';
     export default {
         components: {
             XButton,
@@ -619,6 +619,9 @@
 
             // 获取默认景点列表
             this.getScenicPointList(null, query);
+
+            // 初始化图标菜单
+            this.initMenu();
             
             //拖动中事件 没用
             /*function showInfoDragging(e) {
@@ -810,18 +813,19 @@
                 temp: '',
                 AQI: '',
                 weather: '',
-                weatherImg: ''
+                weatherImg: '',
             }
         },
         watch: {
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 4) {
+                if (val >= 100) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     if (!au.paused || !au.ended) {
                         au.pause();
                     }
+                    return;
                     let hasPlayList = JSON.parse(sessionStorage.getItem('hasPlayList'));
                     console.log(au.dataset)
                     hasPlayList.push(au.dataset.id);
@@ -846,102 +850,126 @@
                     //     sessionStorage.setItem('currentPoint',JSON.stringify(playList[0]));
                     // }
                 }
-            }
-        },        
-        methods: {
-            // 打开图标菜单
-            async openMenu() {
-                if (!this.isShowMenu) {
-                    this.isShowLoading = true;
-
-                    // 获取当前景区经纬度
-                    const getCoordinate = JSON.parse(sessionStorage.getItem('currentScenic'));
-
-                    // 获取 menu 菜单列表 获取天气
-                    const getListAndWheather = await this.$http.all([
-                        {
-                            type: 'get',
-                            url: this.$base + '/hqyatu-navigator/app/resource/getSelectMenue',
-                            urlParams: {
-                                sceneryId: this.sceneryId
-                            }
-                        },
-                        {
-                            type: 'get',
-                            url: this.$base + '/hqyatu-navigator/app/weather/getWeatherData',
-                            urlParams: {
-                                longitude: getCoordinate.longitude,
-                                latitude: getCoordinate.latitude
-                            }
-                        }
-                    ]);
-
-                    console.log(getListAndWheather);
-
-                    if (!getListAndWheather) {
-                        this.isShowLoading = false;
-                        return;
-                    }
-
-                    // 初始化天气
-                    this.temp = getListAndWheather[1].data.temperature + '℃';
-                    this.AQI = getListAndWheather[1].data.airIndex;
-                    this.weather = getListAndWheather[1].data.skycon;
-                    this.weatherImg = getListAndWheather[1].data.iconUrl;
-
-                    // 渲染页面并存储至 sessionStorage
-                    let menuList = [],
-                        colorSrcList = [];
-                    getListAndWheather[0].menue.forEach(item => {
-                        menuList.push({
-                            name: item.remark,
-                            id: item.id,
-                            mark: item.paramKey,
-                            graySrc: item.iconUrl1,
-                            value: item.paramValue
-                        });
-                        colorSrcList.push({
-                            mark: item.paramKey,
-                            colorSrc: item.iconUrl,
-                            graySrc: item.iconUrl1
-                        })
+            },
+            '$route'(to, from) {
+                console.log(to, from);
+                // 关闭菜单并展开对应信息窗体
+                if (from.name === 'scenic-spot' && to.name === 'main' && to.params.pid) {
+                    const selectPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === to.params.pid)[0];
+                    sessionStorage.setItem('currentPoint', JSON.stringify(selectPoint));
+                    this.playAudio({
+                        _src: selectPoint.guideUrl,
+                        _id: to.params.pid,
+                        _type: 3
                     });
-                    this.menuList = [].concat(menuList);
-                    sessionStorage.setItem('colorSrcList', JSON.stringify(colorSrcList));
-
-                    // 初始化默认第一个图标为彩色图片
-                    this.$nextTick(() => {
-                        const lis = document.querySelectorAll('.main_view_footer li');
-                        for (let li of lis) {
-                            if (li.dataset.mark === 'resource_point') {
-                                li.firstElementChild.src = colorSrcList.filter(item => item.mark === 'resource_point')[0].colorSrc;
-                            }
-                        }
-                    })
-                } else {
-                    // 菜单页面关闭后所有图标重置为灰色图片
-                    const _lis = document.querySelectorAll('.main_view_footer li'),
-                          _colorSrcList = JSON.parse(sessionStorage.getItem('colorSrcList'));
-                    for (let li of _lis) {
-                        li.firstElementChild.src = _colorSrcList.filter(item => item.mark === li.dataset.mark)[0].graySrc;
-                    }
+                    this.scenicPointImg = selectPoint.url;
+                    this.scenicPointName = selectPoint.serial + '. ' + selectPoint.name;
+                    this.isShowMenu = false;
                 }
-                this.isShowMenu = !this.isShowMenu;
+            }
+        },  
+        methods: {
+            async initMenu() {
+                this.isShowLoading = true;
 
-                // 默认跳转到景点列表
-                if (this.isShowMenu) {
-                    this.$router.push({
-                        name: 'scenic-spot',
-                        params: {
+                // 获取当前景区经纬度
+                const getCoordinate = JSON.parse(sessionStorage.getItem('currentScenic'));
+
+                // 获取 menu 菜单列表 获取天气
+                const getListAndWheather = await this.$http.all([
+                    {
+                        type: 'get',
+                        url: this.$base + '/hqyatu-navigator/app/resource/getSelectMenue',
+                        urlParams: {
                             sceneryId: this.sceneryId
                         }
-                    });
-                } else {
-                    this.$router.push({
-                        name: 'main'
-                    });
+                    },
+                    {
+                        type: 'get',
+                        url: this.$base + '/hqyatu-navigator/app/weather/getWeatherData',
+                        urlParams: {
+                            longitude: getCoordinate.longitude,
+                            latitude: getCoordinate.latitude
+                        }
+                    }
+                ]);
+
+                // console.log(getListAndWheather);
+                if (!getListAndWheather) {
+                    this.isShowLoading = false;
+                    return;
                 }
+
+                // 初始化天气
+                this.temp = getListAndWheather[1].data.temperature + '℃';
+                this.AQI = getListAndWheather[1].data.airIndex;
+                this.weather = getListAndWheather[1].data.skycon;
+                this.weatherImg = getListAndWheather[1].data.iconUrl;
+
+                // 渲染页面并存储至 sessionStorage
+                let menuList = [],
+                    colorSrcList = [];
+                getListAndWheather[0].menue.forEach(item => {
+                    menuList.push({
+                        name: item.remark,
+                        id: item.id,
+                        mark: item.paramKey,
+                        graySrc: item.iconUrl1,
+                        value: item.paramValue
+                    });
+                    colorSrcList.push({
+                        mark: item.paramKey,
+                        colorSrc: item.iconUrl,
+                        graySrc: item.iconUrl1
+                    })
+                });
+                this.menuList = [].concat(menuList);
+                sessionStorage.setItem('colorSrcList', JSON.stringify(colorSrcList));
+
+                // 初始化默认第一个图标为彩色图片
+                this.$nextTick(() => {
+                    const lis = document.querySelectorAll('.main_view_footer li');
+                    for (let li of lis) {
+                        if (li.dataset.mark === 'resource_point') {
+                            li.firstElementChild.src = colorSrcList.filter(item => item.mark === 'resource_point')[0].colorSrc;
+                        }
+                    }
+                });
+                this.setRouteName('scenic-spot');
+                sessionStorage.removeItem('selectedId');
                 this.isShowLoading = false;
+            },
+            // 打开图标菜单
+            openMenu() {
+                const routeName = this.$store.state.app.routeName;
+                if (!this.isShowMenu) {
+                    // 默认跳转到景点列表
+                    if (routeName === 'scenic-spot') {
+                        this.$router.push({
+                            name: 'scenic-spot',
+                            params: {
+                                sceneryId: this.sceneryId
+                            }
+                        });
+                    } else if (routeName === 'scenic-line') {
+                        this.$router.push({
+                            name: 'scenic-line',
+                            params: {
+
+                            }
+                        });
+                    } else {
+                        this.$router.push({
+                            name: 'scenic-resource',
+                            params: {
+                                type: 'xx'
+                            }
+                        });
+                    }
+                    this.isShowMenu = true;
+                } else {
+                    this.isShowMenu = false;
+                }
             },
             // 点击图标加载对应景区资源
             gotoWhere(remark, value) {
@@ -993,61 +1021,69 @@
                 'getLineList'
             ]),
             ...mapMutations([
-                'saveResourceList'
+                'saveResourceList',
+                'setRouteName'
             ]),
             // 初始化音频播放
-            playAudio({_src, _id, _type}) {
+            playAudio(options) {
                 /**
                  * _type 标志播放来源 1-工具栏播放 2-景点详情页跳转回来播放 3-景点列表点播 4-地图解说播放 5-扫码播放
                  */
+
                 const mainAudio = document.querySelector('.main-audio');
+                const audioContainer = document.querySelector('.toolbars');
                 if (mainAudio && mainAudio.paused) {
                     mainAudio.play();
                 } else {
-                    let src = '', // 播放src
-                        id = '', // 景点id
-                        isContinuePlay = false; // 是否需要续播，针对播放来源2
+                    let src = ''; // 播放src
+                    let id = ''; // 景点id
+                    let {_src, _id, _type} = options;
+                    let isContinuePlay = false; // 是否需要续播，针对播放来源2
 
                     if (_type === 1) { // 工具栏播放:默认取第一个景点来播放
                         let playList = JSON.parse(sessionStorage.getItem('playList'));
                         src = playList[0].aSrc,
                         id = playList[0].aId
                     } else if (_type === 2) { // 景点详情页跳转后续播
-                        this.isContinuePlay = true;
+                        isContinuePlay = true;
                     } else if (_type === 3) { // 景点列表点播
-
+                        src = _src;
+                        id = _id;
+                        if (mainAudio) {
+                            clearInterval(this.timer);
+                            if (!mainAudio.paused) {
+                                mainAudio.pause();
+                            }
+                            audioContainer.removeChild(mainAudio);
+                            this.audioPercent = 0;
+                            this.timer = null;
+                        }
                     } else if (_type === 4) { // 地图解说播放
 
                     } else { // 扫码播放
 
                     }
-                    
-                    if (options) {
-                        src = _src;
-                        id = _id;
+                    if (isContinuePlay) {
+
                     } else {
-                        let sortList = this.getPlayList();
-                        src = sortList[0].guideUrl;
-                        id = sortList[0].resource_id;
-                    }
-                    const audioContainer = document.querySelector('.toolbars');
-                    let audioDom = document.createElement('audio'),
-                        sourceDom = document.createElement('source');
-                    sourceDom.type = 'audio/mpeg';
-                    sourceDom.src = src;
-                    audioDom.dataset.id = id;
-                    audioDom.appendChild(sourceDom);
-                    audioDom.classList.add('main-audio');
-                    audioDom.style.display = 'none';
-                    audioContainer.appendChild(audioDom);
-                    audioDom.oncanplay = (e) => {
-                        const _audioDom = e.target;
-                        this.totalTime = _audioDom.duration;
-                        console.log(this.totalTime)
-                        _audioDom.play();
-                    }
-                    audioDom.onplay = (e) => {
-                        this.changeProgress();
+                        let audioDom = document.createElement('audio'),
+                            sourceDom = document.createElement('source');
+                        sourceDom.type = 'audio/mpeg';
+                        sourceDom.src = src;
+                        audioDom.dataset.id = id;
+                        audioDom.appendChild(sourceDom);
+                        audioDom.classList.add('main-audio');
+                        audioDom.style.display = 'none';
+                        audioContainer.appendChild(audioDom);
+                        audioDom.oncanplay = (e) => {
+                            const _audioDom = e.target;
+                            this.totalTime = _audioDom.duration;
+                            console.log(this.totalTime)
+                            _audioDom.play();
+                        }
+                        audioDom.onplay = (e) => {
+                            this.changeProgress();
+                        }
                     }
                 }
                 this.isPlayed = true;
@@ -1073,11 +1109,9 @@
             // 播放进度圆环
             changeProgress() {
                 this.timer = setInterval(() => {
-                    let mid = this.audioPercent * 10;
-                    mid += 1;
-                    mid = mid / 10;
-                    this.audioPercent = mid;
-                },this.totalTime);
+                    let currentTime = document.querySelector('.main-audio').currentTime;
+                    this.audioPercent = currentTime / this.totalTime * 100;
+                },1000);
             },
             // 跳转其他页
             gotoPage(...params) {
