@@ -647,6 +647,9 @@
             // 获取默认景点列表
             this.getScenicPointList(null, query);
             
+            // 初始化图标菜单
+            this.initMenu();
+            
             //拖动中事件 没用
             /*function showInfoDragging(e) {
                 const bounds = oMap.getBounds();
