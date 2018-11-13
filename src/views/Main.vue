@@ -382,6 +382,7 @@
 
 <template>
     <div id="main">
+        <div>{{}}</div>
         <!-- 网络请求loading层 -->
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <!-- 地图容器 -->
@@ -871,7 +872,13 @@
                 }]
             }
         },
+        computed: mapState({
+            watchPause: state => state.app.pauseStatus
+        }),
         watch: {
+            watchPause(val) {
+                this.pauseAudio();
+            },
             // 播放进度监听
             audioPercent(val) {
                 if (val >= 100) {
@@ -1080,26 +1087,24 @@
             ]),
             ...mapMutations([
                 'saveResourceList',
-                'setRouteName'
+                'setRouteName',
+                'startCurrentPlay'
             ]),
             // 初始化音频播放
             playAudio(options) {
                 /**
                  * _type 标志播放来源 1-工具栏播放 2-景点详情页跳转回来播放 3-景点列表点播 4-地图解说播放 5-扫码播放
                  */
-
+                
                 const mainAudio = document.querySelector('.main-audio');
                 const audioContainer = document.querySelector('.toolbars');
-                if (mainAudio && mainAudio.paused) {
+                if (mainAudio && mainAudio.paused && !options) {
                     mainAudio.play();
+                    this.startCurrentPlay('play');
                 } else {
                     let src = ''; // 播放src
                     let id = ''; // 景点id
-                    options = options || {
-                        _src: '',
-                        _id: '',
-                        _type: 1
-                    }
+                    options = options || {_src: '', _id: '', _type: 1};
                     let {_src, _id, _type} = options;
                     let isContinuePlay = false; // 是否需要续播，针对播放来源2
 
@@ -1159,6 +1164,7 @@
                 clearInterval(this.timer);
                 this.timer = '';
                 document.querySelector('.main-audio').pause();
+                this.startCurrentPlay('pause');
                 this.isPlayed = false;
             },
             // 获取播放列表
@@ -1233,8 +1239,9 @@
                             this.scenicPointName = qrcode_point.serial + '. ' + qrcode_point.name;
                             sessionStorage.setItem("currentPoint",JSON.stringify(qrcode_point));
                             this.playAudio({
-                                src: qrcode_point.guideUrl,
-                                id: qrcode_point.resource_id
+                                _src: qrcode_point.guideUrl,
+                                _id: qrcode_point.resource_id,
+                                _type: 5
                             });
                         } else {
                             this.scenicPointImg = pointList.page.list[0].url;
