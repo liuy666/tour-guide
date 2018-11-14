@@ -498,14 +498,11 @@
                     this.openMenu();
                     this.drawLine(to.params.lineId);
                 }
-                // if (from.name === 'scenic-point-detail') {
-                //     console.log("****")
-                // }
             }
             
             next();
         },
-        created() { 
+        created() {
             if(this.timer){
                 clearInterval(this.timer);
             }
@@ -535,7 +532,7 @@
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
             }
             
-            // 底部景区简介弹窗初始化移至此处
+            // 初始化底部景区简介弹窗
             this.scenicImg = scenicInfo.accessCoverUrl;
             this.scenicName = scenicInfo.name;
             this.scenicLevel = scenicInfo.level;
@@ -553,8 +550,6 @@
                   imgLeftBottom = [scenicInfo.southwest_lng,scenicInfo.southwest_lat], // 地图左下角
                   mapZoom = scenicInfo.zoom, // 地图zoom
                   centerPoint = [scenicInfo.longitude,scenicInfo.latitude]; // 地图中心店
-            // console.log("中心点：" + centerPoint);
-            // console.log('右上：'+imgRightTop+'左下:'+imgLeftBottom);
             
             // 获取屏幕大小 动态设置不同手机的地图zoom
             const containerWidth = document.querySelector('#wrapper').clientWidth;
@@ -681,6 +676,7 @@
                     }
                 }
             }*/
+
             //拖动中事件
             function mapDragging(){ 
                 moveJudgement(false);
@@ -798,7 +794,6 @@
                     document.querySelector(".currentPosition").value = GeolocationResult.position;
                 })
             });
-
         },
         data () {
             return {
@@ -1205,7 +1200,7 @@
                 this.changeMapIcon(false);
             },
             //改变地图图标交互效果 
-            changeMapIcon (isPlay) {debugger
+            changeMapIcon (isPlay) {
                 let cmarker = this.markers[this.scenicPointSerial-1].Ke.contentDom.children[0].children[0];
                 if(isPlay){
                     cmarker.classList.add("player");
@@ -1261,8 +1256,8 @@
                 if (resourceType) {
                     this.resourceType = resourceType;
                 }
-                let _self = this;
-                _self.markers = [];
+                // let _self = this;
+                this.markers = [];
                 const pointList = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${resourceType}`);
 
                 if(!pointList){
@@ -1270,8 +1265,7 @@
                     return;
                 }
 
-                const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
-
+                const playStatus = JSON.parse(sessionStorage.getItem('playStatus')); // ？？播放同步问题
                 if(pointList.page.list && pointList.page.list.length){
                     //设置默认显示(第一个景点的图片和名字) 如果通过二维码扫码进入页面则使用指定景点
                     if(resourceType == 1) {
@@ -1287,14 +1281,14 @@
                                 _type: 5
                             });
                         } else { 
-                            
-                            if (!playStatus) {
+                            if (!playStatus) { // ？？播放同步问题
                                 this.scenicPointImg = pointList.page.list[0].url;
                                 this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
                                 this.scenicPointSerial = pointList.page.list[0].serial;
                                 sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
                             }
                         }
+
                         sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
 
                         // 过滤出默认播放列表
@@ -1311,35 +1305,33 @@
                         this.saveResourceList(pointList.page.list);
                     }
                     //地图画点
-                    let className = _self.typeList.filter(item => item.type == _self.resourceType)[0].className;
+                    let className = this.typeList.filter(item => item.type == this.resourceType)[0].className;
                     pointList.page.list.forEach((v,i) => {
-                        let num = _self.resourceType == 1 ? v.serial : ''; 
+                        let num = this.resourceType == 1 ? v.serial : ''; 
                         let marker = new AMap.Marker({
                             content: "<div class='marker-content' data-flag='"+i+"'><div class='point-icon "+className+"'>"+num+"</div><div class='point-name'>"+v.name+"</div></div>",
                             position: [v.longitude,v.latitude],
                         });
-                        marker.on('click',_self.markerClick);
-                        _self.markers.push(marker);
-
+                        marker.on('click',this.markerClick);
+                        this.markers.push(marker);
                     });
-                }
-        
-                let overlayGroups = new AMap.OverlayGroup(_self.markers);
-                this.pointGroups = overlayGroups;
-                this.oMap_main.add(overlayGroups);
 
-                if(playStatus){
-                    const {guideUrl, resource_id, url, name, serial} = JSON.parse(sessionStorage.getItem('currentPoint'));
-                    this.scenicPointImg = url;
-                    this.scenicPointName = serial + '. ' + name;
-                    this.scenicPointSerial = serial;
-                    this.playAudio({
-                        _src: guideUrl,
-                        _id: resource_id,
-                        _type: 2 
-                    });
+                    let overlayGroups = new AMap.OverlayGroup(this.markers);
+                    this.pointGroups = overlayGroups;
+                    this.oMap_main.add(overlayGroups);
+
+                    if (playStatus) {  // ？？播放同步问题
+                        const {guideUrl, resource_id, url, name, serial} = JSON.parse(sessionStorage.getItem('currentPoint'));
+                        this.scenicPointImg = url;
+                        this.scenicPointName = serial + '. ' + name;
+                        this.scenicPointSerial = serial;
+                        this.playAudio({
+                            _src: guideUrl,
+                            _id: resource_id,
+                            _type: 2 
+                        });
+                    }
                 }
-                
             },
             markerClick(e) { 
                 if(this.infoWindow_main.getPosition() !== undefined && this.infoWindow_main.getPosition().O == e.target.getPosition().O && this.infoWindow_main.getPosition().N == e.target.getPosition().N) {
