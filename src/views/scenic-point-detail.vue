@@ -225,6 +225,10 @@ export default {
                     dAudio.pause();
                 }
                 this.isPlayed = false;
+                if(sessionStorage.getItem("isAuto")){
+                    //如果是自动  找到当前点在播放列表中的位置  然后讲列表序列中的下一个点设置成当前  再执行一个setAudio
+                    //同时找到当前点在所有景点列表中的位置，
+                }
             }
         }
     },

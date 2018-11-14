@@ -470,6 +470,7 @@
                 <div class="dec-title">景区介绍</div>
                 <div class="dec-content font-color-888">{{scenicDec}}</div>
             </div>
+           
         </section>
         <!-- 记录当前经纬度临时框（开发测试用） -->
         <section style="position:absolute;left:0;bottom:0;">
@@ -644,18 +645,6 @@
 
             // 初始化图标菜单
             this.initMenu();
-
-            const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
-            const {guideUrl, resource_id, url, name, serial} = JSON.parse(sessionStorage.getItem('currentPoint'));
-            if (playStatus) {
-                this.playAudio({
-                    _src: guideUrl,
-                    _id: resource_id,
-                    _type: 2 
-                });
-                this.scenicPointImg = url;
-                this.scenicPointName = serial + '. ' + name;
-            }
             
             //拖动中事件 没用
             /*function showInfoDragging(e) {
@@ -836,6 +825,7 @@
                 audioPercent: 0,
                 scenicPointImg: '',
                 scenicPointName: '',
+                scenicPointSerial:'',
                 menuList: [],
                 loadText: '',
                 isShowLoading: false,
@@ -926,14 +916,17 @@
                 if (from.name === 'scenic-spot' && to.name === 'main' && to.params.pid) {
                     const selectPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === to.params.pid)[0];
                     sessionStorage.setItem('currentPoint', JSON.stringify(selectPoint));
+                    
+                    this.scenicPointImg = selectPoint.url;
+                    this.scenicPointName = selectPoint.serial + '. ' + selectPoint.name;
+                    this.scenicPointSerial = selectPoint.serial;
+                    this.isShowMenu = false;
+
                     this.playAudio({
                         _src: selectPoint.guideUrl,
                         _id: to.params.pid,
                         _type: 3
                     });
-                    this.scenicPointImg = selectPoint.url;
-                    this.scenicPointName = selectPoint.serial + '. ' + selectPoint.name;
-                    this.isShowMenu = false;
                 }
             }
         },    
@@ -1196,6 +1189,8 @@
                         this.isPlayed = true;
                     }
                 }
+                //改变地图播放交互
+                this.changeMapIcon(true);
             },
             // 暂停播放
             pauseAudio() {
@@ -1207,13 +1202,25 @@
                 this.isPlayed = false;
 
                 //地图图标交互效果 
-                let serial = sessionStorage.getItem("currentSerial");
-                let cmarker = this.markers[serial-1].Ke.contentDom.children[0].children[0];
-                cmarker.classList.remove("player");
-                cmarker.innerHTML = serial;
-                if(document.querySelector(".info-scenic-btns")){
-                    document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
+                this.changeMapIcon(false);
+            },
+            //改变地图图标交互效果 
+            changeMapIcon (isPlay) {debugger
+                let cmarker = this.markers[this.scenicPointSerial-1].Ke.contentDom.children[0].children[0];
+                if(isPlay){
+                    cmarker.classList.add("player");
+                    cmarker.innerHTML = "";
+                    if(document.querySelector(".info-scenic-btns")){
+                        document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
+                    }
+                }else{
+                    cmarker.classList.remove("player");
+                    cmarker.innerHTML = this.scenicPointSerial;
+                    if(document.querySelector(".info-scenic-btns")){
+                        document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
+                    }
                 }
+                
             },
             // 播放进度圆环
             changeProgress() {
@@ -1263,10 +1270,7 @@
                     return;
                 }
 
-                let pointLnglat = [], 
-                    pointName = [], 
-                    pointflag = [], 
-                    pointSerial = [];
+                const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
 
                 if(pointList.page.list && pointList.page.list.length){
                     //设置默认显示(第一个景点的图片和名字) 如果通过二维码扫码进入页面则使用指定景点
@@ -1275,16 +1279,21 @@
                             const qrcode_point = pointList.filter(item => item.resource_id === query.pid)[0];
                             this.scenicPointImg = qrcode_point.url;
                             this.scenicPointName = qrcode_point.serial + '. ' + qrcode_point.name;
+                            this.scenicPointSerial = qrcode_point.serial;
                             sessionStorage.setItem("currentPoint",JSON.stringify(qrcode_point));
                             this.playAudio({
                                 _src: qrcode_point.guideUrl,
                                 _id: qrcode_point.resource_id,
                                 _type: 5
                             });
-                        } else {
-                            this.scenicPointImg = pointList.page.list[0].url;
-                            this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
-                            sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
+                        } else { 
+                            
+                            if (!playStatus) {
+                                this.scenicPointImg = pointList.page.list[0].url;
+                                this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
+                                this.scenicPointSerial = pointList.page.list[0].serial;
+                                sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
+                            }
                         }
                         sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
 
@@ -1318,6 +1327,19 @@
                 let overlayGroups = new AMap.OverlayGroup(_self.markers);
                 this.pointGroups = overlayGroups;
                 this.oMap_main.add(overlayGroups);
+
+                if(playStatus){
+                    const {guideUrl, resource_id, url, name, serial} = JSON.parse(sessionStorage.getItem('currentPoint'));
+                    this.scenicPointImg = url;
+                    this.scenicPointName = serial + '. ' + name;
+                    this.scenicPointSerial = serial;
+                    this.playAudio({
+                        _src: guideUrl,
+                        _id: resource_id,
+                        _type: 2 
+                    });
+                }
+                
             },
             markerClick(e) { 
                 if(this.infoWindow_main.getPosition() !== undefined && this.infoWindow_main.getPosition().O == e.target.getPosition().O && this.infoWindow_main.getPosition().N == e.target.getPosition().N) {
@@ -1364,7 +1386,11 @@
                 btnArea.className = "info-scenic-btns";
 
                 var btn1 = document.createElement('button');
-                btn1.className = "toPlay";
+                if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused){
+                    btn1.className = "toPlay playing"
+                }else{
+                    btn1.className = "toPlay"
+                }
                 btn1.onclick = this.toPlay;
                 btnArea.appendChild(btn1);
 
@@ -1395,12 +1421,19 @@
                 sessionStorage.setItem("currentSerial",serial);
                 let currentMarker = this.markers[serial-1].Ke.contentDom.children[0].children[0];
                 currentMarker.innerHTML = '';
-                currentMarker.classList.add('player');
-                this.playAudio({
-                    _src: guideUrl,
-                    _id: resource_id,
-                    _type: 4
-                });
+                if(!currentMarker.classList.contains('player')){
+                    if(document.querySelector(".main-audio") && document.querySelector(".main-audio").paused){
+                        this.playAudio();
+                    }else{
+                        this.playAudio({
+                            _src: guideUrl,
+                            _id: resource_id,
+                            _type: 4
+                        });
+                    }
+                    currentMarker.classList.add('player');
+                }
+                
             },
             toDetail() {
                 if(document.querySelector(".main-audio")){
