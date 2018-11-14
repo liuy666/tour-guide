@@ -376,7 +376,6 @@ export default {
         this.pauseAudio();
         let playStatus = {
             currentTime: document.querySelector('.detail-audio').currentTime,
-            totalTime: this.totalTime,
             status : status
         }
         sessionStorage.setItem('playStatus', JSON.stringify(playStatus));

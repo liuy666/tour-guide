@@ -382,7 +382,6 @@
 
 <template>
     <div id="main">
-        <div>{{}}</div>
         <!-- 网络请求loading层 -->
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <!-- 地图容器 -->
@@ -408,9 +407,6 @@
                         </span>
                 </section>
             </section>
-            <!-- <transition> 
-                <router-view></router-view>
-            </transition> -->
             <router-view></router-view>
             <ul class="main_view_footer">
                 <li v-for="menu in menuList" :key="menu.id" :data-mark="menu.mark" @click="gotoWhere(menu.mark, menu.value)">
@@ -464,7 +460,7 @@
             </div>
             <div class="scenic-address-time">
                 <div class="scenic-address">
-                    景区地址： <span class="font-color-666"><a :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=310000&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a></span>
+                    景区地址： <span class="font-color-666"><a :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=' + region + '&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a></span>
                 </div>
                 <div class="scenic-time">
                     开放时间： <span class="font-color-666">{{scenicOpenTime}}</span>
@@ -501,9 +497,9 @@
                     this.openMenu();
                     this.drawLine(to.params.lineId);
                 }
-                if (from.name === 'scenic-point-detail') {
-                    console.log("****")
-                }
+                // if (from.name === 'scenic-point-detail') {
+                //     console.log("****")
+                // }
             }
             
             next();
@@ -512,7 +508,7 @@
             if(this.timer){
                 clearInterval(this.timer);
             }
-            console.log(this.$route)
+            console.log(this.$route);
         },
         async mounted() {
             const _self = this;
@@ -543,6 +539,7 @@
             this.scenicName = scenicInfo.name;
             this.scenicLevel = scenicInfo.level;
             this.scenicAddress = scenicInfo.address;
+            this.region = Number(String(scenicInfo.region).slice(1));
             this.scenicOpenTime = scenicInfo.opening_time;
             this.scenicDec = scenicInfo.introduce;
 
@@ -647,6 +644,18 @@
 
             // 初始化图标菜单
             this.initMenu();
+
+            const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
+            const {guideUrl, resource_id, url, name, serial} = JSON.parse(sessionStorage.getItem('currentPoint'));
+            if (playStatus) {
+                this.playAudio({
+                    _src: guideUrl,
+                    _id: resource_id,
+                    _type: 2 
+                });
+                this.scenicPointImg = url;
+                this.scenicPointName = serial + '. ' + name;
+            }
             
             //拖动中事件 没用
             /*function showInfoDragging(e) {
@@ -866,7 +875,8 @@
                 },{
                     type:10,
                     className:'type-hospital'
-                }]
+                }],
+                region: '',
             }
         },
         computed: mapState({
@@ -1098,6 +1108,7 @@
                 if (mainAudio && mainAudio.paused && !options) {
                     mainAudio.play();
                     this.startCurrentPlay('play');
+                    this.isPlayed = true;
                 } else {
                     let src = ''; // 播放src
                     let id = ''; // 景点id
@@ -1110,6 +1121,8 @@
                         src = playList[0].aSrc,
                         id = playList[0].aId
                     } else if (_type === 2) { // 景点详情页跳转后续播
+                        src = _src;
+                        id = _id;
                         isContinuePlay = true;
                     } else if (_type === 3) { // 景点列表点播
                         src = _src;
@@ -1139,21 +1152,40 @@
 
                     }
 
+                    let audioDom = document.createElement('audio');
+                    let sourceDom = document.createElement('source');
+                    sourceDom.type = 'audio/mpeg';
+                    sourceDom.src = src;
+                    audioDom.dataset.id = id;
+                    audioDom.appendChild(sourceDom);
+                    audioDom.classList.add('main-audio');
+                    audioDom.style.display = 'none';
+                    audioContainer.appendChild(audioDom);
+
                     // 开始播放
                     if (isContinuePlay) {
+                        const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
+                        this.isPlayed = playStatus.status;
+                        audioDom.currentTime = playStatus.currentTime;
 
-                    } else {
-                        let audioDom = document.createElement('audio'),
-                            sourceDom = document.createElement('source');
-                        sourceDom.type = 'audio/mpeg';
-                        sourceDom.src = src;
-                        audioDom.dataset.id = id;
-                        audioDom.appendChild(sourceDom);
-                        audioDom.classList.add('main-audio');
-                        audioDom.style.display = 'none';
-                        audioContainer.appendChild(audioDom);
                         audioDom.oncanplay = (e) => {
-                            const _audioDom = e.target;
+                            let _audioDom = e.target;
+                            this.totalTime = _audioDom.duration;
+                            this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
+                            console.log(this.totalTime);
+                            if (playStatus.status) { // 暂停中
+                                this.isPlayed = false;
+                            } else {
+                                _audioDom.play();
+                                this.isPlayed = true;
+                            }
+                        }
+                        audioDom.onplay = (e) => {
+                            this.changeProgress();
+                        }
+                    } else {
+                        audioDom.oncanplay = (e) => {
+                            let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
                             console.log(this.totalTime)
                             _audioDom.play();
@@ -1161,9 +1193,9 @@
                         audioDom.onplay = (e) => {
                             this.changeProgress();
                         }
+                        this.isPlayed = true;
                     }
                 }
-                this.isPlayed = true;
             },
             // 暂停播放
             pauseAudio() {
