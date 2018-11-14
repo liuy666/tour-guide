@@ -464,7 +464,7 @@
             </div>
             <div class="scenic-address-time">
                 <div class="scenic-address">
-                    景区地址： <span class="font-color-666">{{scenicAddress}}</span>
+                    景区地址： <span class="font-color-666"><a :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=310000&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a></span>
                 </div>
                 <div class="scenic-time">
                     开放时间： <span class="font-color-666">{{scenicOpenTime}}</span>
@@ -474,12 +474,6 @@
                 <div class="dec-title">景区介绍</div>
                 <div class="dec-content font-color-888">{{scenicDec}}</div>
             </div>
-            <!-- <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="qqmap://map/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（只能在App或手机浏览器中生效，微信内置浏览器也不行）</a></p>
-            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="https://apis.map.qq.com/uri/v1/search?keyword=四川省广元市剑门关&region=广元&referer=F7UBZ-CH6R2-TNVUO-CCN73-ZA5LO-LZBO4">试试打开腾讯地图App（h5调用）</a></p>
-            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="https://uri.amap.com/search?keyword=四川省广元市剑门关&city=310000&view=map&src=test&coordinate=gaode&callnative=1">试试打开高德地图App</a></p>
-            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="http://api.map.baidu.com/geocoder?address=四川省广元市剑门关&output=html&src=webapp.baidu.openAPIdemo">试试打开百度地图App--方式1：web端--地址解析</a></p>
-            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="bdapp://map/geocoder?src=andr.baidu.openAPIdemo&address=四川省广元市剑门关">试试打开百度地图App--方式2：安卓端--地址解析</a></p>
-            <p @click="openMap">景区地址：四川省广元市剑门关 -- <a href="baidumap://map/geocoder?address=四川省广元市剑门关&src=ios.baidu.openAPIdemo">试试打开百度地图App--方式3：ios端--地址解析</a></p> -->
         </section>
         <!-- 记录当前经纬度临时框（开发测试用） -->
         <section style="position:absolute;left:0;bottom:0;">
@@ -1130,7 +1124,17 @@
                             this.timer = null;
                         }
                     } else if (_type === 4) { // 地图解说播放
-
+                        src = _src;
+                        id = _id;
+                        if (mainAudio) {
+                            clearInterval(this.timer);
+                            if (!mainAudio.paused) {
+                                mainAudio.pause();
+                            }
+                            audioContainer.removeChild(mainAudio);
+                            this.audioPercent = 0;
+                            this.timer = null;
+                        }
                     } else { // 扫码播放
 
                     }
@@ -1179,16 +1183,6 @@
                     document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
                 }
             },
-            // 获取播放列表
-            // getPlayList() {
-            //     let _sortList = 
-            //         _hasPlayList = JSON.parse(sessionStorage.getItem('hasPlayList'));
-            //     _sortList.sort((a, b) => a.serial - b.serial);
-            //     let notPlayList = _sortList.filter(item => {
-            //         return !this.$tool.isExist(item.resource_id, _hasPlayList);
-            //     });
-            //     return notPlayList;
-            // },
             // 播放进度圆环
             changeProgress() {
                 this.timer = setInterval(() => {
@@ -1365,12 +1359,16 @@
             },
             toPlay(e) {
                 e.currentTarget.classList.add("playing");
-                let currentSerial = JSON.parse(sessionStorage.getItem("currentPoint")).serial;
-                sessionStorage.setItem("currentSerial",currentSerial);
-                let currentMarker = this.markers[currentSerial-1].Ke.contentDom.children[0].children[0];
+                let {serial, guideUrl, resource_id} = JSON.parse(sessionStorage.getItem("currentPoint"));
+                sessionStorage.setItem("currentSerial",serial);
+                let currentMarker = this.markers[serial-1].Ke.contentDom.children[0].children[0];
                 currentMarker.innerHTML = '';
                 currentMarker.classList.add('player');
-                this.playAudio();
+                this.playAudio({
+                    _src: guideUrl,
+                    _id: resource_id,
+                    _type: 4
+                });
             },
             toDetail() {
                 if(document.querySelector(".main-audio")){

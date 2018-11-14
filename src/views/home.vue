@@ -205,7 +205,8 @@
                 }
             },
             openInfoWindow(e) {
-                let flag = e.target.Je.contentDom.children[0].getAttribute("data-flag");//当前景区在景区列表数据中的下标
+                console.log(e.target)
+                let flag = e.target.Ke.contentDom.children[0].getAttribute("data-flag");//当前景区在景区列表数据中的下标
                 const scenicInfo = JSON.parse(sessionStorage.getItem("scenicList"))[flag];
                 sessionStorage.setItem('currentScenic',JSON.stringify(scenicInfo));
                 this.oInfoWindow.setContent(this.createInfoWindow(scenicInfo));
