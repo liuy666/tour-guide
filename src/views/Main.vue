@@ -474,6 +474,7 @@
                 <div class="dec-title">景区介绍</div>
                 <div class="dec-content font-color-888">{{scenicDec}}</div>
             </div>
+           
         </section>
         <!-- 记录当前经纬度临时框（开发测试用） -->
         <section style="position:absolute;left:0;bottom:0;">
