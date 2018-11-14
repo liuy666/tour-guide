@@ -141,12 +141,13 @@ export default {
         this.setRouteName('scenic-spot');
     },
     mounted() {
-        const selectedId = sessionStorage.getItem('selectedId');
+        const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
         const lis = document.querySelectorAll('.spot-list li');
+        const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
 
-        if (selectedId) {
+        if (playStatus && !playStatus.status) {
             for (let li of lis) {
-                if (li.dataset.pid === selectedId) {
+                if (li.dataset.pid === currPoint.resource_id) {
                     li.style.backgroundColor = '#f0f0f0';
                     li.children[1].children[0].style.display = 'none';
                     li.children[1].children[1].style.display = 'block';
@@ -161,23 +162,15 @@ export default {
     }),
     watch: {
         watchPlay(val) {
-            if (val === 'play') {
-                const lis = document.querySelectorAll('.spot-list li');
-                for (let li of lis) {
-                    const selectedId = sessionStorage.getItem('selectedId');
-                    if (selectedId === li.dataset.pid) {
-                        li.style.backgroundColor = '#f0f0f0';
+            const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+            const lis = document.querySelectorAll('.spot-list li');
+            for (let li of lis) {
+                if (li.dataset.pid === currPoint.resource_id) {
+                    if (val === 'play') {
                         li.children[1].children[0].style.display = 'none';
                         li.children[1].children[1].style.display = 'block';
                     }
-                }
-            }
-            if (val === 'pause') {
-                const lis = document.querySelectorAll('.spot-list li');
-                for (let li of lis) {
-                    const selectedId = sessionStorage.getItem('selectedId');
-                    if (selectedId === li.dataset.pid) {
-                        li.style.backgroundColor = '#fff';
+                    if (val === 'pause') {
                         li.children[1].children[0].style.display = 'block';
                         li.children[1].children[1].style.display = 'none';
                     }
@@ -191,13 +184,11 @@ export default {
             'pauseCurrentPlay'
         ]),
         selectOne(e) {
-            console.log(1,e)
             const lis = document.querySelectorAll('.spot-list li');
 
             for (let li of lis) {
                 if (e.target.dataset.pid === li.dataset.pid) {
-                    if (li.style.backgroundColor === 'rgb(240, 240, 240)') {
-                        li.style.backgroundColor = '#fff';
+                    if (li.children[1].children[0].style.display === 'none') {
                         li.children[1].children[0].style.display = 'block';
                         li.children[1].children[1].style.display = 'none';
                         this.pauseCurrentPlay();
@@ -205,7 +196,12 @@ export default {
                         li.style.backgroundColor = '#f0f0f0';
                         li.children[1].children[0].style.display = 'none';
                         li.children[1].children[1].style.display = 'block';
-                        sessionStorage.setItem('selectedId', li.dataset.pid);
+                        let status = {
+                            status: false
+                        }
+                        sessionStorage.setItem('playStatus', JSON.stringify(status));
+                        let currPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === li.dataset.pid)[0];
+                        sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
                         this.$router.push({
                             name: 'main',
                             params: {

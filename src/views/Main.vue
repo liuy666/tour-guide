@@ -928,7 +928,7 @@
             }
         },    
         methods: {
-            // 打开图标菜单
+            // 初始化图标菜单
             async initMenu() {
                 this.isShowLoading = true;
 
@@ -1034,7 +1034,6 @@
             },
             // 点击图标加载对应景区资源
             gotoWhere(remark, value) {
-                console.log(remark);
                 const lis = document.querySelectorAll('.main_view_footer li'),
                       colorSrcList = JSON.parse(sessionStorage.getItem('colorSrcList'));
                 for (let li of lis) {
@@ -1096,6 +1095,10 @@
                 const mainAudio = document.querySelector('.main-audio');
                 const audioContainer = document.querySelector('.toolbars');
                 if (mainAudio && mainAudio.paused && !options) {
+                    let status = {
+                        status: false
+                    }
+                    sessionStorage.setItem('playStatus', JSON.stringify(status));
                     mainAudio.play();
                     this.startCurrentPlay('play');
                     this.isPlayed = true;
@@ -1155,14 +1158,12 @@
                     // 开始播放
                     if (isContinuePlay) {
                         const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
-                        this.isPlayed = !playStatus.status;
                         audioDom.currentTime = playStatus.currentTime;
-
                         audioDom.oncanplay = (e) => {
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
                             this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
-                            console.log(this.totalTime);
+
                             if (playStatus.status) { // 暂停中
                                 this.isPlayed = false;
                             } else {
@@ -1177,7 +1178,11 @@
                         audioDom.oncanplay = (e) => {
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
-                            console.log(this.totalTime)
+                            let status = {
+                                currentTime: 0,
+                                status : false
+                            }
+                            sessionStorage.setItem('playStatus', JSON.stringify(status));
                             _audioDom.play();
                         }
                         audioDom.onplay = (e) => {
@@ -1199,10 +1204,14 @@
             },
             // 暂停播放
             pauseAudio() {
-                console.log(this.timer)
                 clearInterval(this.timer);
                 this.timer = '';
                 document.querySelector('.main-audio').pause();
+                let status = {
+                    currentTime: document.querySelector('.main-audio').currentTime,
+                    status : true
+                } 
+                sessionStorage.setItem('playStatus', JSON.stringify(status));
                 this.startCurrentPlay('pause');
                 this.isPlayed = false;
 
@@ -1276,7 +1285,6 @@
                 if (resourceType) {
                     this.resourceType = resourceType;
                 }
-                // let _self = this;
                 this.markers = [];
                 const pointList = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${resourceType}`);
 
@@ -1285,8 +1293,10 @@
                     return;
                 }
 
-                const playStatus = JSON.parse(sessionStorage.getItem('playStatus')); // ？？播放同步问题
                 if(pointList.page.list && pointList.page.list.length){
+                    // 判断是否是初始化页面 还是回退进入本页面
+                    const fromRouteName = this.$store.state.app.fromRouteName;
+
                     //设置默认显示(第一个景点的图片和名字) 如果通过二维码扫码进入页面则使用指定景点
                     if(resourceType == 1) {
                         if (query && query.pid) {
@@ -1302,31 +1312,37 @@
                                 _type: 5
                             });
                         } else { 
-                            
-                            if (!playStatus) { // ？？播放同步问题
-                                sessionStorage.setItem("oldSerial",this.scenicPointSerial);
-                                this.scenicPointImg = pointList.page.list[0].url;
-                                this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
-                                this.scenicPointSerial = pointList.page.list[0].serial;
-                                sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
+                            if (!fromRouteName) {
+                                const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
+                                if (cPoint) {
+                                    this.scenicPointImg = cPoint.url;
+                                    this.scenicPointName = cPoint.serial + '. ' + cPoint.name;
+                                    this.scenicPointSerial = cPoint.serial;
+                                } else {
+                                    sessionStorage.setItem("oldSerial",this.scenicPointSerial);
+                                    sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
+                                    sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
+                                    this.scenicPointImg = pointList.page.list[0].url;
+                                    this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
+                                    this.scenicPointSerial = pointList.page.list[0].serial;
+
+                                    // 过滤出默认播放列表
+                                    let _sortList = [...pointList.page.list];
+                                    _sortList.sort((a, b) => a.serial - b.serial);
+                                    let playList = _sortList.map(item => {
+                                        return {
+                                            aSrc: item.guideUrl,
+                                            aId: item.resource_id
+                                        }
+                                    });
+                                    sessionStorage.setItem('playList',JSON.stringify(playList));
+                                }
                             }
                         }
-
-                        sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
-
-                        // 过滤出默认播放列表
-                        let _sortList = [...pointList.page.list];
-                        _sortList.sort((a, b) => a.serial - b.serial);
-                        let playList = _sortList.map(item => {
-                            return {
-                                aSrc: item.guideUrl,
-                                aId: item.resource_id
-                            }
-                        });
-                        sessionStorage.setItem('playList',JSON.stringify(playList));
                     } else {
                         this.saveResourceList(pointList.page.list);
                     }
+
                     //地图画点
                     let className = this.typeList.filter(item => item.type == this.resourceType)[0].className;
                     pointList.page.list.forEach((v,i) => {
@@ -1338,17 +1354,17 @@
                         marker.on('click',this.markerClick);
                         this.markers.push(marker);
                     });
-
                     let overlayGroups = new AMap.OverlayGroup(this.markers);
                     this.pointGroups = overlayGroups;
                     this.oMap_main.add(overlayGroups);
 
-                    if (playStatus) {  // ？？播放同步问题
+                    if (fromRouteName === 'scenic-point-detail') {
                         sessionStorage.setItem("oldSerial",this.scenicPointSerial);
-                        const {guideUrl, resource_id, url, name, serial} = JSON.parse(sessionStorage.getItem('currentPoint'));
+                        const { guideUrl, resource_id, url, name, serial } = JSON.parse(sessionStorage.getItem('currentPoint'));
                         this.scenicPointImg = url;
                         this.scenicPointName = serial + '. ' + name;
                         this.scenicPointSerial = serial;
+                        debugger
                         this.playAudio({
                             _src: guideUrl,
                             _id: resource_id,
@@ -1465,9 +1481,6 @@
                         status : status
                     }
                     sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
-                    //sessionStorage.setItem("isPlayed",true);
-                }else{
-                    //sessionStorage.setItem("isPlayed",false);
                 }
                 this.$router.push({
                     name :  'scenic-point-detail'

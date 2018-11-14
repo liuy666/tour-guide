@@ -383,6 +383,7 @@ export default {
             status : status
         }
         sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
+        this.$store.commit('setFromRouteName', 'scenic-point-detail');
         next();
     }
 }

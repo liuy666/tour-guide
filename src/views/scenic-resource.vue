@@ -43,15 +43,24 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapMutations, mapState } from 'vuex';
+
 export default {
     data() {
         return {
             
         }
     },
+    created() {
+        this.setRouteName('scenic-resource');
+    },
     computed: mapState({
         resources: state => state.app.resourceList
     }),
+    methods: {
+        ...mapMutations([
+            'setRouteName'
+        ])
+    }
 }
 </script>
