@@ -820,7 +820,7 @@
                 audioPercent: 0,
                 scenicPointImg: '',
                 scenicPointName: '',
-                scenicPointSerial:'',
+                scenicPointSerial:'1',
                 menuList: [],
                 loadText: '',
                 isShowLoading: false,
@@ -876,6 +876,7 @@
                 if (val >= 100) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
+                    this.changeMapIcon(false);
                     if (!au.paused || !au.ended) {
                         au.pause();
                     }
@@ -911,7 +912,8 @@
                 if (from.name === 'scenic-spot' && to.name === 'main' && to.params.pid) {
                     const selectPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === to.params.pid)[0];
                     sessionStorage.setItem('currentPoint', JSON.stringify(selectPoint));
-                    
+                    sessionStorage.setItem('oldSerial', this.scenicPointSerial);
+
                     this.scenicPointImg = selectPoint.url;
                     this.scenicPointName = selectPoint.serial + '. ' + selectPoint.name;
                     this.scenicPointSerial = selectPoint.serial;
@@ -1153,7 +1155,7 @@
                     // 开始播放
                     if (isContinuePlay) {
                         const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
-                        this.isPlayed = playStatus.status;
+                        this.isPlayed = !playStatus.status;
                         audioDom.currentTime = playStatus.currentTime;
 
                         audioDom.oncanplay = (e) => {
@@ -1184,8 +1186,16 @@
                         this.isPlayed = true;
                     }
                 }
+                
                 //改变地图播放交互
-                this.changeMapIcon(true);
+                if(this.isPlayed){
+                    let result = this.changeMapIcon(true);
+                    if(!result){
+                        setTimeout(() => {
+                            this.changeMapIcon(true);
+                        },1000);
+                    }
+                }
             },
             // 暂停播放
             pauseAudio() {
@@ -1201,7 +1211,17 @@
             },
             //改变地图图标交互效果 
             changeMapIcon (isPlay) {
-                let cmarker = this.markers[this.scenicPointSerial-1].Ke.contentDom.children[0].children[0];
+
+                if(!this.markers[this.scenicPointSerial-1].Ke.contentDom){
+                    return false;
+                }
+                let oldSerial = sessionStorage.getItem("oldSerial"),
+                    oldmarker = this.markers[oldSerial-1].Ke.contentDom.children[0].children[0],
+                    cmarker = this.markers[this.scenicPointSerial-1].Ke.contentDom.children[0].children[0];
+                
+                oldmarker.classList.remove("player");
+                oldmarker.innerHTML = oldSerial;
+
                 if(isPlay){
                     cmarker.classList.add("player");
                     cmarker.innerHTML = "";
@@ -1215,7 +1235,7 @@
                         document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
                     }
                 }
-                
+                return true;
             },
             // 播放进度圆环
             changeProgress() {
@@ -1270,6 +1290,7 @@
                     //设置默认显示(第一个景点的图片和名字) 如果通过二维码扫码进入页面则使用指定景点
                     if(resourceType == 1) {
                         if (query && query.pid) {
+                            sessionStorage.setItem("oldSerial",this.scenicPointSerial);
                             const qrcode_point = pointList.filter(item => item.resource_id === query.pid)[0];
                             this.scenicPointImg = qrcode_point.url;
                             this.scenicPointName = qrcode_point.serial + '. ' + qrcode_point.name;
@@ -1281,7 +1302,9 @@
                                 _type: 5
                             });
                         } else { 
+                            
                             if (!playStatus) { // ？？播放同步问题
+                                sessionStorage.setItem("oldSerial",this.scenicPointSerial);
                                 this.scenicPointImg = pointList.page.list[0].url;
                                 this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
                                 this.scenicPointSerial = pointList.page.list[0].serial;
@@ -1321,6 +1344,7 @@
                     this.oMap_main.add(overlayGroups);
 
                     if (playStatus) {  // ？？播放同步问题
+                        sessionStorage.setItem("oldSerial",this.scenicPointSerial);
                         const {guideUrl, resource_id, url, name, serial} = JSON.parse(sessionStorage.getItem('currentPoint'));
                         this.scenicPointImg = url;
                         this.scenicPointName = serial + '. ' + name;
@@ -1378,7 +1402,7 @@
                 btnArea.className = "info-scenic-btns";
 
                 var btn1 = document.createElement('button');
-                if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused){
+                if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointSerial === pointInfo.serial){
                     btn1.className = "toPlay playing"
                 }else{
                     btn1.className = "toPlay"
@@ -1408,13 +1432,18 @@
                 return info_other;
             },
             toPlay(e) {
-                e.currentTarget.classList.add("playing");
-                let {serial, guideUrl, resource_id} = JSON.parse(sessionStorage.getItem("currentPoint"));
-                sessionStorage.setItem("currentSerial",serial);
-                let currentMarker = this.markers[serial-1].Ke.contentDom.children[0].children[0];
-                currentMarker.innerHTML = '';
-                if(!currentMarker.classList.contains('player')){
-                    if(document.querySelector(".main-audio") && document.querySelector(".main-audio").paused){
+                //e.currentTarget.classList.add("playing");
+                sessionStorage.setItem("oldSerial",this.scenicPointSerial);
+                let {url, name, serial, guideUrl, resource_id} = JSON.parse(sessionStorage.getItem("currentPoint"));
+                this.scenicPointImg = url;
+                this.scenicPointName = serial + '. ' + name;
+                this.scenicPointSerial = serial;
+                //sessionStorage.setItem("currentSerial",serial);
+                //let currentMarker = this.markers[serial-1].Ke.contentDom.children[0].children[0];
+                // currentMarker.innerHTML = '';
+                if(!e.currentTarget.classList.contains('playing')){
+                    let cau = document.querySelector(".main-audio");
+                    if(cau && cau.paused && resource_id == cau.dataset.id){
                         this.playAudio();
                     }else{
                         this.playAudio({
@@ -1423,7 +1452,6 @@
                             _type: 4
                         });
                     }
-                    currentMarker.classList.add('player');
                 }
                 
             },
