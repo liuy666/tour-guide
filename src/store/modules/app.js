@@ -8,6 +8,8 @@ const app = {
         routeName: '',
         pauseStatus: false,
         playStatus: '',
+        autoPlay: false,
+        playEnd: false,
         fromRouteName: '',
         lineStatus: ''
     },
@@ -41,7 +43,13 @@ const app = {
         },
         removecurrentLine(state) {
             state.lineStatus = !state.lineStatus;
-        }
+        },
+        autoPlay(state) {
+            state.autoPlay = !state.autoPlay;
+        },
+        autoPlayEnd(state) {
+            state.playEnd = !state.playEnd;
+        },
     },
     actions: {
         async getLineList({commit}, {_this, sceneryId}) {

@@ -150,14 +150,21 @@ export default {
                 if (playStatus && !playStatus.status) {
                     li.children[1].children[0].style.display = 'none';
                     li.children[1].children[1].style.display = 'block';
+                } else {
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
                 }
             } else {
                 li.style.backgroundColor = '#fff';
+                li.children[1].children[0].style.display = 'block';
+                li.children[1].children[1].style.display = 'none';
             }
         }        
     },
     computed: mapState({
-        watchPlay: state => state.app.playStatus
+        watchPlay: state => state.app.playStatus,
+        watchAutoPlay: state => state.app.autoPlay,
+        watchAutoPlayEnd: state => state.app.playEnd,
     }),
     watch: {
         watchPlay(val) {
@@ -173,6 +180,36 @@ export default {
                         li.children[1].children[0].style.display = 'block';
                         li.children[1].children[1].style.display = 'none';
                     }
+                }
+            }
+        },
+        watchAutoPlay(val) {
+            const lis = document.querySelectorAll('.spot-list li');
+            const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+            for (let li of lis) {
+                if (li.dataset.pid === currPoint.resource_id) {
+                    li.style.backgroundColor = '#f0f0f0';
+                    li.children[1].children[0].style.display = 'none';
+                    li.children[1].children[1].style.display = 'block';
+                } else {
+                    li.style.backgroundColor = '#fff';
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
+                }
+            }
+        },
+        watchAutoPlayEnd(val) {
+            const lis = document.querySelectorAll('.spot-list li');
+            const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+            for (let li of lis) {
+                if (li.dataset.pid === currPoint.resource_id) {
+                    li.style.backgroundColor = '#f0f0f0';
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
+                } else {
+                    li.style.backgroundColor = '#fff';
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
                 }
             }
         }

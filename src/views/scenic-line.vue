@@ -83,7 +83,7 @@ export default {
     created() {
         this.setRouteName('scenic-line');
     },
-    mounted() {debugger
+    mounted() {
         const lineId = sessionStorage.getItem('lineId');
         const imgs = document.querySelectorAll('.img-right img');
         for (let img of imgs) {

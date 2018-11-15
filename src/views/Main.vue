@@ -873,21 +873,27 @@
                     }
                     this.audioPercent = 0;
                     this.timer = '';
+                    let currentId = au.dataset.id;
+                    const currentAudioContainer = document.querySelector('.toolbars');
+                    currentAudioContainer.removeChild(au);
+                    this.autoPlayEnd();
                     this.isPlayed = false;
                     if (this.isAuto) {
-                        let currentId = au.dataset.id;
-                        const currentAudioContainer = document.querySelector('.toolbars');
-                        currentAudioContainer.removeChild(au);
                         let next = this.getNext(currentId);
                         if (next) {
+                            this.scenicPointImg = next.nextPoint.url;
+                            this.scenicPointName = next.nextPoint.serial + '. ' + next.nextPoint.name;
+                            this.scenicPointSerial = next.nextPoint.serial;
+                            sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
+                            this.autoPlay();
                             this.playAudio({
                                 _src: next.nextPlay.aSrc,
                                 _id: next.nextPlay.aId,
                                 _type: 5
                             });
-                            this.scenicPointImg = next.nextPoint.url;
-                            this.scenicPointName = next.nextPoint.serial + '. ' + next.nextPoint.name;
-                            sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
+                        } else {
+                            sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
+                            this.autoPlayEnd();
                         }
                     }
                 }
@@ -1088,7 +1094,9 @@
             ...mapMutations([
                 'saveResourceList',
                 'setRouteName',
-                'startCurrentPlay'
+                'startCurrentPlay',
+                'autoPlay',
+                'autoPlayEnd'
             ]),
             // 初始化音频播放
             playAudio(options) {
@@ -1105,6 +1113,7 @@
                     sessionStorage.setItem('playStatus', JSON.stringify(status));
                     mainAudio.play();
                     this.startCurrentPlay('play');
+                    console.log(0)
                     this.isPlayed = true;
                 } else {
                     let src = ''; // 播放src
@@ -1117,10 +1126,13 @@
                         let playList = JSON.parse(sessionStorage.getItem('playList'));
                         src = playList[0].aSrc,
                         id = playList[0].aId
+                        this.startCurrentPlay('play');
+                        console.log(1)
                     } else if (_type === 2) { // 景点详情页跳转后续播
                         src = _src;
                         id = _id;
                         isContinuePlay = true;
+                        console.log(2)
                     } else if (_type === 3) { // 景点列表点播
                         src = _src;
                         id = _id;
@@ -1133,6 +1145,7 @@
                             this.audioPercent = 0;
                             this.timer = null;
                         }
+                        console.log(3)
                     } else if (_type === 4) { // 地图解说播放
                         src = _src;
                         id = _id;
@@ -1145,9 +1158,11 @@
                             this.audioPercent = 0;
                             this.timer = null;
                         }
+                        console.log(4)
                     } else if (_type === 5) {
                         src = _src;
                         id = _id;
+                        console.log(5)
                     } else { // 扫码播放
 
                     }
@@ -1323,29 +1338,30 @@
                                 const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
                                 sessionStorage.removeItem('playStatus');
                                 sessionStorage.removeItem('isAuto');
-                                if (cPoint) {
-                                    this.scenicPointImg = cPoint.url;
-                                    this.scenicPointName = cPoint.serial + '. ' + cPoint.name;
-                                    this.scenicPointSerial = cPoint.serial;
-                                } else {
-                                    sessionStorage.setItem("oldSerial",this.scenicPointSerial);
-                                    sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
-                                    sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
-                                    this.scenicPointImg = pointList.page.list[0].url;
-                                    this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
-                                    this.scenicPointSerial = pointList.page.list[0].serial;
+                                // if (cPoint) {
+                                //     this.scenicPointImg = cPoint.url;
+                                //     this.scenicPointName = cPoint.serial + '. ' + cPoint.name;
+                                //     this.scenicPointSerial = cPoint.serial;
+                                // } else {
+                                    
+                                // }
+                                sessionStorage.setItem("oldSerial",this.scenicPointSerial);
+                                sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
+                                sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
+                                this.scenicPointImg = pointList.page.list[0].url;
+                                this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
+                                this.scenicPointSerial = pointList.page.list[0].serial;
 
-                                    // 过滤出默认播放列表
-                                    let _sortList = [...pointList.page.list];
-                                    _sortList.sort((a, b) => a.serial - b.serial);
-                                    let playList = _sortList.map(item => {
-                                        return {
-                                            aSrc: item.guideUrl,
-                                            aId: item.resource_id
-                                        }
-                                    });
-                                    sessionStorage.setItem('playList',JSON.stringify(playList));
-                                }
+                                // 过滤出默认播放列表
+                                let _sortList = [...pointList.page.list];
+                                _sortList.sort((a, b) => a.serial - b.serial);
+                                let playList = _sortList.map(item => {
+                                    return {
+                                        aSrc: item.guideUrl,
+                                        aId: item.resource_id
+                                    }
+                                });
+                                sessionStorage.setItem('playList',JSON.stringify(playList));
                             }
                         }
                     } else {
