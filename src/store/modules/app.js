@@ -8,6 +8,7 @@ const app = {
         routeName: '',
         pauseStatus: false,
         playStatus: '',
+        fromRouteName: ''
     },
     mutations: {
         getLineList(state, list) {
@@ -33,7 +34,10 @@ const app = {
         },
         startCurrentPlay(state, val) {
             state.playStatus = val;
-        }
+        },
+        setFromRouteName(state, val) {
+            state.fromRouteName = val;
+        },
     },
     actions: {
         async getLineList({commit}, {_this, sceneryId}) {
