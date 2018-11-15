@@ -83,7 +83,7 @@ export default {
     created() {
         this.setRouteName('scenic-line');
     },
-    mounted() {
+    mounted() {debugger
         const lineId = sessionStorage.getItem('lineId');
         const imgs = document.querySelectorAll('.img-right img');
         for (let img of imgs) {
@@ -107,8 +107,9 @@ export default {
                     if (img.style.display === 'block') {
                         img.style.display = 'none';
                         this.removecurrentLine();
-                        sessionStorage.setItem('lineId', lineId);
+                        
                     } else {
+                        sessionStorage.setItem('lineId', lineId);
                         img.style.display = 'block';
                         this.$router.push({
                             name: 'main',
