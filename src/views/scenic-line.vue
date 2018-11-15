@@ -107,7 +107,6 @@ export default {
                     if (img.style.display === 'block') {
                         img.style.display = 'none';
                         this.removecurrentLine();
-                        
                     } else {
                         sessionStorage.setItem('lineId', lineId);
                         img.style.display = 'block';

@@ -202,6 +202,17 @@ export default {
                         sessionStorage.setItem('playStatus', JSON.stringify(status));
                         let currPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === li.dataset.pid)[0];
                         sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
+                        const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                        let sortList = [...pointList];
+                        sortList.sort((a, b) => a.serial - b.serial);
+                        let index = sortList.findIndex(item => item.resource_id === li.dataset.pid);
+                        let newPlayList = sortList.slice(index).map(item => {
+                            return {
+                                aSrc: item.guideUrl,
+                                aId: item.resource_id
+                            }
+                        });
+                        sessionStorage.setItem('playList', JSON.stringify(newPlayList));
                         this.$router.push({
                             name: 'main',
                             params: {
