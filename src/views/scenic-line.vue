@@ -83,6 +83,15 @@ export default {
     created() {
         this.setRouteName('scenic-line');
     },
+    mounted() {
+        const lineId = sessionStorage.getItem('lineId');
+        const imgs = document.querySelectorAll('.img-right img');
+        for (let img of imgs) {
+            if (img.dataset.lineid === lineId) {
+                img.style.display = 'block';
+            }
+        }
+    },
     computed: mapState({
         lines: state => state.app.lineList,
     }),
@@ -98,6 +107,7 @@ export default {
                     if (img.style.display === 'block') {
                         img.style.display = 'none';
                         this.removecurrentLine();
+                        sessionStorage.setItem('lineId', lineId);
                     } else {
                         img.style.display = 'block';
                         this.$router.push({
