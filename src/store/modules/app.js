@@ -8,7 +8,8 @@ const app = {
         routeName: '',
         pauseStatus: false,
         playStatus: '',
-        fromRouteName: ''
+        fromRouteName: '',
+        lineStatus: ''
     },
     mutations: {
         getLineList(state, list) {
@@ -38,6 +39,9 @@ const app = {
         setFromRouteName(state, val) {
             state.fromRouteName = val;
         },
+        removecurrentLine(state) {
+            state.lineStatus = !state.lineStatus;
+        }
     },
     actions: {
         async getLineList({commit}, {_this, sceneryId}) {
