@@ -857,7 +857,7 @@
             watchPause(val) {
                 this.pauseAudio();
             },
-            watchLine(val) {debugger
+            watchLine(val) {
                 // 清除当前路线
                 this.oMap_main.remove(this.line);
                 this.oMap_main.remove(this.linePointGroups);
