@@ -1515,14 +1515,19 @@
                         if (lineList) {
                             const currLineId = sessionStorage.getItem('lineId');
                             let lineDetailList =  lineList.filter(item => item.lineId === currLineId)[0].lineDetailList;
-                            if (this.$tool.isExist(this.mapClickPointId, lineDetailList)) {
+                            let pidList = lineDetailList.map(item => item.resourceId);
+                            if (this.$tool.isExist(this.mapClickPointId, pidList)) {
+                                console.log(111)
+
                                 newPlayList = lineDetailList.map(item => {
+                                    let url = JSON.parse(sessionStorage.getItem('pointList')).filter(i => i.resource_id === item.resourceId)[0].guideUrl;
                                     return {
-                                        aSrc: item.guideUrl,
-                                        aId: item.resource_id
+                                        aSrc: url,
+                                        aId: item.resourceId
                                     }
                                 });
                             } else {
+                                console.log(222)
                                 const pointList = JSON.parse(sessionStorage.getItem('pointList'));
                                 let sortList = [...pointList];
                                 sortList.sort((a, b) => a.serial - b.serial);
@@ -1535,6 +1540,7 @@
                                 });
                             }
                         } else {
+                            debugger
                             const pointList = JSON.parse(sessionStorage.getItem('pointList'));
                             let sortList = [...pointList];
                             sortList.sort((a, b) => a.serial - b.serial);
