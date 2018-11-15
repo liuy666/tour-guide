@@ -1160,7 +1160,7 @@
                     if (isContinuePlay) {
                         const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
                         audioDom.currentTime = playStatus.currentTime;
-                        audioDom.oncanplay = (e) => {
+                        audioDom.oncanplay = (e) => { debugger
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
                             this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
@@ -1170,7 +1170,7 @@
                             } else {
                                 _audioDom.play();
                                 this.isPlayed = true;
-                            }
+                            } debugger
                         }
                         audioDom.onplay = (e) => {
                             this.changeProgress();
@@ -1192,7 +1192,7 @@
                         this.isPlayed = true;
                     }
                 }
-                
+                debugger
                 //改变地图播放交互
                 if(this.isPlayed){
                     let result = this.changeMapIcon(true);
@@ -1366,7 +1366,7 @@
                         this.scenicPointImg = url;
                         this.scenicPointName = serial + '. ' + name;
                         this.scenicPointSerial = serial;
-                        debugger
+                        
                         this.playAudio({
                             _src: guideUrl,
                             _id: resource_id,

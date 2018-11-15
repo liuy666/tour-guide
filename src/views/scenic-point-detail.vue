@@ -401,6 +401,9 @@ export default {
         }
         sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
         this.$store.commit('setFromRouteName', 'scenic-point-detail');
+        if(this.timer){
+            clearInterval(this.timer);
+        }
         next();
     }
 }
