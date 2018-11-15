@@ -869,7 +869,7 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 50) {
+                if (val >= 5) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);
@@ -897,6 +897,7 @@
                                 _id: next.nextPlay.aId,
                                 _type: 5
                             });
+                            this.infoWindow_main.close();
                         } else {
                             sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
                             this.playEnd();

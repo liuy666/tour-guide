@@ -354,7 +354,7 @@ export default {
             this.imageList = [];
             const imgList = await this.$http.get(this.$base + 'hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
             if(!imgList){
-                this.isShowLoading = true;
+                this.isShowLoading = false;
                 return;
             }
             if(imgList.sowingPictures && imgList.sowingPictures.length>0){
