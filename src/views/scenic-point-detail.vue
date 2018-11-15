@@ -1,6 +1,15 @@
 <style lang="less">
     #scenic-point-detail{
         padding: 30px;
+        .weui-toast {
+            height: 170px;
+            width: 228px;
+            i {
+                width: 60px;
+                height: 60px;
+                margin-top: 55px;
+            }
+        }
         .weui-progress__bar{
             background:rgba(254,235,226,1);
             height: 6px;
@@ -135,6 +144,7 @@
 
 <template>
     <div id="scenic-point-detail">
+        <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <section class="audio-area">
             <div class="audio-area-img">
                 <img :src="pointImg" style="width:100%;height:100%;border-radius:100%;" />
@@ -178,7 +188,7 @@
         </section>
         <section class="point-list-area">
             <div class="area-title">
-                所有景点
+                全部景点
             </div>
             <ul class="point-list">
                 <li v-for="(item,index) in pointList" :key="index" @click="changePointInfo(index,true,$event)">
@@ -191,11 +201,12 @@
 </template>
 
 <script>
-import { Swiper, XProgress } from 'vux'
+import { Swiper, XProgress, Loading } from 'vux'
 export default {
     components : {
         Swiper,
-        XProgress
+        XProgress,
+        Loading
     },
     data() {
         return {
@@ -214,7 +225,9 @@ export default {
             totalTime:'',
             imageList : [],
             timer: '',
-            playIndex : 0
+            playIndex : 0,
+            isShowLoading : false,
+            loadText:''
         }
     },
     watch : {
@@ -264,6 +277,8 @@ export default {
                 this.totalTime = _audioDom.duration;
                 let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
+
+                
             }
             audioDom.onplay = (e) => {
                 this.changeProgress();
@@ -283,6 +298,9 @@ export default {
                     }else{
                         this.isPlayed = false;
                     }   
+                    //初始化进度条
+                    this.audioProgress = playStatus.currentTime / playStatus.totalTime * 100;
+                    document.querySelector(".circle").style.left = "calc("+this.audioProgress+"% - 8px)";
                 }else{
                     let tm1 = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                     this.currentTimeStr = '0:00';
@@ -332,6 +350,7 @@ export default {
         },
         //获取当前景点轮播图
         async getCurrentImgList() {
+            this.isShowLoading = true;
             let _self = this;
             this.imageList = [];
             const imgList = await this.$http.get(this.$base + 'hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
@@ -358,6 +377,7 @@ export default {
                     title : ''
                 })
             }
+            this.isShowLoading = false;
         },
         //切换景点
         changePointInfo (index,isClick,ev) {
