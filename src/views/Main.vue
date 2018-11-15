@@ -123,21 +123,6 @@
                     }
                 }
             }
-            // .v-enter {
-            //     opacity: 0;
-            // }
-            // .v-enter-active {
-            //     transition: all 0.5s ease;
-            // }
-            // .v-leave {
-            //     opacity: 1;
-            // }
-            // .v-leave-active {
-            //     transition: all .5s ease;
-            // }
-            // .v-leave-to {
-            //     opacity: 0;
-            // }
         }
         //底部景点播放
         .toolbars {
@@ -506,7 +491,6 @@
             if(this.timer){
                 clearInterval(this.timer);
             }
-            console.log(this.$route);
         },
         async mounted() {
             const _self = this;
@@ -1316,6 +1300,7 @@
                         } else { 
                             if (!fromRouteName) {
                                 const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
+                                sessionStorage.removeItem('playStatus');
                                 if (cPoint) {
                                     this.scenicPointImg = cPoint.url;
                                     this.scenicPointName = cPoint.serial + '. ' + cPoint.name;
