@@ -864,7 +864,7 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 100) {
+                if (val >= 4) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);
@@ -926,7 +926,7 @@
                     let nextPoint = pointList.filter(item => item.resource_id === playList[index + 1].aId)[0];
                     return {
                         nextPlay: playList[index + 1],
-                        nextPoint
+                        nextPoint: nextPoint
                     }
                 }
             },
@@ -1145,7 +1145,7 @@
                             this.audioPercent = 0;
                             this.timer = null;
                         }
-                    } else if (_type === 6) {
+                    } else if (_type === 5) {
                         src = _src;
                         id = _id;
                     } else { // 扫码播放
@@ -1322,6 +1322,7 @@
                             if (!fromRouteName) {
                                 const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
                                 sessionStorage.removeItem('playStatus');
+                                sessionStorage.removeItem('isAuto');
                                 if (cPoint) {
                                     this.scenicPointImg = cPoint.url;
                                     this.scenicPointName = cPoint.serial + '. ' + cPoint.name;

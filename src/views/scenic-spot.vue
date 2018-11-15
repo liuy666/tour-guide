@@ -144,18 +144,17 @@ export default {
         const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
         const lis = document.querySelectorAll('.spot-list li');
         const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-
-        if (playStatus && !playStatus.status) {
-            for (let li of lis) {
-                if (li.dataset.pid === currPoint.resource_id) {
-                    li.style.backgroundColor = '#f0f0f0';
+        for (let li of lis) {
+            if (li.dataset.pid === currPoint.resource_id) {
+                li.style.backgroundColor = '#f0f0f0';
+                if (playStatus && !playStatus.status) {
                     li.children[1].children[0].style.display = 'none';
                     li.children[1].children[1].style.display = 'block';
-                } else {
-                    li.style.backgroundColor = '#fff';
                 }
+            } else {
+                li.style.backgroundColor = '#fff';
             }
-        }
+        }        
     },
     computed: mapState({
         watchPlay: state => state.app.playStatus
