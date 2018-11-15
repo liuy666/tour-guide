@@ -857,8 +857,10 @@
             watchPause(val) {
                 this.pauseAudio();
             },
-            watchLine(val) {
+            watchLine(val) {debugger
                 // 清除当前路线
+                this.oMap_main.remove(this.line);
+                this.oMap_main.remove(this.linePointGroups);
             },
             // 播放进度监听
             audioPercent(val) {
