@@ -850,11 +850,15 @@
             }
         },
         computed: mapState({
-            watchPause: state => state.app.pauseStatus
+            watchPause: state => state.app.pauseStatus,
+            watchLine: state => state.app.lineStatus
         }),
         watch: {
             watchPause(val) {
                 this.pauseAudio();
+            },
+            watchLine(val) {
+                // 清除当前路线
             },
             // 播放进度监听
             audioPercent(val) {

@@ -88,23 +88,29 @@ export default {
     }),
     methods: {
         ...mapMutations([
-            'setRouteName'
+            'setRouteName',
+            'removecurrentLine'
         ]),
         gotoMapLine(lineId) {
             const imgs = document.querySelectorAll('.img-right img');
             for (let img of imgs) {
                 if (img.dataset.lineid === lineId) {
-                    img.style.display = 'block';
+                    if (img.style.display === 'block') {
+                        img.style.display = 'none';
+                        this.removecurrentLine();
+                    } else {
+                        img.style.display = 'block';
+                        this.$router.push({
+                            name: 'main',
+                            params: {
+                                lineId
+                            }
+                        });
+                    }
                 } else {
                     img.style.display = 'none';
                 }
             }
-            this.$router.push({
-                name: 'main',
-                params: {
-                    lineId
-                }
-            });
         }
     }
 }
