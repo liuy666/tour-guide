@@ -242,12 +242,13 @@ export default {
                 if(sessionStorage.getItem("isAuto")){
                     //如果是自动  找到当前点在播放列表中的位置  然后讲列表序列中的下一个点设置成当前 
                     //同时找到当前点在所有景点列表中的位置，执行changePointInfo
-                    this.playList.forEach((v,i) => { 
-                        if(v.aId === this.currentPointId) {
-                            this.playIndex = i;
-                            return;
-                        }
-                    })
+                    // this.playList.forEach((v,i) => { 
+                    //     if(v.aId === this.currentPointId) {
+                    //         this.playIndex = i;
+                    //         return;
+                    //     }
+                    // })
+                    this.playIndex = this.playList.findIndex(item => item.aId === this.currentPointId);
                     if(this.playIndex < this.playList.length-1){
                         this.changePointInfo(this.playIndex+1,false);
                     }
@@ -277,8 +278,6 @@ export default {
                 this.totalTime = _audioDom.duration;
                 let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
-
-                
             }
             audioDom.onplay = (e) => {
                 this.changeProgress();
@@ -355,6 +354,7 @@ export default {
             this.imageList = [];
             const imgList = await this.$http.get(this.$base + 'hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
             if(!imgList){
+                this.isShowLoading = true;
                 return;
             }
             if(imgList.sowingPictures && imgList.sowingPictures.length>0){
@@ -402,14 +402,18 @@ export default {
         this.getCurrentImgList();
     },
     mounted() {
-        this.pointList.forEach((v,i) => {
-            if(v.resource_id === this.currentPointId){
-                this.currentIndex = i;
-                return;
-            }
-        });
+        // this.pointList.forEach((v,i) => {
+        //     if(v.resource_id === this.currentPointId){
+        //         this.currentIndex = i;
+        //         return;
+        //     }
+        // });
+        this.currentIndex = this.pointList.findIndex(item => item.resource_id === this.currentPointId);
         document.querySelector(".point-list").scrollLeft = 120 * this.currentIndex;
-
+        const fromRouteName = this.$store.state.app.fromRouteName_detail;
+        if(fromRouteName != 'scenic-point-detail'){
+            sessionStorage.removeItem('playStatus');
+        }
         this.setAudio();
     },
     beforeRouteLeave (to, from , next) {

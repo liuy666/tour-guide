@@ -477,14 +477,19 @@
             Toast,
             Loading
         },
-        beforeRouteUpdate (to, from, next) { 
+        beforeRouteLeave(to, from, next){debugger
+            if(to.name == "scenic-point-detail"){
+                this.$store.commit('setFromRouteName_detail', 'scenic-point-detail');
+            }
+            next();
+        },
+        beforeRouteUpdate (to, from, next) {  debugger
             if(to.name == "main"){
                 if(from.name == "scenic-line" && to.params.lineId){
                     this.openMenu();
                     this.drawLine(to.params.lineId);
                 }
             }
-            
             next();
         },
         created() {
@@ -576,8 +581,8 @@
                     imgLeftBottom,
                     imgRightTop
                 ),
-                //zooms:[zoom,maxZoom],
-                zooms:[16,19],
+                zooms:[zoom,maxZoom],
+                //zooms:[16,19],
                 zIndex: 100
             });
 

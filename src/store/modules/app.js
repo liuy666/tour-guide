@@ -11,6 +11,7 @@ const app = {
         autoPlay: false,
         playEnd: false,
         fromRouteName: '',
+        fromRouteName_detail: '',
         lineStatus: ''
     },
     mutations: {
@@ -19,7 +20,7 @@ const app = {
         },
         saveResourceList(state, rlist) {
             state.resourceList = rlist;
-            sessionStorage.setItem('otherPointList',JSON.stringify(rlist));
+            sessionStorage.setItem('otherPointList', JSON.stringify(rlist));
         },
         saveContent(state, val) {
             state.content = val;
@@ -30,7 +31,7 @@ const app = {
         },
         setRouteName(state, val) {
             state.routeName = val;
-            sessionStorage.setItem('routeName',val);
+            sessionStorage.setItem('routeName', val);
         },
         pauseCurrentPlay(state) {
             state.pauseStatus = !state.pauseStatus;
@@ -40,6 +41,9 @@ const app = {
         },
         setFromRouteName(state, val) {
             state.fromRouteName = val;
+        },
+        setFromRouteName_detail(state, val) {
+            state.fromRouteName_detail = val;
         },
         removecurrentLine(state) {
             state.lineStatus = !state.lineStatus;
@@ -52,7 +56,7 @@ const app = {
         },
     },
     actions: {
-        async getLineList({commit}, {_this, sceneryId}) {
+        async getLineList({ commit }, { _this, sceneryId }) {
             _this.isShowLoading = true;
             console.log(vm)
             const lineList = await vm.$http.get(vm.$base + '/hqyatu-navigator/app/line/getLineList', {
