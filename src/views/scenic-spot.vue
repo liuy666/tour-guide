@@ -164,7 +164,7 @@ export default {
     computed: mapState({
         watchPlay: state => state.app.playStatus,
         watchAutoPlay: state => state.app.autoPlay,
-        watchAutoPlayEnd: state => state.app.playEnd,
+        watchPlayEnd: state => state.app.playEnd,
     }),
     watch: {
         watchPlay(val) {
@@ -198,7 +198,8 @@ export default {
                 }
             }
         },
-        watchAutoPlayEnd(val) {
+        // 监听是否播放结束
+        watchPlayEnd(val) {
             const lis = document.querySelectorAll('.spot-list li');
             const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
             for (let li of lis) {
@@ -221,7 +222,6 @@ export default {
         ]),
         selectOne(e) {
             const lis = document.querySelectorAll('.spot-list li');
-
             for (let li of lis) {
                 if (e.target.dataset.pid === li.dataset.pid) {
                     if (li.children[1].children[0].style.display === 'none') {

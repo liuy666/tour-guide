@@ -869,7 +869,7 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 4) {
+                if (val >= 50) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);
@@ -881,7 +881,8 @@
                     let currentId = au.dataset.id;
                     const currentAudioContainer = document.querySelector('.toolbars');
                     currentAudioContainer.removeChild(au);
-                    this.autoPlayEnd();
+                    sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
+                    this.playEnd();
                     this.isPlayed = false;
                     if (this.isAuto) {
                         let next = this.getNext(currentId);
@@ -898,7 +899,7 @@
                             });
                         } else {
                             sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
-                            this.autoPlayEnd();
+                            this.playEnd();
                         }
                     }
                 }
@@ -1009,7 +1010,6 @@
                     }
                 });
                 this.setRouteName('scenic-spot');
-                sessionStorage.removeItem('selectedId');
                 this.isShowLoading = false;
             },
             // 打开图标菜单
@@ -1098,10 +1098,10 @@
             ]),
             ...mapMutations([
                 'saveResourceList',
-                'setRouteName',
-                'startCurrentPlay',
-                'autoPlay',
-                'autoPlayEnd'
+                'setRouteName', // 更改路由name
+                'startCurrentPlay', // 开始播放
+                'autoPlay', // 自动连播
+                'playEnd' // 播放结束
             ]),
             // 初始化音频播放
             playAudio(options) {
@@ -1127,11 +1127,10 @@
                     let {_src, _id, _type} = options;
                     let isContinuePlay = false; // 是否需要续播，针对播放来源2
 
-                    if (_type === 1) { // 工具栏播放:默认取第一个景点来播放
+                    if (_type === 1) { // 工具栏播放，默认取第一个景点来播放
                         let playList = JSON.parse(sessionStorage.getItem('playList'));
                         src = playList[0].aSrc,
                         id = playList[0].aId
-                        this.startCurrentPlay('play');
                         console.log(1)
                     } else if (_type === 2) { // 景点详情页跳转后续播
                         src = _src;
@@ -1164,7 +1163,7 @@
                             this.timer = null;
                         }
                         console.log(4)
-                    } else if (_type === 5) {
+                    } else if (_type === 5) { // 自动连播
                         src = _src;
                         id = _id;
                         console.log(5)
@@ -1195,6 +1194,7 @@
                                 this.isPlayed = false;
                             } else {
                                 _audioDom.play();
+                                this.startCurrentPlay('play');
                                 this.isPlayed = true;
                             } 
 
@@ -1215,6 +1215,7 @@
                             }
                             sessionStorage.setItem('playStatus', JSON.stringify(status));
                             _audioDom.play();
+                            this.startCurrentPlay('play');
                             this.isPlayed = true;
 
                             if(this.isPlayed){
@@ -1508,23 +1509,36 @@
                     if(cau && cau.paused && resource_id == cau.dataset.id){
                         this.playAudio();
                     }else{
-                        const currLineId = sessionStorage.getItem('lineId');
                         const lineList = JSON.parse(sessionStorage.getItem('lineList'));
-                        let lineDetailList =  lineList.filter(item => item.lineId === currLineId)[0].lineDetailList;
                         let newPlayList = [];
-                        if (this.$tool.isExist(this.mapClickPointId, lineDetailList)) {
-                            newPlayList = lineDetailList.map(item => {
-                                return {
-                                    aSrc: item.guideUrl,
-                                    aId: item.resource_id
-                                }
-                            });
+                        if (lineList) {
+                            const currLineId = sessionStorage.getItem('lineId');
+                            let lineDetailList =  lineList.filter(item => item.lineId === currLineId)[0].lineDetailList;
+                            if (this.$tool.isExist(this.mapClickPointId, lineDetailList)) {
+                                newPlayList = lineDetailList.map(item => {
+                                    return {
+                                        aSrc: item.guideUrl,
+                                        aId: item.resource_id
+                                    }
+                                });
+                            } else {
+                                const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                                let sortList = [...pointList];
+                                sortList.sort((a, b) => a.serial - b.serial);
+                                let index = sortList.findIndex(item => item.resource_id === this.mapClickPointId);
+                                newPlayList = sortList.slice(index).map(item => {
+                                    return {
+                                        aSrc: item.guideUrl,
+                                        aId: item.resource_id
+                                    }
+                                });
+                            }
                         } else {
                             const pointList = JSON.parse(sessionStorage.getItem('pointList'));
                             let sortList = [...pointList];
                             sortList.sort((a, b) => a.serial - b.serial);
                             let index = sortList.findIndex(item => item.resource_id === this.mapClickPointId);
-                            let newPlayList = sortList.slice(index).map(item => {
+                            newPlayList = sortList.slice(index).map(item => {
                                 return {
                                     aSrc: item.guideUrl,
                                     aId: item.resource_id

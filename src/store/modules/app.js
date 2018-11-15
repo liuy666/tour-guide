@@ -36,6 +36,7 @@ const app = {
         pauseCurrentPlay(state) {
             state.pauseStatus = !state.pauseStatus;
         },
+        // 景点列表页监听Main页面的播放暂停
         startCurrentPlay(state, val) {
             state.playStatus = val;
         },
@@ -48,10 +49,12 @@ const app = {
         removecurrentLine(state) {
             state.lineStatus = !state.lineStatus;
         },
+        // 监听自动播
         autoPlay(state) {
             state.autoPlay = !state.autoPlay;
         },
-        autoPlayEnd(state) {
+        // 监听播放结束
+        playEnd(state) {
             state.playEnd = !state.playEnd;
         },
     },
