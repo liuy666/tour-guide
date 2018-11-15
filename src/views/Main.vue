@@ -864,37 +864,38 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 100) {
+                if (val >= 4) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);
                     if (!au.paused || !au.ended) {
                         au.pause();
                     }
-                    return;
-                    let hasPlayList = JSON.parse(sessionStorage.getItem('hasPlayList'));
-                    console.log(au.dataset)
-                    hasPlayList.push(au.dataset.id);
-                    sessionStorage.setItem('hasPlayList', JSON.stringify(hasPlayList));
                     this.audioPercent = 0;
                     this.timer = '';
+                    let currentId = au.dataset.id;
+                    const currentAudioContainer = document.querySelector('.toolbars');
+                    currentAudioContainer.removeChild(au);
+                    this.autoPlayEnd();
                     this.isPlayed = false;
-                    // if (this.isAuto) {
-                    //     const currentAudioContainer = document.querySelector('.toolbars');
-                    //     currentAudioContainer.removeChild(au);
-                    //     let playList = this.getPlayList();
-                    //     if (!playList.length) {
-                    //         console.log('是否从头播')
-                    //         return;
-                    //     }
-                    //     this.playAudio({
-                    //         src: playList[0].guideUrl,
-                    //         id: playList[0].resource_id
-                    //     });
-                    //     this.scenicPointImg = playList[0].url;
-                    //     this.scenicPointName = playList[0].serial + '. ' + playList[0].name;
-                    //     sessionStorage.setItem('currentPoint',JSON.stringify(playList[0]));
-                    // }
+                    if (this.isAuto) {
+                        let next = this.getNext(currentId);
+                        if (next) {
+                            this.scenicPointImg = next.nextPoint.url;
+                            this.scenicPointName = next.nextPoint.serial + '. ' + next.nextPoint.name;
+                            this.scenicPointSerial = next.nextPoint.serial;
+                            sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
+                            this.autoPlay();
+                            this.playAudio({
+                                _src: next.nextPlay.aSrc,
+                                _id: next.nextPlay.aId,
+                                _type: 5
+                            });
+                        } else {
+                            sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
+                            this.autoPlayEnd();
+                        }
+                    }
                 }
             },
             '$route'(to, from) {
@@ -920,6 +921,21 @@
             }
         },    
         methods: {
+            getNext(lastId) {
+                const playList = JSON.parse(sessionStorage.getItem('playList'));
+                let index = playList.findIndex(item => item.aId === lastId);
+
+                if (index + 1 === playList.length) {
+                    return false;
+                } else {
+                    const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                    let nextPoint = pointList.filter(item => item.resource_id === playList[index + 1].aId)[0];
+                    return {
+                        nextPlay: playList[index + 1],
+                        nextPoint: nextPoint
+                    }
+                }
+            },
             // 初始化图标菜单
             async initMenu() {
                 this.isShowLoading = true;
@@ -1078,12 +1094,14 @@
             ...mapMutations([
                 'saveResourceList',
                 'setRouteName',
-                'startCurrentPlay'
+                'startCurrentPlay',
+                'autoPlay',
+                'autoPlayEnd'
             ]),
             // 初始化音频播放
             playAudio(options) {
                 /**
-                 * _type 标志播放来源 1-工具栏播放 2-景点详情页跳转回来播放 3-景点列表点播 4-地图解说播放 5-扫码播放
+                 * _type 标志播放来源 1-工具栏播放 2-景点详情页跳转回来播放 3-景点列表点播 4-地图解说播放 5-连播 6-扫码播放
                  */
                 
                 const mainAudio = document.querySelector('.main-audio');
@@ -1095,6 +1113,7 @@
                     sessionStorage.setItem('playStatus', JSON.stringify(status));
                     mainAudio.play();
                     this.startCurrentPlay('play');
+                    console.log(0)
                     this.isPlayed = true;
                 } else {
                     let src = ''; // 播放src
@@ -1107,10 +1126,13 @@
                         let playList = JSON.parse(sessionStorage.getItem('playList'));
                         src = playList[0].aSrc,
                         id = playList[0].aId
+                        this.startCurrentPlay('play');
+                        console.log(1)
                     } else if (_type === 2) { // 景点详情页跳转后续播
                         src = _src;
                         id = _id;
                         isContinuePlay = true;
+                        console.log(2)
                     } else if (_type === 3) { // 景点列表点播
                         src = _src;
                         id = _id;
@@ -1123,6 +1145,7 @@
                             this.audioPercent = 0;
                             this.timer = null;
                         }
+                        console.log(3)
                     } else if (_type === 4) { // 地图解说播放
                         src = _src;
                         id = _id;
@@ -1135,6 +1158,11 @@
                             this.audioPercent = 0;
                             this.timer = null;
                         }
+                        console.log(4)
+                    } else if (_type === 5) {
+                        src = _src;
+                        id = _id;
+                        console.log(5)
                     } else { // 扫码播放
 
                     }
@@ -1193,16 +1221,6 @@
                         }
                     }
                 }
-                
-                //改变地图播放交互
-                /*if(this.isPlayed){
-                    let result = this.changeMapIcon(true);
-                    if(!result){
-                        setTimeout(() => {
-                            this.changeMapIcon(true);
-                        },1000);
-                    }
-                }*/
             },
             // 暂停播放
             pauseAudio() {
@@ -1313,35 +1331,37 @@
                             this.playAudio({
                                 _src: qrcode_point.guideUrl,
                                 _id: qrcode_point.resource_id,
-                                _type: 5
+                                _type: 6
                             });
                         } else { 
                             if (!fromRouteName) {
                                 const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
                                 sessionStorage.removeItem('playStatus');
-                                if (cPoint) {
-                                    this.scenicPointImg = cPoint.url;
-                                    this.scenicPointName = cPoint.serial + '. ' + cPoint.name;
-                                    this.scenicPointSerial = cPoint.serial;
-                                } else {
-                                    sessionStorage.setItem("oldSerial",this.scenicPointSerial);
-                                    sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
-                                    sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
-                                    this.scenicPointImg = pointList.page.list[0].url;
-                                    this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
-                                    this.scenicPointSerial = pointList.page.list[0].serial;
+                                sessionStorage.removeItem('isAuto');
+                                // if (cPoint) {
+                                //     this.scenicPointImg = cPoint.url;
+                                //     this.scenicPointName = cPoint.serial + '. ' + cPoint.name;
+                                //     this.scenicPointSerial = cPoint.serial;
+                                // } else {
+                                    
+                                // }
+                                sessionStorage.setItem("oldSerial",this.scenicPointSerial);
+                                sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
+                                sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
+                                this.scenicPointImg = pointList.page.list[0].url;
+                                this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
+                                this.scenicPointSerial = pointList.page.list[0].serial;
 
-                                    // 过滤出默认播放列表
-                                    let _sortList = [...pointList.page.list];
-                                    _sortList.sort((a, b) => a.serial - b.serial);
-                                    let playList = _sortList.map(item => {
-                                        return {
-                                            aSrc: item.guideUrl,
-                                            aId: item.resource_id
-                                        }
-                                    });
-                                    sessionStorage.setItem('playList',JSON.stringify(playList));
-                                }
+                                // 过滤出默认播放列表
+                                let _sortList = [...pointList.page.list];
+                                _sortList.sort((a, b) => a.serial - b.serial);
+                                let playList = _sortList.map(item => {
+                                    return {
+                                        aSrc: item.guideUrl,
+                                        aId: item.resource_id
+                                    }
+                                });
+                                sessionStorage.setItem('playList',JSON.stringify(playList));
                             }
                         }
                     } else {
@@ -1483,6 +1503,30 @@
                     if(cau && cau.paused && resource_id == cau.dataset.id){
                         this.playAudio();
                     }else{
+                        const currLineId = sessionStorage.getItem('lineId');
+                        const lineList = JSON.parse(sessionStorage.getItem('lineList'));
+                        let lineDetailList =  lineList.filter(item => item.lineId === currLineId)[0].lineDetailList;
+                        let newPlayList = [];
+                        if (this.$tool.isExist(this.mapClickPointId, lineDetailList)) {
+                            newPlayList = lineDetailList.map(item => {
+                                return {
+                                    aSrc: item.guideUrl,
+                                    aId: item.resource_id
+                                }
+                            });
+                        } else {
+                            const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                            let sortList = [...pointList];
+                            sortList.sort((a, b) => a.serial - b.serial);
+                            let index = sortList.findIndex(item => item.resource_id === this.mapClickPointId);
+                            let newPlayList = sortList.slice(index).map(item => {
+                                return {
+                                    aSrc: item.guideUrl,
+                                    aId: item.resource_id
+                                }
+                            });
+                        }
+                        sessionStorage.setItem('playList', JSON.stringify(newPlayList));
                         this.playAudio({
                             _src: guideUrl,
                             _id: resource_id,
@@ -1490,7 +1534,6 @@
                         });
                     }
                 }
-                
             },
             toDetail() {
                 if(document.querySelector(".main-audio")){

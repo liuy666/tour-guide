@@ -144,21 +144,27 @@ export default {
         const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
         const lis = document.querySelectorAll('.spot-list li');
         const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-
-        if (playStatus && !playStatus.status) {
-            for (let li of lis) {
-                if (li.dataset.pid === currPoint.resource_id) {
-                    li.style.backgroundColor = '#f0f0f0';
+        for (let li of lis) {
+            if (li.dataset.pid === currPoint.resource_id) {
+                li.style.backgroundColor = '#f0f0f0';
+                if (playStatus && !playStatus.status) {
                     li.children[1].children[0].style.display = 'none';
                     li.children[1].children[1].style.display = 'block';
                 } else {
-                    li.style.backgroundColor = '#fff';
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
                 }
+            } else {
+                li.style.backgroundColor = '#fff';
+                li.children[1].children[0].style.display = 'block';
+                li.children[1].children[1].style.display = 'none';
             }
-        }
+        }        
     },
     computed: mapState({
-        watchPlay: state => state.app.playStatus
+        watchPlay: state => state.app.playStatus,
+        watchAutoPlay: state => state.app.autoPlay,
+        watchAutoPlayEnd: state => state.app.playEnd,
     }),
     watch: {
         watchPlay(val) {
@@ -174,6 +180,36 @@ export default {
                         li.children[1].children[0].style.display = 'block';
                         li.children[1].children[1].style.display = 'none';
                     }
+                }
+            }
+        },
+        watchAutoPlay(val) {
+            const lis = document.querySelectorAll('.spot-list li');
+            const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+            for (let li of lis) {
+                if (li.dataset.pid === currPoint.resource_id) {
+                    li.style.backgroundColor = '#f0f0f0';
+                    li.children[1].children[0].style.display = 'none';
+                    li.children[1].children[1].style.display = 'block';
+                } else {
+                    li.style.backgroundColor = '#fff';
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
+                }
+            }
+        },
+        watchAutoPlayEnd(val) {
+            const lis = document.querySelectorAll('.spot-list li');
+            const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+            for (let li of lis) {
+                if (li.dataset.pid === currPoint.resource_id) {
+                    li.style.backgroundColor = '#f0f0f0';
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
+                } else {
+                    li.style.backgroundColor = '#fff';
+                    li.children[1].children[0].style.display = 'block';
+                    li.children[1].children[1].style.display = 'none';
                 }
             }
         }
@@ -202,6 +238,17 @@ export default {
                         sessionStorage.setItem('playStatus', JSON.stringify(status));
                         let currPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === li.dataset.pid)[0];
                         sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
+                        const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                        let sortList = [...pointList];
+                        sortList.sort((a, b) => a.serial - b.serial);
+                        let index = sortList.findIndex(item => item.resource_id === li.dataset.pid);
+                        let newPlayList = sortList.slice(index).map(item => {
+                            return {
+                                aSrc: item.guideUrl,
+                                aId: item.resource_id
+                            }
+                        });
+                        sessionStorage.setItem('playList', JSON.stringify(newPlayList));
                         this.$router.push({
                             name: 'main',
                             params: {
