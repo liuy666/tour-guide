@@ -826,6 +826,7 @@
                 scenicPointImg: '',
                 scenicPointName: '',
                 scenicPointSerial:'1',
+                mapClickPointId:'',
                 menuList: [],
                 loadText: '',
                 isShowLoading: false,
@@ -1268,6 +1269,7 @@
             // 自动连播切换
             changeAuto() {
                 this.isAuto = !this.isAuto;
+                sessionStorage.setItem('isAuto',this.isAuto);
             },
 
             /**
@@ -1336,7 +1338,7 @@
                     pointList.page.list.forEach((v,i) => {
                         let num = _self.resourceType == 1 ? v.serial : ''; 
                         let marker = new AMap.Marker({
-                            content: "<div class='marker-content' data-flag='"+i+"'><div class='point-icon "+className+"'>"+num+"</div><div class='point-name'>"+v.name+"</div></div>",
+                            content: "<div class='marker-content' data-id='"+ v.resource_id +"' data-flag='"+i+"'><div class='point-icon "+className+"'>"+num+"</div><div class='point-name'>"+v.name+"</div></div>",
                             position: [v.longitude,v.latitude],
                         });
                         marker.on('click',_self.markerClick);
@@ -1375,13 +1377,11 @@
                 }
             },
             openInfoWindow(e) {
-                let flag = e.target.Ke.contentDom.children[0].getAttribute("data-flag");//当前点在点列表数据中的下标
+                let flag = e.target.Ke.contentDom.children[0].dataset.flag;//当前点在点列表数据中的下标
+                this.mapClickPointId = e.target.Ke.contentDom.children[0].dataset.id;
                 const pointInfo = this.resourceType == 1 ? JSON.parse(sessionStorage.getItem("pointList"))[flag] : JSON.parse(sessionStorage.getItem("otherPointList"))[flag];
-                if(this.resourceType == 1){
-                    // this.scenicPointImg = pointInfo.url;
-                    // this.scenicPointName = pointInfo.serial+'.'+pointInfo.name;
+                if(this.resourceType == 1){                    
                     this.infoWindow_main.setContent(this.createInfoWindow_scenicPoint(pointInfo));
-                    sessionStorage.setItem('currentPoint',JSON.stringify(pointInfo));
                 }else{
                     this.infoWindow_main.setContent(this.createInfoWindow(pointInfo));
                 }
@@ -1440,14 +1440,15 @@
             toPlay(e) {
                 //e.currentTarget.classList.add("playing");
                 sessionStorage.setItem("oldSerial",this.scenicPointSerial);
-                let {url, name, serial, guideUrl, resource_id} = JSON.parse(sessionStorage.getItem("currentPoint"));
+
+                let currentPointInfo = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === this.mapClickPointId)[0];
+                let {url, name, serial, guideUrl, resource_id} = currentPointInfo;
                 this.scenicPointImg = url;
                 this.scenicPointName = serial + '. ' + name;
                 this.scenicPointSerial = serial;
-                //sessionStorage.setItem("currentSerial",serial);
-                //let currentMarker = this.markers[serial-1].Ke.contentDom.children[0].children[0];
-                // currentMarker.innerHTML = '';
+                
                 if(!e.currentTarget.classList.contains('playing')){
+                    sessionStorage.setItem('currentPoint',JSON.stringify(currentPointInfo));
                     let cau = document.querySelector(".main-audio");
                     if(cau && cau.paused && resource_id == cau.dataset.id){
                         this.playAudio();
@@ -1480,10 +1481,13 @@
                 });
             },
             //画路线
-            drawLine(lineId) {
+            drawLine(lineId) { 
+                this.oMap_main.remove(this.line);
+                this.oMap_main.remove(this.linePointGroups);
                 const lineList = this.$store.state.app.lineList;
                 let currentLine = lineList.filter(item => item.lineId === lineId)[0];
                 let path = currentLine.coordinatesList;
+                if(path.length == 0) return;
                 let mapPath = [];
                 path.forEach(v => {
                     let one = [v.longitude,v.latitude];

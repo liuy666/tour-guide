@@ -181,7 +181,7 @@
                 所有景点
             </div>
             <ul class="point-list">
-                <li v-for="(item,index) in pointList" :key="index" @click="changePointInfo(index,$event)">
+                <li v-for="(item,index) in pointList" :key="index" @click="changePointInfo(index,true,$event)">
                     <div class="point-list-img"><img :src="item.url" style="width:100%;height:100%;border-radius:50%;" /></div>
                     <div class="point-list-name" :class="item.resource_id == currentPointId ? 'current' : ''" >{{item.serial+'. '+item.name}}</div>
                 </li>
@@ -205,7 +205,7 @@ export default {
             pointName: JSON.parse(sessionStorage.getItem("currentPoint")).serial+'.'+JSON.parse(sessionStorage.getItem("currentPoint")).name,
             pointCaption: JSON.parse(sessionStorage.getItem("currentPoint")).commentary,
             pointList: JSON.parse(sessionStorage.getItem("pointList")),
-
+            playList: JSON.parse(sessionStorage.getItem("playList")),
             isPlayed: false,
             audioProgress: 0,
             currentTimeStr: '0:00',
@@ -213,11 +213,12 @@ export default {
             currentTime : '',
             totalTime:'',
             imageList : [],
-            timer: ''
+            timer: '',
+            playIndex : 0
         }
     },
     watch : {
-        audioProgress (v) {
+        audioProgress (v) { 
             if(v >= 100){
                 const dAudio = document.querySelector('.detail-audio');
                 clearInterval(this.timer);
@@ -226,15 +227,24 @@ export default {
                 }
                 this.isPlayed = false;
                 if(sessionStorage.getItem("isAuto")){
-                    //如果是自动  找到当前点在播放列表中的位置  然后讲列表序列中的下一个点设置成当前  再执行一个setAudio
-                    //同时找到当前点在所有景点列表中的位置，
+                    //如果是自动  找到当前点在播放列表中的位置  然后讲列表序列中的下一个点设置成当前 
+                    //同时找到当前点在所有景点列表中的位置，执行changePointInfo
+                    this.playList.forEach((v,i) => { 
+                        if(v.aId === this.currentPointId) {
+                            this.playIndex = i;
+                            return;
+                        }
+                    })
+                    if(this.playIndex < this.playList.length-1){
+                        this.changePointInfo(this.playIndex+1,false);
+                    }
                 }
             }
         }
     },
     methods : {
         //初始化音频
-        setAudio(isChange,isAuto) {
+        setAudio(isChange) {
             const audio = document.querySelector(".detail-audio");
             if(audio){
                 document.querySelector(".audio-area").removeChild(audio);
@@ -284,7 +294,7 @@ export default {
                 this.currentTimeStr = '0:00';
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + tm2;
                 this.isPlayed = false;
-                if(isAuto){
+                if(sessionStorage.getItem("isAuto")){
                     this.playAudio();
                 }
             }
@@ -350,13 +360,20 @@ export default {
             }
         },
         //切换景点
-        changePointInfo (index,ev) {
-            sessionStorage.setItem("currentPoint",JSON.stringify(this.pointList[index]));
-            this.currentIndex = index;
-            this.currentPointId = this.pointList[index].resource_id;
-            this.pointImg = this.pointList[index].url;
-            this.pointName = this.pointList[index].serial + '. ' + this.pointList[index].name;
-            this.pointCaption = this.pointList[index].commentary;
+        changePointInfo (index,isClick,ev) {
+            let newPointInfo = {};
+            if(isClick){
+                newPointInfo = this.pointList[index];
+            }else{
+                newPointInfo = this.pointList.filter(item => item.resource_id === this.playList[index].aId)[0];
+                document.querySelector(".point-list").scrollLeft = 120 * (parseInt(newPointInfo.serial)-1);
+            }
+            sessionStorage.setItem("currentPoint",JSON.stringify(newPointInfo));
+            //this.currentIndex = index;
+            this.currentPointId = newPointInfo.resource_id;
+            this.pointImg = newPointInfo.url;
+            this.pointName = newPointInfo.serial + '. ' + newPointInfo.name;
+            this.pointCaption = newPointInfo.commentary;
             this.getCurrentImgList();
             this.setAudio(true);
         }
