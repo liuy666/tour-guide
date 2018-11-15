@@ -1044,6 +1044,8 @@
                         break;
                     case 'resource_line':
                         this.getScenicPointList(1);
+                        this.oMap_main.add(this.line);
+                        this.oMap_main.add(this.linePointGroups);
                         this.getLineList({
                             _this: this,
                             sceneryId: this.sceneryId
@@ -1144,7 +1146,7 @@
                     if (isContinuePlay) {
                         const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
                         audioDom.currentTime = playStatus.currentTime;
-                        audioDom.oncanplay = (e) => { debugger
+                        audioDom.oncanplay = (e) => { 
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
                             this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
@@ -1154,7 +1156,11 @@
                             } else {
                                 _audioDom.play();
                                 this.isPlayed = true;
-                            } debugger
+                            } 
+
+                            if(this.isPlayed){
+                                this.changeMapIcon(true);
+                            }
                         }
                         audioDom.onplay = (e) => {
                             this.changeProgress();
@@ -1169,23 +1175,27 @@
                             }
                             sessionStorage.setItem('playStatus', JSON.stringify(status));
                             _audioDom.play();
+                            this.isPlayed = true;
+
+                            if(this.isPlayed){
+                                this.changeMapIcon(true);
+                            }
                         }
                         audioDom.onplay = (e) => {
                             this.changeProgress();
                         }
-                        this.isPlayed = true;
                     }
                 }
-                debugger
+                
                 //改变地图播放交互
-                if(this.isPlayed){
+                /*if(this.isPlayed){
                     let result = this.changeMapIcon(true);
                     if(!result){
                         setTimeout(() => {
                             this.changeMapIcon(true);
                         },1000);
                     }
-                }
+                }*/
             },
             // 暂停播放
             pauseAudio() {
@@ -1253,6 +1263,7 @@
             },
             // 打开/关闭景区详情弹窗
             seeIntroduce() {
+                this.infoWindow_main.close();
                 this.isOpenDetail = !this.isOpenDetail;
             },
             // 自动连播切换
@@ -1372,6 +1383,8 @@
                 }
             },
             openInfoWindow(e) {
+                this.isShowMenu = false;
+
                 let flag = e.target.Ke.contentDom.children[0].dataset.flag;//当前点在点列表数据中的下标
                 this.mapClickPointId = e.target.Ke.contentDom.children[0].dataset.id;
                 const pointInfo = this.resourceType == 1 ? JSON.parse(sessionStorage.getItem("pointList"))[flag] : JSON.parse(sessionStorage.getItem("otherPointList"))[flag];
