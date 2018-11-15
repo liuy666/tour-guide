@@ -599,10 +599,10 @@
             });
 
             // 清除地图上其他默认标记点
-            // oMap.setFeatures([]);
+            oMap.setFeatures([]);
 
             // 更改为黑色主题
-            // oMap.setMapStyle("amap://styles/dark");
+            oMap.setMapStyle("amap://styles/normal");
 
             // 地图点击事件
             oMap.on('click',function(e) {
@@ -909,6 +909,7 @@
                     this.scenicPointName = selectPoint.serial + '. ' + selectPoint.name;
                     this.scenicPointSerial = selectPoint.serial;
                     this.isShowMenu = false;
+                    this.markerClick(null, this.markers[selectPoint.serial-1]);
 
                     this.playAudio({
                         _src: selectPoint.guideUrl,
@@ -1360,7 +1361,7 @@
                     });
                     let overlayGroups = new AMap.OverlayGroup(this.markers);
                     this.pointGroups = overlayGroups;
-                    this.oMap_main.add(overlayGroups);
+                    this.oMap_main.add(overlayGroups);                    
 
                     if (fromRouteName === 'scenic-point-detail') {
                         sessionStorage.setItem("oldSerial",this.scenicPointSerial);
@@ -1377,29 +1378,44 @@
                     }
                 }
             },
-            markerClick(e) { 
-                if(this.infoWindow_main.getPosition() !== undefined && this.infoWindow_main.getPosition().O == e.target.getPosition().O && this.infoWindow_main.getPosition().N == e.target.getPosition().N) {
-                    if(this.infoWindow_main.getIsOpen()){
-                        this.infoWindow_main.close();
+            markerClick(e, v) {
+                if (!e) {
+                    if(this.infoWindow_main.getPosition() !== undefined && this.infoWindow_main.getPosition().O == v.getPosition().O && this.infoWindow_main.getPosition().N == v.getPosition().N) {
+                        
+                        if(this.infoWindow_main.getIsOpen()){
+                            this.infoWindow_main.close();
+                        }else{
+                            this.openInfoWindow(v);
+                        }
                     }else{
-                        this.openInfoWindow(e);
+                        this.openInfoWindow(v);
                     }
-                }else{
-                    this.openInfoWindow(e);
+                } else {
+                    if(this.infoWindow_main.getPosition() !== undefined && this.infoWindow_main.getPosition().O == e.target.getPosition().O && this.infoWindow_main.getPosition().N == e.target.getPosition().N) {
+                        
+                        if(this.infoWindow_main.getIsOpen()){
+                            this.infoWindow_main.close();
+                        }else{
+                            this.openInfoWindow(e.target);
+                        }
+                    }else{
+                        this.openInfoWindow(e.target);
+                    }
                 }
+                
             },
-            openInfoWindow(e) {
+            openInfoWindow(target) {
                 this.isShowMenu = false;
 
-                let flag = e.target.Ke.contentDom.children[0].dataset.flag;//当前点在点列表数据中的下标
-                this.mapClickPointId = e.target.Ke.contentDom.children[0].dataset.id;
+                let flag = target.Ke.contentDom.children[0].dataset.flag;//当前点在点列表数据中的下标
+                this.mapClickPointId = target.Ke.contentDom.children[0].dataset.id;
                 const pointInfo = this.resourceType == 1 ? JSON.parse(sessionStorage.getItem("pointList"))[flag] : JSON.parse(sessionStorage.getItem("otherPointList"))[flag];
                 if(this.resourceType == 1){                    
                     this.infoWindow_main.setContent(this.createInfoWindow_scenicPoint(pointInfo));
                 }else{
                     this.infoWindow_main.setContent(this.createInfoWindow(pointInfo));
                 }
-                this.infoWindow_main.open(this.oMap_main, e.target.getPosition());
+                this.infoWindow_main.open(this.oMap_main, target.getPosition());
             },
             //景点的弹窗内容
             createInfoWindow_scenicPoint(pointInfo) {
