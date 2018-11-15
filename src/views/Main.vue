@@ -1512,9 +1512,11 @@
                             let pidList = lineDetailList.map(item => item.resourceId);
                             if (this.$tool.isExist(this.mapClickPointId, pidList)) {
                                 console.log(111)
+
                                 newPlayList = lineDetailList.map(item => {
+                                    let url = JSON.parse(sessionStorage.getItem('pointList')).filter(i => i.resource_id === item.resourceId)[0].guideUrl;
                                     return {
-                                        aSrc: item.guideUrl,
+                                        aSrc: url,
                                         aId: item.resourceId
                                     }
                                 });
