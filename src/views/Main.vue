@@ -329,12 +329,26 @@
             .scenic-address-time{
                 padding: 40px 0;
                 font-size: 30px;
-                line-height: 34px;
+                line-height: 44px;
                 background: url('../assets/images/xian@3x.png') no-repeat center bottom;
                 .scenic-address{
                     text-indent: 44px;
                     background: url('../assets/images/icon_black_site@3x.png') no-repeat left top;
                     background-size: 32px 40px;
+                    position: relative;
+                    .font-color-666{
+                        background: url('../assets/images/icon_map_more@3x.png') no-repeat right center;
+                        background-size: 16px 28px;
+                        padding-right: 20px;
+                        position: absolute;
+                        right: 0;
+                        top: 2px;
+                        box-sizing: border-box;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        width: calc(~'100% - 160px');
+                    }
                 }
                 .scenic-time{
                     text-indent: 44px;
@@ -445,7 +459,11 @@
             </div>
             <div class="scenic-address-time">
                 <div class="scenic-address">
-                    景区地址： <span class="font-color-666"><a style="text-decoration: none; color:#333;" :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=' + region + '&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a></span>
+                    景区地址： 
+                    <!-- <div class="font-color-666">
+                        <a style="text-decoration: none; color:#333;" :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=' + region + '&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a>
+                    </div> -->
+                    <a class="font-color-666" style="text-decoration: none; color:#333;" :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=' + region + '&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a>
                 </div>
                 <div class="scenic-time">
                     开放时间： <span class="font-color-666">{{scenicOpenTime}}</span>
