@@ -445,7 +445,7 @@
             </div>
             <div class="scenic-address-time">
                 <div class="scenic-address">
-                    景区地址： <span class="font-color-666"><a :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=' + region + '&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a></span>
+                    景区地址： <span class="font-color-666"><a style="text-decoration: none; color:#333;" :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=' + region + '&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a></span>
                 </div>
                 <div class="scenic-time">
                     开放时间： <span class="font-color-666">{{scenicOpenTime}}</span>
@@ -477,13 +477,13 @@
             Toast,
             Loading
         },
-        beforeRouteLeave(to, from, next){debugger
+        beforeRouteLeave(to, from, next){
             if(to.name == "scenic-point-detail"){
                 this.$store.commit('setFromRouteName_detail', 'scenic-point-detail');
             }
             next();
         },
-        beforeRouteUpdate (to, from, next) {  debugger
+        beforeRouteUpdate (to, from, next) { 
             if(to.name == "main"){
                 if(from.name == "scenic-line" && to.params.lineId){
                     this.openMenu();
@@ -823,34 +823,36 @@
                 AQI: '',
                 weather: '',
                 weatherImg: '',
-                typeList : [{
-                    type:1,
-                    className:'type-point'
-                },{
-                    type:3,
-                    className:'type-buy'
-                },{
-                    type:4,
-                    className:'type-eat'
-                },{
-                    type:5,
-                    className:'type-door'
-                },{
-                    type:6,
-                    className:'type-wc'
-                },{
-                    type:7,
-                    className:'type-park'
-                },{
-                    type:8,
-                    className:'type-hotel'
-                },{
-                    type:9,
-                    className:'type-center'
-                },{
-                    type:10,
-                    className:'type-hospital'
-                }],
+                typeList : [
+                    {
+                        type:1,
+                        className:'type-point'
+                    },{
+                        type:3,
+                        className:'type-buy'
+                    },{
+                        type:4,
+                        className:'type-eat'
+                    },{
+                        type:5,
+                        className:'type-door'
+                    },{
+                        type:6,
+                        className:'type-wc'
+                    },{
+                        type:7,
+                        className:'type-park'
+                    },{
+                        type:8,
+                        className:'type-hotel'
+                    },{
+                        type:9,
+                        className:'type-center'
+                    },{
+                        type:10,
+                        className:'type-hospital'
+                    }
+                ],
                 region: '',
             }
         },
@@ -924,6 +926,9 @@
                         _id: to.params.pid,
                         _type: 3
                     });
+                }
+                if (from.name === 'scenic-resource' && to.name === 'main' && to.params.rid) {
+                    this.isShowMenu = false;
                 }
             }
         },    
@@ -1037,12 +1042,15 @@
                         this.$router.push({
                             name: 'scenic-resource',
                             params: {
-                                type: 'xx'
+                                type: sessionStorage.getItem('currentResource')
                             }
                         });
                     }
                     this.isShowMenu = true;
                 } else {
+                    this.$router.push({
+                        name: 'main'
+                    });
                     this.isShowMenu = false;
                 }
             },
@@ -1085,6 +1093,7 @@
                         this.getScenicPointList(value);
                         this.oMap_main.remove(this.line);
                         this.oMap_main.remove(this.linePointGroups);
+                        sessionStorage.setItem('currentResource', remark);
                         this.$router.push({
                             name: 'scenic-resource',
                             params: {
@@ -1345,6 +1354,7 @@
                                 const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
                                 sessionStorage.removeItem('playStatus');
                                 sessionStorage.removeItem('isAuto');
+                                sessionStorage.removeItem('currentResource');
                                 // if (cPoint) {
                                 //     this.scenicPointImg = cPoint.url;
                                 //     this.scenicPointName = cPoint.serial + '. ' + cPoint.name;
@@ -1540,7 +1550,6 @@
                                 });
                             }
                         } else {
-                            debugger
                             const pointList = JSON.parse(sessionStorage.getItem('pointList'));
                             let sortList = [...pointList];
                             sortList.sort((a, b) => a.serial - b.serial);

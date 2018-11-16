@@ -26,7 +26,6 @@
         .weui-toast__content {
             margin-top: 20px;
         }
-
         .img-690-866 {
             background: url("../assets/images/recognize.png") no-repeat center center / 690px 866px;
             border-radius: 20px;
@@ -35,28 +34,41 @@
             margin: 31px auto 78px;
         }
         .camera-wraper {
-            position: relative;
-            width: 130px;
+            display: flex;
+            flex-direction: row;
+            width: 410px;
             height: 177px;
             margin: 0 auto;
             overflow: hidden;
-            section {
-                width: 130px;
-                height: 130px;
-                background: url("../assets/images/icon_photograph@2x.png") no-repeat center top / 130px 130px;
-                margin-bottom: 11px;
+            .s-130-177 {
+                position: relative;
+                overflow: hidden;
+                section {
+                    width: 130px;
+                    height: 130px;
+                    margin-bottom: 11px;
+                }
+                p {
+                    font-size: 30px;
+                    font-weight: 500;
+                    line-height: 36px;
+                    text-align: center;
+                }
+                input {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    opacity: 0;
+                }
             }
-            p {
-                font-size:30px;
-                font-weight:500;
-                line-height: 36px;
-                text-align: center;
+            .left {
+                margin-right: 150px;
+                section {
+                    background: url("../assets/images/icon_photograph@2x.png") no-repeat center top / 130px 130px;
+                }
             }
-            #camera {
-                width: 100%;
-                height: 100%;
-                position: absolute;
-                opacity: 0;
+            .right section {
+                background: url("../assets/images/icon_photo@2x.png") no-repeat center top / 130px 130px;
             }
         }
     }
@@ -68,9 +80,16 @@
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
         <section class="img-690-866"></section>
         <section class="camera-wraper">
-            <input type="file" id="camera" accept="image/*" @change="addImg" />
-            <section></section>
-            <p>拍照</p>
+            <section class="left s-130-177">
+                <input type="file" class="camera" accept="image/*" capture="camera" @change="addImg" />
+                <section></section>
+                <p>拍照</p>
+            </section>
+            <section class="right s-130-177">
+                <input type="file" class="camera" accept="image/*" @change="addImg" />
+                <section></section>
+                <p>相册</p>
+            </section>
         </section>
     </div>
 </template>
