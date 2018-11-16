@@ -125,7 +125,7 @@
                     [104.49496, 31.459197],
                     [105.725429, 33.573508]  
                 ),
-                zooms:[zoom,14],
+                zooms:[10,14],
                 zIndex: 100
             });
             //地图
@@ -136,9 +136,9 @@
                 rotateEnable: false,
                 touchZoomCenter: 1,
                 center: [105.019557,32.526044],
-                zoom: 9,
-                zooms:[zoom,14],
-                viewMode: '3D',
+                zoom: 10,
+                zooms:[10,14],
+                //viewMode: '3D',
                 layers: [
                     new AMap.TileLayer(),
                     imageLayer

@@ -477,13 +477,13 @@
             Toast,
             Loading
         },
-        beforeRouteLeave(to, from, next){debugger
+        beforeRouteLeave(to, from, next){
             if(to.name == "scenic-point-detail"){
                 this.$store.commit('setFromRouteName_detail', 'scenic-point-detail');
             }
             next();
         },
-        beforeRouteUpdate (to, from, next) {  debugger
+        beforeRouteUpdate (to, from, next) {
             if(to.name == "main"){
                 if(from.name == "scenic-line" && to.params.lineId){
                     this.openMenu();
@@ -509,6 +509,7 @@
                 });
                 if (!scenicList) {
                     this.isTips = true;
+                    this.tipsText = "请求失败";
                     return;
                 }
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
@@ -773,14 +774,22 @@
                     'strokeWeight': 1,
                     'fillColor': '#02B0FF',
                     'fillOpacity': 0.25
-                }
+                },
+                'panToLocation':false
             }
             AMap.plugin(["AMap.Geolocation"], function() {
                 var geolocation = new AMap.Geolocation(options);
                 _self.oMap_main.addControl(geolocation);
                 //geolocation.getCurrentPosition()
                 geolocation.on('complete',function(GeolocationResult) {
-                    document.querySelector(".currentPosition").value = GeolocationResult.position;
+                    let cp = GeolocationResult.position;
+                    if(cp.lat >= imgLeftBottom.lat && cp.lat <= imgRightTop.lat && cp.lng >= imgLeftBottom.lng && cp.lng <= imgRightTop.lng){
+                        _self.oMap_main.setCenter(cp);
+                    }else{
+                        _self.isTips = true;
+                        _self.tipsText = "您当前不在景区范围内";
+                    }
+                    //document.querySelector(".currentPosition").value = GeolocationResult.position;
                 })
             });
         },
@@ -1319,6 +1328,7 @@
 
                 if(!pointList){
                     this.isTips = true;
+                    this.tipsText = "请求失败";
                     return;
                 }
 
@@ -1540,7 +1550,6 @@
                                 });
                             }
                         } else {
-                            debugger
                             const pointList = JSON.parse(sessionStorage.getItem('pointList'));
                             let sortList = [...pointList];
                             sortList.sort((a, b) => a.serial - b.serial);

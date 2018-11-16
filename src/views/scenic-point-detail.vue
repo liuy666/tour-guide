@@ -371,11 +371,12 @@ export default {
                 })
                 this.imageList = list;
             }else{
-                this.imageList.push({
+                /*this.imageList.push({
                     url : 'javascript:',
                     img : './fj.jpg',
                     title : ''
-                })
+                })*/
+                document.querySelector(".vux-swiper").style.backgroundColor = "#f8f8f8";
             }
             this.isShowLoading = false;
         },
