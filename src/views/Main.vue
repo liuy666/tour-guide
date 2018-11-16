@@ -486,7 +486,7 @@
         beforeRouteUpdate (to, from, next) { 
             if(to.name == "main"){
                 if(from.name == "scenic-line" && to.params.lineId){
-                    this.openMenu();
+                    this.isShowMenu = false;
                     this.drawLine(to.params.lineId);
                 }
             }
@@ -941,6 +941,7 @@
                 }
                 if (from.name === 'scenic-resource' && to.name === 'main' && to.params.rid) {
                     this.isShowMenu = false;
+                    this.markerClick(null, this.markers.filter(item => item.Ke.contentDom.children[0].dataset.id === to.params.rid)[0]);
                 }
             }
         },    
