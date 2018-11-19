@@ -22,13 +22,17 @@
         .audio-area{
             display: flex;
             .audio-area-img{
-                width: 94px;
-                height: 94px;
+                width: 112px;
+                height: 112px;
                 position: relative;
                 .control {
                     position: absolute;
                     left: 50%;
-                    top: 50%; 
+                    top: 50%;
+                    img {
+                        width: 100%;
+                        height: 100%;
+                    }
                 }
                 .img-16-26 {
                     width: 16px;
@@ -43,8 +47,8 @@
             }
             .audio-area-name{
                 width: calc(~'100% - 114px');
-                height: 94px;
                 margin-left: 20px;
+                margin-top: 10px;
                 .point-name{
                     font-size: 30px;
                 }
@@ -69,7 +73,6 @@
                     }
                 }
             }
-            
         }
         .img-list-area{
             margin-top: 24px;
@@ -80,60 +83,61 @@
                 text-align: right;
             }
         }
-        .captiom-area , .point-list-area{
-            margin-top: 40px;
-        }
-        .area-title{
-            text-indent: 24px;
+        .captiom-area {
+            margin-top: 41px;
             font-size: 30px;
-            background: url('../assets/images/kuai@3x.png') no-repeat left center;
-            background-size: 10px 30px;
-            line-height: 30px;
-            margin-bottom: 20px;
+            line-height: 48px; 
+            color: #666;
+            font-weight: 400;
+            padding-bottom: 175px;
+            text-indent: 2em;
         }
-        .caption-content-area{
-            height: 300px;
-            padding: 30px;
-            box-sizing: border-box;
-            background:rgba(248,248,248,1);
-            font-size: 24px;
-            overflow: hidden;
-            .caption-content{
-                height: 100%;
-                overflow-y: auto;
-                line-height: 36px; 
-            }
-        }
-        .point-list{
+        .point-list-area {
+            background-color: #fff;
+            position: fixed;
+            bottom: 0;
+            left: 0;
             width: 100%;
-            white-space: nowrap;
-            display: flex;
-            flex-direction: row;
-            overflow-x: auto;
-            padding-top: 10px;
-            li{
-                flex:1;
+            height: 175px;
+            padding-top: 19px;
+            box-sizing: border-box;
+            .point-list{
+                white-space: nowrap;
                 display: flex;
-                flex-direction: column;
-                justify-content: center;
-                padding-right: 100px;
-                background: url('../assets/images/icon_dot@3x.png') no-repeat 160px 70px;
-                background-size: auto 10px;
-                cursor: pointer;
-                &:last-child{
-                    padding-right: 0;
-                    background: none;
-                }
-                .point-list-img{
-                    width: 140px;
-                    height: 140px;
-                }
-                .point-list-name{
-                    font-size: 24px;
-                    margin-top: 20px;
-                    text-indent: 10px;
-                    &.current{
-                        color: #FE5100;
+                flex-direction: row;
+                overflow-x: auto;
+                -webkit-overflow-scrolling : touch;
+                margin: 0 33px;
+                box-sizing: border-box;
+                li{
+                    display: flex;
+                    height: 150px;
+                    flex-direction: column;
+                    padding-right: 92px;
+                    background: url('../assets/images/icon_dian@3x.png') no-repeat 124px 51px;
+                    background-size: 44px 8px;
+                    position: relative;
+                    &:last-child{
+                        padding-right: 0;
+                        background: none;
+                    }
+                    .point-list-img{
+                        width: 100px;
+                        height: 100px;
+                    }
+                    .point-list-name{
+                        position: absolute;
+                        font-size: 24px;
+                        width: 130px;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
+                        left: -15px;
+                        text-align: center;
+                        bottom: 0;
+                        &.current{
+                            color: #FE5100;
+                        }
                     }
                 }
             }
@@ -149,13 +153,17 @@
             <div class="audio-area-img">
                 <img :src="pointImg" style="width:100%;height:100%;border-radius:100%;" />
                 <!-- 播放图标-暂停中状态 -->
-                <img v-show="!isPlayed" @click="playAudio()" class="control img-16-26" src="../assets/images/icon_small_pause@3x.png" alt="" />
+                <div class="control img-16-26">
+                    <img v-show="!isPlayed" @click="playAudio()" src="../assets/images/icon_small_pause@3x.png" alt="" />
+                </div>
                 <!-- 暂停图标-播放中状态 -->
-                <img v-show="isPlayed" @click="pauseAudio" class="control img-20-24" src="../assets/images/icon_suspend@3x.png" alt="" />
+                <div class="control img-20-24">
+                    <img v-show="isPlayed" @click="pauseAudio" src="../assets/images/icon_suspend@3x.png" alt="" />
+                </div>
             </div>
             <div class="audio-area-name">
                 <span class="point-name">{{pointName}}</span>
-                <div style="display:flex;margin-top:6px;">
+                <div style="display:flex;margin-top:4px;">
                     <div class="audio-time">{{currentTimeStr}}</div>
                     <div class="audio-progress">
                         <x-progress :percent="audioProgress" :show-cancel="false"></x-progress>
@@ -177,23 +185,13 @@
             </swiper>
         </section>
         <section class="captiom-area">
-            <div class="area-title">
-                解说词
-            </div>
-            <div class="caption-content-area">
-                <div class="caption-content">
-                    {{pointCaption}}
-                </div>
-            </div>
+            {{pointCaption}}
         </section>
         <section class="point-list-area">
-            <div class="area-title">
-                全部景点
-            </div>
             <ul class="point-list">
                 <li v-for="(item,index) in pointList" :key="index" @click="changePointInfo(index,true,$event)">
                     <div class="point-list-img"><img :src="item.url" style="width:100%;height:100%;border-radius:50%;" /></div>
-                    <div class="point-list-name" :class="item.resource_id == currentPointId ? 'current' : ''" >{{item.serial+'. '+item.name}}</div>
+                    <div class="point-list-name" :class="item.resource_id == currentPointId ? 'current' : ''" >{{item.name}}</div>
                 </li>
             </ul>
         </section>
@@ -213,7 +211,7 @@ export default {
             currentIndex: 0,
             currentPointId: JSON.parse(sessionStorage.getItem("currentPoint")).resource_id,
             pointImg: JSON.parse(sessionStorage.getItem("currentPoint")).url,
-            pointName: JSON.parse(sessionStorage.getItem("currentPoint")).serial+'.'+JSON.parse(sessionStorage.getItem("currentPoint")).name,
+            pointName: JSON.parse(sessionStorage.getItem("currentPoint")).name,
             pointCaption: JSON.parse(sessionStorage.getItem("currentPoint")).commentary,
             pointList: JSON.parse(sessionStorage.getItem("pointList")),
             playList: JSON.parse(sessionStorage.getItem("playList")),

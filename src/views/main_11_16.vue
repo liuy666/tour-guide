@@ -23,7 +23,7 @@
         #wrapper {
             width: 100%;
             height: 100%;
-            /*.amap-geolocation-con {
+            .amap-geolocation-con {
                 z-index: inherit !important;
             }
             .amap-geolocation-con .amap-geo{
@@ -36,105 +36,90 @@
             .amap-icon img{
                 width: 50px;
                 height: 56px;
-            }*/
+            }
         }
-        //菜单弹窗
         .main_view {
-            width: 732px;
-            height: 733px;
-            z-index: 1010;
-            background: url("../assets/images/bg@3x.png") no-repeat center center / 100% 100%;
+            width: 710px;
+            height: 714px;
+            z-index: 10;
+            background: url("../assets/images/bg_liebiao@2x.png") no-repeat center center / 100% 100%;
             position: absolute;
-            bottom: 20.233vw;
-            left: calc(~"50% - 366px");
-            .main_view_wrapper {
-                width: 710px;
-                height: 714px;
-                margin: 10px 0 0 11px;
-                .main_view_header {
-                    height: 120px;
+            bottom: 20.733vw;
+            left: calc(~"50% - 355px");
+            .main_view_header {
+                height: 120px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                position: relative;
+                box-sizing: border-box;
+                padding-left: 169px;
+                p {
+                    font-size:32px;
+                    font-weight:500;
+                    line-height:34px;
+                    margin-top: 41px;
+                }
+                .camera {
+                    width: 122px;
+                    height: 142px;
+                    background: url("../assets/images/icon_ai@2x.png") no-repeat center center / 100% 100%;
+                    position: absolute;
+                    left: 32px;
+                    top: -37px;
+                }
+                .weather {
+                    width: 191px;
+                    margin-right: 29px;
                     display: flex;
                     flex-direction: row;
                     justify-content: space-between;
-                    position: relative;
-                    box-sizing: border-box;
-                    padding-left: 169px;
-                    p {
-                        font-size:32px;
-                        font-weight:500;
-                        line-height:34px;
-                        margin-top: 41px;
+                    img {
+                        width: 80px;
+                        height: 80px;
+                        margin-top: 24px;
                     }
-                    .camera {
-                        width: 122px;
-                        height: 142px;
-                        background: url("../assets/images/icon_ai@3x.png") no-repeat center center / 100% 100%;
-                        position: absolute;
-                        left: 32px;
-                        top: -37px;
-                    }
-                    .weather {
-                        width: 191px;
-                        margin-right: 29px;
+                    .content {
+                        height: 80px;
+                        font-weight: 500;
                         display: flex;
-                        flex-direction: row;
-                        justify-content: space-between;
-                        .img-box {
-                            width: 80px;
-                            height: 80px;
-                            margin-top: 24px;
-                            img {
-                                width: 100%;
-                                height: 100%;
-                            }
-                        }
-                        .content {
-                            height: 80px;
-                            font-weight: 500;
-                            display: flex;
-                            flex-direction: column;
-                            margin-top: 31px;
-                            overflow: hidden;
-                            span {
-                                font-size: 24px;
-                                line-height: 41px;
-                                animation: rollup 8s linear 1s  infinite;
-                            }
+                        flex-direction: column;
+                        margin-top: 31px;
+                        overflow: hidden;
+                        span {
+                            font-size: 24px;
+                            line-height: 41px;
+                            animation: rollup 8s linear 1s  infinite;
                         }
                     }
                 }
-                ul.main_view_footer {
-                    height: 100px;
-                    overflow-x: auto;
-                    -webkit-overflow-scrolling : touch; 
+            }
+            ul.main_view_footer {
+                height: 100px;
+                overflow-x: auto;
+                display: flex;
+                flex-direction: row;
+                box-sizing: border-box;
+                margin: 0 29px 0 30px;
+                border-top: 1px solid #f8f8f8;
+                li {
+                    margin-right: 54px;
                     display: flex;
-                    flex-direction: row;
-                    box-sizing: border-box;
-                    margin: 0 29px 0 30px;
-                    border-top: 1px solid #f8f8f8;
-                    li {
-                        margin-right: 54px;
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        text-align: center;
-                        &:last-of-type {
-                            margin-left: 0;
-                        }
-                        div {
-                            width: 42px;
-                            height: 42px;
-                            margin: 0 27px 5px;
-                            img {
-                                width:100%;
-                                height:100%;
-                            }
-                        }
-                        span {
-                            font-size: 24px;
-                            line-height: 32px;
-                            width: 96px;
-                        }
+                    flex-direction: column;
+                    justify-content: center;
+                    text-align: center;
+                    &:last-of-type {
+                        margin-left: 0;
+                    }
+                    img {
+                        width: 42px;
+                        height: 42px;
+                        margin: 0 27px 5px;
+                    }
+                    span {
+                        font-size: 24px;
+                        line-height: 32px;
+                        width: 96px;
                     }
                 }
             }
@@ -149,7 +134,6 @@
             bottom: 30px;
             width: 520px;
             height: 148px;
-            z-index: 1001;
             box-sizing: border-box;
             background: url("../assets/images/bg_player@3x.png") no-repeat center / 100% 100%;
 
@@ -168,34 +152,20 @@
                     height: 112px;
                     margin-top: 6px;
                     margin-left: 6px;
-                    position: relative;
-                    .wrapper {
-                        width: 112px;
-                        height: 112px;
+                    .control {
                         position: absolute;
-                        left: 0;
-                        top: 0;
-                        .control {
-                            position: absolute;
-                            left: 50%;
-                            top: 50%; 
-                            overflow: hidden;
-                            img {
-                                float: left;
-                                width: 100%;
-                                height: 100%;
-                            }
-                        }
-                        .img-16-26 {
-                            width: 16px;
-                            height: 26px;
-                            transform: translate(-8px, -13px);
-                        }
-                        .img-20-24 {
-                            width: 20px;
-                            height: 24px;
-                            transform: translate(-10px, -12px);
-                        }
+                        left: 50%;
+                        top: 50%; 
+                    }
+                    .img-16-26 {
+                        width: 16px;
+                        height: 26px;
+                        transform: translate(-8px, -13px);
+                    }
+                    .img-20-24 {
+                        width: 20px;
+                        height: 24px;
+                        transform: translate(-10px, -12px);
                     }
                 }
                 .player-control-btn{
@@ -210,9 +180,6 @@
                 margin-top: 24px;
                 background: url('../assets/images/icon_down@3x.png') no-repeat 50% 80px;
                 background-size: 24px 8px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
             }
             .list-btn{
                 width: 44px;
@@ -228,7 +195,6 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            z-index: 1001;
         }
         .function-area-right{
             height: 250px;
@@ -266,7 +232,7 @@
             }
         }
         //点标记
-        /*.marker-content{
+        .marker-content{
             font-size: 20px;
             .point-icon{
                 width: 100px;
@@ -314,84 +280,6 @@
                 background: rgba(0,0,0,0.3);
                 color: rgba(255,255,255,0.8);
             }
-        }*/
-        .marker-content-new{
-            width: auto !important;
-            height: auto !important;
-            margin-left: -33px !important;
-            margin-top: -90px !important;
-            .icon{
-                width: 66px;
-                height: 73.3px;
-                &.type-point{
-                    background: url("../assets/images/icon_use_normal@3x.png") no-repeat center / 100% 100%;
-                }
-                &.type-buy{
-                    background: url("../assets/images/icon_gowu@3x.png") no-repeat center / 100% 100%;
-                }
-                &.type-eat{
-                    background: url("../assets/images/icon_to_food@3x.png") no-repeat center / 100% 100%;
-                }
-                &.type-door{
-                    background: url("../assets/images/icon_to_exit@3x.png") no-repeat center / 100% 100%;
-                }
-                &.type-wc{
-                    background: url("../assets/images/icon_to_wc@3x.png") no-repeat center / 100% 100%;
-                }
-                &.type-park{
-                    background: url("../assets/images/icon_to_shop@3x.png") no-repeat center / 100% 100%;
-                }
-                &.type-hotel{
-                    background: url("../assets/images/icon_to_hotel@3x.png") no-repeat center / 100% 100%;
-                }
-                &.type-center{
-                    background: url("../assets/images/icon_to_centre@3x.png") no-repeat center / 100% 100%;
-                }
-                &.type-hospital{
-                    background: url("../assets/images/icon_to_doctor@3x.png") no-repeat center / 100% 100%;
-                }
-                &.player{
-                    background: url("../assets/images/playing.gif") no-repeat center / 100% 100%;
-                }
-            }
-            .name{
-                white-space: nowrap;
-                border-radius: 30px;
-                padding: 0px 20px;
-                background: rgba(0,0,0,0.5);
-                color: #ffffff;
-                position: absolute;
-                display: block;
-                margin-left: 33px;
-                text-align: center;
-                -webkit-transform: translateX(-50%);
-                transform: translateX(-50%);
-            }
-        }
-        .point-serial{
-            width: 30px !important;
-            height: 30px !important;
-            margin-left: 20px !important;
-            margin-top: -46px !important;
-            background: #68A8FC;
-            color: #fff;
-            line-height: 34px;
-            text-align: center;
-            border-radius: 15px;
-        }
-        .info-content-new{
-            bottom: 70px !important;
-        }
-        .leaflet-popup-content-wrapper{
-            padding: 0;
-            border-radius: 20px;
-        }
-        .leaflet-popup-content{
-            margin: 0;
-        }
-        .leaflet-popup-tip{
-            width: 26px;
-            height: 26px;
         }
         
         .introDetail{
@@ -400,6 +288,7 @@
             bottom: 0;
             background: #fff;
             width: 690px;
+            height: 686px;
             padding: 20px 30px;
             border-radius: 10px 10px 0 0 ;
             box-sizing: border-box;
@@ -419,8 +308,8 @@
                     }
                     .scenic-level{
                         display: inline-block;
-                        padding: 12px 10px 8px 10px;
-                        line-height: 22px;
+                        padding: 10px;
+                        line-height: 20px;
                         border-radius: 20px;
                         border: 1px solid #FEA32B;
                         color: #FEA32B;
@@ -438,11 +327,10 @@
                 }
             }
             .scenic-address-time{
-                padding: 40px 0 30px;
+                padding: 40px 0;
                 font-size: 30px;
                 line-height: 44px;
-                border-bottom: 1px solid dashed #FE5100; 
-                margin-bottom: 20px;
+                background: url('../assets/images/xian@3x.png') no-repeat center bottom;
                 .scenic-address{
                     text-indent: 44px;
                     background: url('../assets/images/icon_black_site@3x.png') no-repeat left top;
@@ -477,17 +365,15 @@
                 background-size: 10px 30px;
                 line-height: 30px;
             }
-            .scenic-dec {
+            .dec-content{
+                height: 210px;
+                font-size: 24px;
+                line-height: 36px;
                 overflow: hidden;
-                .dec-content{
-                    font-size: 28px;
-                    line-height: 36px;
-                    margin-bottom: 40px;
-                    overflow: hidden;
-                    word-break: break-all;
-                    overflow: hidden;
-                    max-height: 540px;
-                }
+                word-break: break-all;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
         }
     }
@@ -501,36 +387,32 @@
         <section id="wrapper"></section>
         <!-- 图标菜单弹窗 -->
         <section class="main_view " v-show="isShowMenu">
-            <section class="main_view_wrapper">
-                <section class="main_view_header">
-                    <v-touch tag="section" class="camera" v-on:tap="gotoPage({name: 'recognize'})"></v-touch>
-                    <p>遇见全世界的美</p>
-                    <section class="weather">
-                        <section class="content">
-                            <span>{{ temp }}</span>
-                            <span>{{ weather }}</span>
-                            <span>空气指数</span>
-                            <span>{{ AQI }}</span>
-                            <span>{{ temp }}</span>
-                            <span>{{ weather }}</span>
-                            <span>空气指数</span>
-                            <span>{{ AQI }}</span>
-                        </section>
-                        <section>
-                            <section class="img-box"><img :src="weatherImg" alt="加载中..." /></section>
-                        </section>
+            <section class="main_view_header">
+                <section class="camera" @click="gotoPage({name: 'recognize'})"></section>
+                <p>遇见全世界的美</p>
+                <section class="weather">
+                    <section class="content">
+                        <span>{{ temp }}</span>
+                        <span>{{ weather }}</span>
+                        <span>空气指数</span>
+                        <span>{{ AQI }}</span>
+                        <span>{{ temp }}</span>
+                        <span>{{ weather }}</span>
+                        <span>空气指数</span>
+                        <span>{{ AQI }}</span>
                     </section>
+                    <span>
+                        <img :src="weatherImg" alt="加载中..." />
+                        </span>
                 </section>
-                <router-view></router-view>
-                <ul class="main_view_footer">
-                    <v-touch tag="li" v-for="menu in menuList" :key="menu.id" :data-mark="menu.mark" v-on:tap="gotoWhere(menu.mark, menu.value)">
-                        <div>
-                            <img :src="menu.graySrc" alt="" />
-                        </div>
-                        <span>{{ menu.name }}</span>
-                    </v-touch>
-                </ul>
             </section>
+            <router-view></router-view>
+            <ul class="main_view_footer">
+                <li v-for="menu in menuList" :key="menu.id" :data-mark="menu.mark" @click="gotoWhere(menu.mark, menu.value)">
+                    <img :src="menu.graySrc" alt="" />
+                    <span>{{ menu.name }}</span>
+                </li>
+            </ul>
         </section>
         <!-- 图标菜单 -->
         <section class="toolbars">
@@ -544,34 +426,26 @@
                     <div class="player-img-area">
                         <img style="width:100%; height:100%; border-radius: 50%;" :src="scenicPointImg" />
                         <!-- 播放图标-暂停中状态 -->
-                        <v-touch class="wrapper" v-show="!isPlayed" v-on:tap="playAudio()">
-                            <div class="control img-16-26">
-                                <img src="../assets/images/icon_small_pause@3x.png" alt="" />
-                            </div>
-                        </v-touch>
-                            <!-- 暂停图标-播放中状态 -->
-                        <v-touch class="wrapper" v-show="isPlayed" v-on:tap="pauseAudio">
-                            <div class="control img-20-24">
-                                <img src="../assets/images/icon_suspend@3x.png" alt="" />
-                            </div>
-                        </v-touch>
+                        <img v-show="!isPlayed" @click="playAudio()" class="control img-16-26" src="../assets/images/icon_small_pause@3x.png" alt="" />
+                        <!-- 暂停图标-播放中状态 -->
+                        <img v-show="isPlayed" @click="pauseAudio" class="control img-20-24" src="../assets/images/icon_suspend@3x.png" alt="" />
                     </div>
                 </x-circle>
             </div>
-            <v-touch class="scenic-point-name-area" v-on:tap="toDetail">
+            <div class="scenic-point-name-area" @click="toDetail">
                 {{scenicPointName}}
-            </v-touch>
-            <v-touch class="list-btn" v-on:tap="openMenu" ></v-touch>
+            </div>
+            <div class="list-btn" @click="openMenu" ></div> 
         </section>
         <!-- 左侧反馈功能图标 -->
         <section class="function-area-left">
-            <v-touch class="function-btn FK" v-on:tap="gotoPage({name: 'feedback'})"></v-touch>
+            <div class="function-btn FK" @click="gotoPage({name: 'feedback'})"></div>
         </section>
         <!-- 右侧简介/全景/自动功能图标 -->
         <section class="function-area-right">
-            <v-touch tag="section" class="function-btn JJ" v-on:tap="seeIntroduce"></v-touch>
-            <v-touch tag="section" class="function-btn QJ" v-on:tap="gotoPage({name: 'full-view', needGetSrc: true})"></v-touch>
-            <v-touch tag="section" class="function-btn ZD" v-on:tap="changeAuto" :class="isAuto ? '' : 'NO'"></v-touch>
+            <div class="function-btn JJ" @click="seeIntroduce"></div>
+            <div class="function-btn QJ" @click="gotoPage({name: 'full-view', needGetSrc: true})"></div>
+            <div class="function-btn ZD" @click="changeAuto" :class="isAuto ? '' : 'NO'"></div>
         </section>
         <!-- 底部景区简介弹窗 -->
         <section v-show="isOpenDetail" class="introDetail">
@@ -581,11 +455,14 @@
                     <div class="scenic-name">{{scenicName}}</div>
                     <span class="scenic-level">{{scenicLevel+"级风景区"}}</span>
                 </div>
-                <v-touch class="close-btn" v-on:tap="seeIntroduce"></v-touch>
+                <div class="close-btn" @click="seeIntroduce"></div>
             </div>
             <div class="scenic-address-time">
                 <div class="scenic-address">
-                    景区地址：
+                    景区地址： 
+                    <!-- <div class="font-color-666">
+                        <a style="text-decoration: none; color:#333;" :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=' + region + '&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a>
+                    </div> -->
                     <a class="font-color-666" style="text-decoration: none; color:#333;" :href="'https://uri.amap.com/search?keyword=' + scenicAddress + '&city=' + region + '&view=map&src=test&coordinate=gaode&callnative=1'">{{scenicAddress}}</a>
                 </div>
                 <div class="scenic-time">
@@ -594,14 +471,13 @@
             </div>
             <div class="scenic-dec">
                 <div class="dec-title">景区介绍</div>
-                <!-- 最大限制字数340 -->
                 <div class="dec-content font-color-888">{{scenicDec}}</div>
             </div>
            
         </section>
         <!-- 记录当前经纬度临时框（开发测试用） -->
         <section style="position:absolute;left:0;bottom:0;">
-            <input v-model="longlati" class="currentPosition"  />
+            <input class="currentPosition"  />
         </section>
         <!-- 提示弹窗 -->
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true" width="8.2em"></toast>
@@ -609,8 +485,6 @@
 </template>
 
 <script>
-    import L from 'leaflet';
-    import LC from 'leaflet.chinatmsproviders';
     import { XButton, Icon, XCircle, Toast, Loading } from 'vux';
     import { mapActions, mapMutations, mapState } from 'vuex';
     export default {
@@ -679,14 +553,12 @@
             this.sceneryId = scenicInfo.scenery_id;
 
             // 获取地图初始化信息
-            const scenicBgImg = './dhk.jpg', // 图片图层
+            const scenicBgImg = './qxgz.jpg', // 图片图层
                   imgRightTop = [scenicInfo.northeast_lng,scenicInfo.northeast_lat], // 地图右上角
                   imgLeftBottom = [scenicInfo.southwest_lng,scenicInfo.southwest_lat], // 地图左下角
-                  imgRightTop1 = [scenicInfo.northeast_lat,scenicInfo.northeast_lng], // 地图右上角
-                  imgLeftBottom1 = [scenicInfo.southwest_lat,scenicInfo.southwest_lng], // 地图左下角
                   mapZoom = scenicInfo.zoom, // 地图zoom
-                  centerPoint = [scenicInfo.center_lat,scenicInfo.center_lng]; // 地图显示范围中心点
-         
+                  centerPoint = [scenicInfo.longitude,scenicInfo.latitude]; // 地图中心店
+            
             // 获取屏幕大小 动态设置不同手机的地图zoom
             const containerWidth = document.querySelector('#wrapper').clientWidth;
             const containerHeight = document.querySelector('#wrapper').clientHeight;
@@ -710,9 +582,203 @@
             maxZoom = zoom+2;
             if (zoom > 17) maxZoom = 19;
             if (zoom > 19) zoom = 19;
+
+            // 信息窗体偏移
+            let offsetx = 4;
+            if(containerWidth > 600 && containerWidth < 800){
+                offsetx = 12;
+            }else if(containerWidth > 800 && containerWidth < 1000) {
+                offsetx = 14;
+            }else if(containerWidth > 1000) {
+                offsetx = 16;
+            }
+
+            // 添加地图图片图层
+            const imageLayer = new AMap.ImageLayer({
+                url: scenicBgImg,
+                bounds: new AMap.Bounds(
+                    imgLeftBottom,
+                    imgRightTop
+                ),
+                zooms:[zoom,maxZoom],
+                //zooms:[16,19],
+                zIndex: 100
+            });
+
+            // 实例化地图对象
+            const oMap = new AMap.Map('wrapper', {
+                showBuildingBlock: true,
+                pitchEnable: false,
+                buildingAnimation: true,
+                rotateEnable: false,
+                touchZoomCenter: 1,
+                center: centerPoint,
+                zoom: zoom,
+                zooms:[zoom,maxZoom],
+                viewMode: '3D',
+                layers: [
+                    new AMap.TileLayer(),
+                    imageLayer
+                ]
+            });
+
+            // 清除地图上其他默认标记点
+            oMap.setFeatures([]);
+
+            // 更改为黑色主题
+            oMap.setMapStyle("amap://styles/normal");
+
+            // 地图点击事件
+            oMap.on('click',function(e) {
+                console.log(e.lnglat.getLng()+','+e.lnglat.getLat());
+                _self.isShowMenu = false;
+                _self.isOpenDetail = false;
+                _self.infoWindow_main.close();
+            });
+
+            // 添加地图信息窗体
+            let infoWindow = new AMap.InfoWindow({
+                isCustom: true,  //使用自定义窗体
+                offset: new AMap.Pixel(offsetx, -30)
+            });
+            
+            // 保存地图实例及信息窗体实例，用于清除
+            this.oMap_main = oMap;
+            this.infoWindow_main = infoWindow;
+
+            // 获取默认景点列表
+            this.getScenicPointList(null, query);
+
+            // 初始化图标菜单
+            this.initMenu();
+            
+            //拖动中事件 没用
+            /*function showInfoDragging(e) {
+                const bounds = oMap.getBounds();
+                console.log(bounds)
+                const southWest = lnglat2container(105.554561, 32.201035);
+                const northEast = lnglat2container(105.600952, 32.234801);
+                const c1 = lnglat2container(bounds.bounds[0].O, bounds.bounds[0].N);
+                const c2 = lnglat2container(bounds.bounds[1].O, bounds.bounds[1].N);
+                const c3 = lnglat2container(bounds.bounds[2].O, bounds.bounds[2].N);
+                const c4 = lnglat2container(bounds.bounds[3].O, bounds.bounds[3].N);
+                const c5 = lnglat2container(bounds.bounds[4].O, bounds.bounds[4].N);
+                const containerWidth = document.querySelector('#wrapper').clientWidth;
+                const containerHeight = document.querySelector('#wrapper').clientHeight;
+                const imgWidth = northEast.x - southWest.x;
+                const imgHeight = southWest.y - northEast.y;
+                console.log(southWest, northEast);
+                // if()
+                if (southWest.x >= 30) {
+                    if (northEast.y >= 30) {
+                        move(-southWest.x, -northEast.y);
+                        return;
+                    } else if (southWest.y <= containerHeight - 30) {
+                        move(-southWest.x, containerHeight - southWest.y);
+                        return;
+                    }
+                } else if (northEast.x <= containerWidth - 30) {
+                    if (northEast.y >= 30) {
+                        move(containerWidth - northEast.x, -northEast.y);
+                        return;
+                    } else if (southWest.y <= containerHeight - 30) {
+                        move(containerWidth - northEast.x, containerHeight - southWest.y);
+                        return;
+                    }
+                }
+            }*/
+
+            //拖动中事件
+            function mapDragging(){ 
+                moveJudgement(false);
+            }
+            //移动结束事件
+            function mapDragged(){ 
+                moveJudgement(true);
+            }
+            //移动事件的判断内容
+            function moveJudgement(isEnd){
+                let bounds = oMap.getBounds();
+
+                let x = oMap.getSize().width;
+                let y = oMap.getSize().height;
+
+                //图片图层左上角的经纬度和像素
+                let img_leftTop_LngLat = new AMap.LngLat(105.554561, 32.234801);
+                let img_leftTop_pixel = oMap.lngLatToContainer(img_leftTop_LngLat);  
+
+                //图片图层左下角的经纬度和像素
+                let img_leftBottom_LngLat = new AMap.LngLat(105.554561, 32.201035);
+                let img_leftBottom_pixel = oMap.lngLatToContainer(img_leftBottom_LngLat); 
+
+                //图片图层右上角的经纬度和像素
+                let img_rightTop_LngLat = new AMap.LngLat(105.600952, 32.234801);
+                let img_rightTop_pixel = oMap.lngLatToContainer(img_rightTop_LngLat);  
+
+                //图片图层右下角的经纬度和像素
+                let img_rightBottom_LngLat = new AMap.LngLat(105.600952, 32.201035);
+                let img_rightBottom_pixel = oMap.lngLatToContainer(img_rightBottom_LngLat); 
+
+                
+                let flag = 0;
+                //上边
+                if(img_leftTop_pixel.y > 0){  
+                    if(img_leftTop_pixel.x > 0){
+                        move(-img_leftTop_pixel.x,-img_leftTop_pixel.y)
+                    }else if(img_rightTop_pixel.x > x){
+                        move(0,-img_leftTop_pixel.y)
+                    }else{
+                        move(x-img_rightTop_pixel.x,-img_leftTop_pixel.y)
+                    }
+                    flag = 1;
+                }
+                //下边
+                if(y-img_rightBottom_pixel.y > 0){ 
+                    if(img_leftBottom_pixel.x > 0){
+                        move(-img_leftBottom_pixel.x,y-img_rightBottom_pixel.y)
+                    }else if(img_rightBottom_pixel.x > x){
+                        move(0,y-img_rightBottom_pixel.y)
+                    }else{
+                        move(x-img_rightBottom_pixel.x,y-img_rightBottom_pixel.y)
+                    }
+                    flag = 1;
+                }
+                //左边
+                if(flag == 0 && img_leftTop_pixel.x > 0){
+                    if(img_leftTop_pixel.y < 0 || img_leftBottom_pixel.y > y){
+                        move(-img_leftTop_pixel.x,0)
+                    }
+                }
+                //右边
+                if(flag == 0 && x-img_rightTop_pixel.x > 0){
+                    if(img_rightTop_pixel.y < 0 || img_rightBottom_pixel.y > y){
+                        move(x-img_rightTop_pixel.x,0)
+                    }
+                }
+                
+            }
+            //地图移动
+            function move(x, y) {
+                oMap.setStatus({
+                    dragEnable: false
+                });
+                oMap.panBy(x, y);
+                setTimeout(() => {
+                    oMap.setStatus({
+                        dragEnable: true
+                    });
+                },500);
+            }
+            //经纬度转换为坐标
+            function lnglat2container(long, lati) {
+                const lnglat = new AMap.LngLat(long, lati);
+                const pixel = oMap.lnglatTocontainer(lnglat);
+                return pixel.round();
+            }
+            //oMap.on('moveend', mapDragged);
             
             // 获取当前地图定位
-            /*var options = {
+            var options = {
                 'showButton': true,//是否显示定位按钮
                 'buttonPosition': 'LB',//定位按钮的位置
                 'buttonOffset': new AMap.Pixel(15, 93),//定位按钮距离对应角落的距离
@@ -746,39 +812,11 @@
                     }
                     //document.querySelector(".currentPosition").value = GeolocationResult.position;
                 })
-            });*/
-
-
-            //地图
-            let oMap1 = L.map("wrapper", {
-                center: centerPoint,
-                zoom: 17,
-                attributionControl: false,
-                zoomControl: false,
-                maxBounds : [imgLeftBottom1, imgRightTop1],
-                maxBoundsViscosity : 0.8
             });
-            L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
-                maxZoom: 19,
-                minZoom: 17
-            }).addTo(oMap1);
-            
-            L.imageOverlay('./dhk.jpg', [imgLeftBottom1,imgRightTop1]).addTo(oMap1);
-            this.oMap_main = oMap1;
-
-            oMap1.on('click',function(e) {
-                console.log(e.latlng);
-            })
-            // 获取默认景点列表
-            this.getScenicPointList(null, query);
-
-            // 初始化图标菜单
-            this.initMenu();
         },
         data () {
             return {
                 //景区信息
-                longlati: '',
                 sceneryId: '',
                 scenicImg: '',
                 scenicName: '',
@@ -811,7 +849,6 @@
                 totalTime: '',
                 currentScenicId: '',
                 markers: [],
-                markers_line:[],
                 temp: '',
                 AQI: '',
                 weather: '',
@@ -846,18 +883,6 @@
                         className:'type-hospital'
                     }
                 ],
-                defaultImgList : [
-                    '/bg_scenic@3x.png',
-                    '/bg_select@3x.png',
-                    '/bg_shop@3x.png',
-                    '/bg_food@3x.png',
-                    '/bg_exit@3x.png',
-                    '/bg_toilet@3x.png',
-                    '/bg_stop@3x.png',
-                    '/bg_hotel@3x.png',
-                    '/bg_centre@3x.png',
-                    '/bg_doctor@3x.png'
-                ],
                 region: '',
             }
         },
@@ -871,8 +896,8 @@
             },
             watchLine(val) {
                 // 清除当前路线
-                this.removeMarker(2);
-                this.line.remove();
+                this.oMap_main.remove(this.line);
+                this.oMap_main.remove(this.linePointGroups);
             },
             // 播放进度监听
             audioPercent(val) {
@@ -895,7 +920,7 @@
                         let next = this.getNext(currentId);
                         if (next) {
                             this.scenicPointImg = next.nextPoint.url;
-                            this.scenicPointName = next.nextPoint.name;
+                            this.scenicPointName = next.nextPoint.serial + '. ' + next.nextPoint.name;
                             this.scenicPointSerial = next.nextPoint.serial;
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
                             this.autoPlay();
@@ -904,6 +929,7 @@
                                 _id: next.nextPlay.aId,
                                 _type: 5
                             });
+                            this.infoWindow_main.close();
                         } else {
                             sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
                             this.playEnd();
@@ -912,29 +938,28 @@
                 }
             },
             '$route'(to, from) {
+                console.log(to, from);
                 // 关闭菜单并展开对应信息窗体
                 if (from.name === 'scenic-spot' && to.name === 'main' && to.params.pid) {
-                    // console.log(to, from)
-                    // const selectPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === to.params.pid)[0];
-                    // sessionStorage.setItem('currentPoint', JSON.stringify(selectPoint));
-                    const currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+                    const selectPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === to.params.pid)[0];
+                    sessionStorage.setItem('currentPoint', JSON.stringify(selectPoint));
                     sessionStorage.setItem('oldSerial', this.scenicPointSerial);
-                    
-                    this.scenicPointImg = currentPoint.url;
-                    this.scenicPointName = currentPoint.name;
-                    this.scenicPointSerial = currentPoint.serial;
+
+                    this.scenicPointImg = selectPoint.url;
+                    this.scenicPointName = selectPoint.serial + '. ' + selectPoint.name;
+                    this.scenicPointSerial = selectPoint.serial;
                     this.isShowMenu = false;
-                    
-                    this.markers[0].openPopup()
-                    
+                    this.markerClick(null, this.markers[selectPoint.serial-1]);
+
                     this.playAudio({
-                        _src: currentPoint.guideUrl,
+                        _src: selectPoint.guideUrl,
                         _id: to.params.pid,
                         _type: 3
                     });
                 }
                 if (from.name === 'scenic-resource' && to.name === 'main' && to.params.rid) {
                     this.isShowMenu = false;
+                    this.markerClick(null, this.markers.filter(item => item.Ke.contentDom.children[0].dataset.id === to.params.rid)[0]);
                 }
             }
         },    
@@ -1017,7 +1042,7 @@
                     const lis = document.querySelectorAll('.main_view_footer li');
                     for (let li of lis) {
                         if (li.dataset.mark === 'resource_point') {
-                            li.firstElementChild.children[0].src = colorSrcList.filter(item => item.mark === 'resource_point')[0].colorSrc;
+                            li.firstElementChild.src = colorSrcList.filter(item => item.mark === 'resource_point')[0].colorSrc;
                         }
                     }
                 });
@@ -1028,6 +1053,7 @@
             openMenu() {
                 const routeName = this.$store.state.app.routeName;
                 if (!this.isShowMenu) {
+                    this.infoWindow_main.close();
                     // 默认跳转到景点列表
                     if (routeName === 'scenic-spot') {
                         this.$router.push({
@@ -1065,20 +1091,18 @@
                       colorSrcList = JSON.parse(sessionStorage.getItem('colorSrcList'));
                 for (let li of lis) {
                     if (li.dataset.mark !== remark) {
-                        li.firstElementChild.children[0].src = colorSrcList.filter(item => item.mark === li.dataset.mark)[0].graySrc;
+                        li.firstElementChild.src = colorSrcList.filter(item => item.mark === li.dataset.mark)[0].graySrc;
                     } else {
-                        li.firstElementChild.children[0].src = colorSrcList.filter(item => item.mark === li.dataset.mark)[0].colorSrc;
+                        li.firstElementChild.src = colorSrcList.filter(item => item.mark === li.dataset.mark)[0].colorSrc;
                     }
                 }
-                //this.oMap_main.remove(this.pointGroups);
-                this.removeMarker(1);
+                this.oMap_main.remove(this.pointGroups);
+                this.infoWindow_main.close();
                 switch (remark) {
                     case 'resource_point':
                         this.getScenicPointList(value);
-                        if(this.markers_line.length>0){
-                            this.removeMarker(2);
-                            this.line.remove();
-                        }
+                        this.oMap_main.remove(this.line);
+                        this.oMap_main.remove(this.linePointGroups);
                         this.$router.push({
                             name: 'scenic-spot',
                             params: {
@@ -1088,12 +1112,8 @@
                         break;
                     case 'resource_line':
                         this.getScenicPointList(1);
-                        if(this.markers_line.length>0){
-                            this.markers_line.forEach(v =>  {
-                                v.addTo(this.oMap_main);
-                            })
-                            this.line.addTo(this.oMap_main);
-                        }
+                        this.oMap_main.add(this.line);
+                        this.oMap_main.add(this.linePointGroups);
                         this.getLineList({
                             _this: this,
                             sceneryId: this.sceneryId
@@ -1102,10 +1122,8 @@
                         break;
                     default:
                         this.getScenicPointList(value);
-                        if(this.markers_line.length>0){
-                            this.removeMarker(2);
-                            this.line.remove();
-                        }
+                        this.oMap_main.remove(this.line);
+                        this.oMap_main.remove(this.linePointGroups);
                         sessionStorage.setItem('currentResource', remark);
                         this.$router.push({
                             name: 'scenic-resource',
@@ -1163,7 +1181,6 @@
                     } else if (_type === 3) { // 景点列表点播
                         src = _src;
                         id = _id;
-                        
                         if (mainAudio) {
                             clearInterval(this.timer);
                             if (!mainAudio.paused) {
@@ -1199,14 +1216,12 @@
                     let sourceDom = document.createElement('source');
                     sourceDom.type = 'audio/mpeg';
                     sourceDom.src = src;
-                    audioDom.preload = 'auto';
                     audioDom.dataset.id = id;
                     audioDom.appendChild(sourceDom);
                     audioDom.classList.add('main-audio');
                     audioDom.style.display = 'none';
                     audioContainer.appendChild(audioDom);
-                    audioDom.load();
-                    console.log('load')
+
                     // 开始播放
                     if (isContinuePlay) {
                         const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
@@ -1232,7 +1247,6 @@
                             this.changeProgress();
                         }
                     } else {
-                        console.log('oncanplay')
                         audioDom.oncanplay = (e) => {
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
@@ -1241,17 +1255,15 @@
                                 status : false
                             }
                             sessionStorage.setItem('playStatus', JSON.stringify(status));
-                            console.time('test');
                             _audioDom.play();
-                            console.timeEnd('test');
                             this.startCurrentPlay('play');
                             this.isPlayed = true;
+
                             if(this.isPlayed){
                                 this.changeMapIcon(true);
                             }
                         }
                         audioDom.onplay = (e) => {
-                            console.log('onplay')
                             this.changeProgress();
                         }
                     }
@@ -1323,6 +1335,7 @@
             },
             // 打开/关闭景区详情弹窗
             seeIntroduce() {
+                this.infoWindow_main.close();
                 this.isOpenDetail = !this.isOpenDetail;
             },
             // 自动连播切换
@@ -1360,7 +1373,7 @@
                             sessionStorage.setItem("oldSerial",this.scenicPointSerial);
                             const qrcode_point = pointList.filter(item => item.resource_id === query.pid)[0];
                             this.scenicPointImg = qrcode_point.url;
-                            this.scenicPointName = qrcode_point.name;
+                            this.scenicPointName = qrcode_point.serial + '. ' + qrcode_point.name;
                             this.scenicPointSerial = qrcode_point.serial;
                             sessionStorage.setItem("currentPoint",JSON.stringify(qrcode_point));
                             this.playAudio({
@@ -1385,7 +1398,7 @@
                                 sessionStorage.setItem('pointList',JSON.stringify(pointList.page.list));
                                 sessionStorage.setItem("currentPoint",JSON.stringify(pointList.page.list[0]));
                                 this.scenicPointImg = pointList.page.list[0].url;
-                                this.scenicPointName = pointList.page.list[0].name;
+                                this.scenicPointName = pointList.page.list[0].serial + '. ' + pointList.page.list[0].name;
                                 this.scenicPointSerial = pointList.page.list[0].serial;
 
                                 // 过滤出默认播放列表
@@ -1405,21 +1418,25 @@
                     }
 
                     //地图画点
-                    let className_resource = this.typeList.filter(item => item.type == this.resourceType)[0].className;
+                    let className = this.typeList.filter(item => item.type == this.resourceType)[0].className;
                     pointList.page.list.forEach((v,i) => {
-                        let infoContent = this.resourceType == 1 ? this.createInfoWindow_scenicPoint(v) : this.createInfoWindow(v);
-                        let myIcon = L.divIcon({html:'<div data-id="'+v.resource_id+'"><div class="icon '+ className_resource +'" ></div><div class="name">'+v.name+'</div></div>',className: 'marker-content-new'});
-                        let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
-                                     .bindPopup(infoContent,{className:"info-content-new"})
-                                     .on('click',function(){})
+                        let num = this.resourceType == 1 ? v.serial : ''; 
+                        let marker = new AMap.Marker({
+                            content: "<div class='marker-content' data-id='"+ v.resource_id +"' data-flag='"+i+"'><div class='point-icon "+className+"'>"+num+"</div><div class='point-name'>"+v.name+"</div></div>",
+                            position: [v.longitude,v.latitude],
+                        });
+                        marker.on('click',this.markerClick);
                         this.markers.push(marker);
-                    });           
+                    });
+                    let overlayGroups = new AMap.OverlayGroup(this.markers);
+                    this.pointGroups = overlayGroups;
+                    this.oMap_main.add(overlayGroups);                    
 
                     if (fromRouteName === 'scenic-point-detail') {
                         sessionStorage.setItem("oldSerial",this.scenicPointSerial);
                         const { guideUrl, resource_id, url, name, serial } = JSON.parse(sessionStorage.getItem('currentPoint'));
                         this.scenicPointImg = url;
-                        this.scenicPointName = name;
+                        this.scenicPointName = serial + '. ' + name;
                         this.scenicPointSerial = serial;
                         
                         this.playAudio({
@@ -1430,14 +1447,7 @@
                     }
                 }
             },
-            //清除点标记
-            removeMarker(type) {
-                let markerArr = type == 1 ? this.markers : this.markers_line;
-                markerArr.forEach(v => {
-                    v.remove();
-                })                
-            },
-            /*markerClick(e, v) {
+            markerClick(e, v) {
                 if (!e) {
                     if(this.infoWindow_main.getPosition() !== undefined && this.infoWindow_main.getPosition().O == v.getPosition().O && this.infoWindow_main.getPosition().N == v.getPosition().N) {
                         
@@ -1475,7 +1485,7 @@
                     this.infoWindow_main.setContent(this.createInfoWindow(pointInfo));
                 }
                 this.infoWindow_main.open(this.oMap_main, target.getPosition());
-            },*/
+            },
             //景点的弹窗内容
             createInfoWindow_scenicPoint(pointInfo) {
                 var info = document.createElement("div");
@@ -1522,11 +1532,7 @@
                 img_other.style.width = "100%";
                 img_other.style.height = "100%";
                 img_other.style.borderRadius = "10px";
-                if(pointInfo.url){
-                    img_other.src = pointInfo.url;
-                }else{
-                    img_other.src = this.defaultImgList[this.resourceType-1];
-                }
+                img_other.src = pointInfo.url;
                 info_other.appendChild(img_other);
                 return info_other;
             },
@@ -1594,8 +1600,6 @@
                             _type: 4
                         });
                     }
-                }else{
-                    this.pauseAudio();
                 }
             },
             toDetail() {
@@ -1615,30 +1619,49 @@
             },
             //画路线
             drawLine(lineId) { 
-                if(this.markers_line.length>0){
-                    this.removeMarker(2);
-                    this.line.remove();
-                }
+                this.oMap_main.remove(this.line);
+                this.oMap_main.remove(this.linePointGroups);
                 const lineList = this.$store.state.app.lineList;
                 let currentLine = lineList.filter(item => item.lineId === lineId)[0];
-                let path = currentLine.coordinatesList; //完整点
-                let path_point = currentLine.lineDetailList; //途径景点
+                let path = currentLine.coordinatesList;
                 if(path.length == 0) return;
                 let mapPath = [];
                 path.forEach(v => {
-                    let one = [v.latitude,v.longitude];
+                    let one = [v.longitude,v.latitude];
                     mapPath.push(one);
                 })
-                let polyline = L.polyline(mapPath,{color:"#68A8FC",weight:4,dashArray:[20,10]}).addTo(this.oMap_main);
+                let polyline = new AMap.Polyline({
+                    path: mapPath,
+                    isOutline: false,
+                    strokeColor: "#68A8FC", 
+                    strokeOpacity: 1,
+                    strokeWeight: 4,
+                    // 折线样式还支持 'dashed'
+                    strokeStyle: "dashed",
+                    // strokeStyle是dashed时有效
+                    strokeDasharray: [40, 10],
+                    lineJoin: 'round',
+                    lineCap: 'round',
+                    zIndex: 150
+                });
                 this.line = polyline;
+                this.oMap_main.add(polyline);
 
-                //路线途径景点
-                path_point.forEach((v,i) => {
-                    let num = i+1;
-                    let myIcon = L.divIcon({html:'<div data-id="'+v.resourceId+'">'+ num +'</div>',className: 'point-serial'});
-                    let marker_line = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
-                    this.markers_line.push(marker_line);
+                //起点终点
+                let points = [mapPath[0],mapPath[mapPath.length-1]];
+                let linePoints = [];
+                points.forEach((v,i) => {
+                    let ic = i == 0 ? '/icon_rise@3x.png' : 'icon_end@3x.png';
+                    let linemarker = new AMap.Marker({
+                        icon : ic,
+                        position: v,
+                        offset: new AMap.Pixel(-12, -28),
+                    });
+                    linePoints.push(linemarker);
                 })
+                let groups = new AMap.OverlayGroup(linePoints);
+                this.linePointGroups = groups;
+                this.oMap_main.add(groups);
             }
         }
     }

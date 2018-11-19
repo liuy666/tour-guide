@@ -28,8 +28,8 @@
                         width: 690px;
                         height: 310px;
                         img {
-                            width: 690px;
-                            height: 310px;
+                            width: 100%;
+                            height: 100%;
                         }
                     }
                     dd {

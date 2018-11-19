@@ -16,11 +16,14 @@
                     .img-left {
                         display: flex;
                         flex-direction: row;
-                        img {
+                        div {
+                            margin-right: 30px;
                             height: 100px;
                             width: 112px;
-                            margin-right: 30px;
-                            border-radius: 10px;
+                            img {
+                                height: 100%;
+                                width: 100%;
+                            }
                         }
                         p {
                             font-weight: 400;
@@ -39,10 +42,14 @@
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
-                        img {
+                        div {
                             width: 30px;
                             height: 24px;
                             margin-right: 28px;
+                        }
+                        img {
+                            width: 100%;
+                            height: 100%;
                             display: none;
                         }
                     }
@@ -58,14 +65,18 @@
             <ul>
                 <li v-for="line of lines" :key="line.lineId" @click="gotoMapLine(line.lineId)">
                     <section class="img-left">
-                        <img src="../assets/images/bg_select@2x.png" alt="" />
+                        <div>
+                            <img style="border-radius: 10px;" src="../assets/images/bg_select@2x.png" alt="加载中..." />
+                        </div>
                         <section>
                             <p class="font30">{{line.name}}</p>
                             <p class="font24">用时{{parseInt(line.playHour)}}小时</p>
                         </section>
                     </section>
                     <section class="img-right">
-                        <img :data-lineid="line.lineId" src="../assets/images/icon_select@2x.png" alt="" />
+                        <div>
+                            <img :data-lineid="line.lineId" src="../assets/images/icon_select@2x.png" alt="加载中..." />
+                        </div>
                     </section>
                 </li>
             </ul>

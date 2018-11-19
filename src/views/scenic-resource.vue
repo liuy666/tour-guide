@@ -19,7 +19,6 @@
                         img {
                             width: 100%;
                             height: 100%;
-                            border-radius: 10px;
                         }
                     }
                     span {
@@ -39,7 +38,15 @@
             <ul>
                 <li v-for="res of resourceList" :key="res.resource_id" :data-rid="res.resource_id" @click="selectOne">
                     <div :data-rid="res.resource_id">
-                        <img :data-rid="res.resource_id" :src="res.url" alt="" />
+                        <img v-if="res.url" style="border-radius: 10px;" :data-rid="res.resource_id" :src="res.url" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 7" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_stop@3x.png" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 3" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_shop@3x.png" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 8" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_hotel@3x.png" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 5" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_exit@3x.png" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 9" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_centre@3x.png" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 10" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_doctor@3x.png" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 4" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_food@3x.png" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 6" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_toilet@3x.png" alt="加载中..." />
                     </div>
                     <span :data-rid="res.resource_id">{{res.name}}</span>
                 </li>

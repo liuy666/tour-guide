@@ -6,50 +6,6 @@
         #wrapper_home{
             width: 100%;
             height: 100%;
-            .marker-icon{
-                width: 88px;
-                height: 96px;
-                margin-left: -44px;
-                margin-top: -96px;
-            }
-            .marker-content-new{
-                width: auto !important;
-                height: auto !important;
-                margin-left: -44px !important;
-                margin-top: -90px !important;
-                .icon{
-                    width: 88px;
-                    height: 96px;
-                    background: url("../assets/images/icon_scenic_home@3x.png") no-repeat center center / 100% 100%;
-                }
-                .name{
-                    white-space: nowrap;
-                    position: absolute;
-                    //left: calc(~'-50% + 44px');
-                    padding: 10px 20px;
-                    // line-height: 60px;
-                    background: url("../assets/images/icon_bg@3x.png") no-repeat center center / 100% 100%;
-                    font-weight: bold;
-                    color: #572b12;
-                    -webkit-transform: translateX(-50%);
-                    transform: translateX(-50%);
-                    margin-left: 44px;
-                    text-align: center;
-                }
-            }
-            .info-content-new{
-                bottom: 70px !important;
-            }
-            .leaflet-popup-content-wrapper{
-                padding: 0;
-            }
-            .leaflet-popup-content{
-                margin: 0;
-            }
-            .leaflet-popup-tip{
-                width: 26px;
-                height: 26px;
-            }
         }
         .weui-icon_toast.weui-icon-success-no-circle:before {
             font-size: 100px;
@@ -76,19 +32,19 @@
         }
     }
 
-    // #wrapper_home .marker-content{
-    //     width: 60px;
-    //     height: 50px;
-    //     margin-left: -30px;
-    //     font-size: 20px;
-    // }
-    // #wrapper_home .scenic-icon{
-    //     width: 100%;
-    //     height: 100%;
-    //     background: url(/icon_scenic_home@3x.png) no-repeat center / auto 100%;
-    //     text-align: center;
-    //     color: #fff;
-    // }
+    #wrapper_home .marker-content{
+        width: 60px;
+        height: 50px;
+        margin-left: -30px;
+        font-size: 20px;
+    }
+    #wrapper_home .scenic-icon{
+        width: 100%;
+        height: 100%;
+        background: url(/icon_scenic_home@3x.png) no-repeat center / auto 100%;
+        text-align: center;
+        color: #fff;
+    }
     
 </style>
 
@@ -101,8 +57,6 @@
 </template>
 
 <script>
-    import L from 'leaflet';
-    import LC from 'leaflet.chinatmsproviders'
     import { setTimeout } from 'timers'
     import { Toast, Badge } from 'vux'
     export default {
@@ -150,36 +104,53 @@
             }else if(containerHeight<900){
                 zoom = 9.8;
             }else if(containerWidth > 500 && containerWidth < 800){
-                zoom = 11;
+                zoom = 10.3;
             }else if(containerWidth > 800){
-                zoom = 11;
+                zoom = 10.8;
             }
-            
-            //地图
-            let oMap = L.map("wrapper_home", {
-                center: [32.526044, 105.019557],
-                zoom: 10,
-                attributionControl: false,
-                zoomControl: false,
-                maxBounds : [[31.459197, 104.49496], [33.573508, 105.725429]],
-                maxBoundsViscosity : 0.8
+
+            let offsetx = 4;//信息窗体偏移
+            if(containerWidth > 600 && containerWidth < 800){
+                offsetx = 12;
+            }else if(containerWidth > 800 && containerWidth < 1000) {
+                offsetx = 14;
+            }else if(containerWidth > 1000) {
+                offsetx = 16;
+            }
+
+            //地图图片图层
+            const imageLayer = new AMap.ImageLayer({
+                url: './qcx.jpg',
+                bounds: new AMap.Bounds(
+                    [104.49496, 31.459197],
+                    [105.725429, 33.573508]  
+                ),
+                zooms:[10,14],
+                zIndex: 100
             });
-            L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
-                maxZoom: 18,
-                minZoom: 10
-            }).addTo(oMap);
-
-            let imageUrl = './qcx.jpg',
-            imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
-            L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
-
+            //地图
+            const oMap = new AMap.Map('wrapper_home', {
+                showBuildingBlock: true,
+                pitchEnable: false,
+                buildingAnimation: true,
+                rotateEnable: false,
+                touchZoomCenter: 1,
+                center: [105.019557,32.526044],
+                zoom: 10,
+                zooms:[10,14],
+                //viewMode: '3D',
+                layers: [
+                    new AMap.TileLayer(),
+                    imageLayer
+                ]
+            });
             //地图信息窗体
-            // let popup = L.popup({
-            //     autoClose:false,
-            //     className:"info-content-new"
-            // });
+            let infoWindow = new AMap.InfoWindow({
+                isCustom: true,  //使用自定义窗体
+                offset: new AMap.Pixel(-10, -30)
+            });
             this.oMap_home = oMap;
-            //this.oInfoWindow = popup;
+            this.oInfoWindow = infoWindow;
             this.getScenicList();
         },
         data () {
@@ -201,49 +172,48 @@
                     this.isTips = true;
                     return;
                 }
+                let scenicLnglat = [], scenicName = [], secnicflag = [];
                 if(scenicList.data && scenicList.data.length && scenicList.data.length>0){
                     sessionStorage.setItem('scenicList',JSON.stringify(scenicList.data));
                     scenicList.data.forEach((v,i) => {
-                        let myIcon = L.divIcon({html:'<div data-id="'+v.scenery_id+'"><div class="icon"></div><div class="name">'+v.name+'</div></div>',className: 'marker-content-new'});
-                        let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_home)
-                                     .bindPopup(_self.createInfoWindow(v),{className:"info-content-new"})
-                                     .on('click',function(){
-                                         sessionStorage.setItem("currentScenic",JSON.stringify(v));
-                                     })
+                        scenicLnglat.push([v.longitude,v.latitude])
+                        scenicName.push(v.name)
+                        secnicflag.push(i)
                     })
                 }
-                // function setPoint(point,index) { 
-                //     let num = index + 1;
-                //     let marker = new AMap.Marker({
-                //         content: "<div class='marker-content' data-flag='"+secnicflag[index]+"'><div class='scenic-icon'></div></div>",
-                //         position: point,
-                //     });
-                //     marker.on('click',_self.markerClick);
-                //     _self.oMap_home.add(marker);
-                // }
+                function setPoint(point,index) { 
+                    let num = index + 1;
+                    let marker = new AMap.Marker({
+                        content: "<div class='marker-content' data-flag='"+secnicflag[index]+"'><div class='scenic-icon'></div></div>",
+                        position: point,
+                    });
+                    marker.on('click',_self.markerClick);
+                    _self.oMap_home.add(marker);
+                }
+                scenicLnglat.forEach(function(value,index){
+                    setPoint(value,index);
+                })
             },
-            /*markerClick(e) { 
-                if(this.oInfoWindow.getLatLng() !== undefined && e.latlng.lat == this.oInfoWindow.getLatLng().lat && e.latlng.lng == this.oInfoWindow.getLatLng().lng){
-                    if(this.oInfoWindow.isOpen()){
-                        this.oMap_home.popupclose();
+            markerClick(e) {
+                if(this.oInfoWindow.getPosition() !== undefined &&  this.oInfoWindow.getPosition().N == e.target.getPosition().N) {
+                    if(this.oInfoWindow.getIsOpen()){
+                        this.oInfoWindow.close();
                     }else{
                         this.openInfoWindow(e);
                     }
                 }else{
                     this.openInfoWindow(e);
                 }
-            },*/
-            /*openInfoWindow(e) {
-                let scenicId= e.target._icon.children[0].dataset.id;
-                let scenicInfo = JSON.parse(sessionStorage.getItem("scenicList")).filter(item => item.scenery_id===scenicId)[0];
-                sessionStorage.setItem("currentScenic",JSON.stringify(scenicInfo));
-                this.oInfoWindow
-                .setLatLng(e.latlng)
-                .setContent(this.createInfoWindow(scenicInfo))
-                .openOn(this.oMap_home);
-            },*/
-            createInfoWindow(scenicInfo) { 
-
+            },
+            openInfoWindow(e) {
+                console.log(e.target)
+                let flag = e.target.Ke.contentDom.children[0].getAttribute("data-flag");//当前景区在景区列表数据中的下标
+                const scenicInfo = JSON.parse(sessionStorage.getItem("scenicList"))[flag];
+                sessionStorage.setItem('currentScenic',JSON.stringify(scenicInfo));
+                this.oInfoWindow.setContent(this.createInfoWindow(scenicInfo));
+                this.oInfoWindow.open(this.oMap_home, e.target.getPosition());
+            },
+            createInfoWindow(scenicInfo) {
                 var info = document.createElement("div");
                 info.className = "info-contanir";
 
@@ -267,6 +237,7 @@
                 btn1.onclick = this.toScenic;
                 btnArea.appendChild(btn1);
 
+                
                 info.appendChild(btnArea);
                 return info;
             },

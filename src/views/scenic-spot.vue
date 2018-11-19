@@ -29,9 +29,13 @@
                 padding-left: 72px;
                 box-sizing: border-box;
             }
-            img {
+            section {
                 position: absolute;
                 top: 13px;
+                img {
+                    width: 100%;
+                    height: 100%;
+                }
             }
             .img-32-34 {
                 width: 32px;
@@ -60,11 +64,14 @@
                     .img-left {
                         display: flex;
                         flex-direction: row;
-                        img {
+                        div {
                             width: 112px;
                             height: 100px;
-                            border-radius: 10px;
                             margin-right: 32px;
+                            img {
+                                width: 100%;
+                                height: 100%;
+                            }
                         }
                         span {
                             font-size: 30px;
@@ -76,9 +83,13 @@
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
-                        img {
+                        div {
                             width: 50px;
                             height: 50px;
+                            img {
+                                width: 100%;
+                                height: 100%;
+                            }
                         }
                     }
                     .play {
@@ -88,7 +99,6 @@
             }
         }
     }
-    
 </style>
 
 <template>
@@ -97,19 +107,28 @@
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <section class="seach">
             <input type="text" placeholder="请输入景点名称" v-model="val" />
-            <img src="../assets/images/icon_so@2x.png" alt=""  class="img-32-34" @click="searchInput" />
-            <img src="../assets/images/icon_close@2x.png" alt="" class="img-34-34" @click="clearInput" />
+            <section class="img-32-34">
+                <img src="../assets/images/icon_so@2x.png" alt="" @click="searchInput" />
+            </section>
+            <section class="img-34-34">
+                <img src="../assets/images/icon_close@2x.png" alt="" @click="clearInput" />
+            </section>
         </section>
         <section class="spot-list">
             <ul class="list">
                 <li v-for="point of pointsList" :key="point.id" :data-pid="point.id" @click="selectOne">
                     <section class="img-left" :data-pid="point.id">
-                        <img :data-pid="point.id" :src="point.src" alt="加载中..." />
-                        <span :data-pid="point.id">{{ point.index + '. ' +point.name }}</span>
+                        <div :data-pid="point.id">
+                            <img v-if="point.src" style="border-radius: 10px;" :data-pid="point.id" :src="point.src" alt="加载中..." />
+                            <img v-else style="border-radius: 10px;" :data-pid="point.id" src="../assets/images/bg_scenic@3x.png" alt="加载中..." />
+                        </div>
+                        <span :data-pid="point.id">{{ point.name }}</span>
                     </section>
                     <section :data-pid="point.id" class="img-right">
-                        <img :data-pid="point.id" src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
-                        <img :data-pid="point.id" class="play" src="../assets/images/icon_big_play@2x.png" alt="加载中..." />
+                        <div :data-pid="point.id">
+                            <img :data-pid="point.id" src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
+                            <img :data-pid="point.id" class="play" src="../assets/images/icon_big_play@2x.png" alt="加载中..." />
+                        </div>
                     </section>
                 </li>
             </ul>
@@ -118,12 +137,11 @@
 </template>
 
 <script>
-import { Loading, XCircle  } from 'vux';
+import { Loading } from 'vux';
 import { mapMutations, mapState } from 'vuex';
 export default {
     components: {
-        Loading,
-        XCircle
+        Loading
     },
     data() {
         return {
@@ -148,16 +166,16 @@ export default {
             if (li.dataset.pid === currPoint.resource_id) {
                 li.style.backgroundColor = '#f0f0f0';
                 if (playStatus && !playStatus.status) {
-                    li.children[1].children[0].style.display = 'none';
-                    li.children[1].children[1].style.display = 'block';
+                    li.children[1].children[0].children[0].style.display = 'none';
+                    li.children[1].children[0].children[1].style.display = 'block';
                 } else {
-                    li.children[1].children[0].style.display = 'block';
-                    li.children[1].children[1].style.display = 'none';
+                    li.children[1].children[0].children[0].style.display = 'block';
+                    li.children[1].children[0].children[1].style.display = 'none';
                 }
             } else {
                 li.style.backgroundColor = '#fff';
-                li.children[1].children[0].style.display = 'block';
-                li.children[1].children[1].style.display = 'none';
+                li.children[1].children[0].children[0].style.display = 'block';
+                li.children[1].children[0].children[1].style.display = 'none';
             }
         }        
     },
@@ -173,12 +191,12 @@ export default {
             for (let li of lis) {
                 if (li.dataset.pid === currPoint.resource_id) {
                     if (val === 'play') {
-                        li.children[1].children[0].style.display = 'none';
-                        li.children[1].children[1].style.display = 'block';
+                        li.children[1].children[0].children[0].style.display = 'none';
+                        li.children[1].children[0].children[1].style.display = 'block';
                     }
                     if (val === 'pause') {
-                        li.children[1].children[0].style.display = 'block';
-                        li.children[1].children[1].style.display = 'none';
+                        li.children[1].children[0].children[0].style.display = 'block';
+                        li.children[1].children[0].children[1].style.display = 'none';
                     }
                 }
             }
@@ -189,12 +207,12 @@ export default {
             for (let li of lis) {
                 if (li.dataset.pid === currPoint.resource_id) {
                     li.style.backgroundColor = '#f0f0f0';
-                    li.children[1].children[0].style.display = 'none';
-                    li.children[1].children[1].style.display = 'block';
+                    li.children[1].children[0].children[0].style.display = 'none';
+                    li.children[1].children[0].children[1].style.display = 'block';
                 } else {
                     li.style.backgroundColor = '#fff';
-                    li.children[1].children[0].style.display = 'block';
-                    li.children[1].children[1].style.display = 'none';
+                    li.children[1].children[0].children[0].style.display = 'block';
+                    li.children[1].children[0].children[1].style.display = 'none';
                 }
             }
         },
@@ -224,21 +242,21 @@ export default {
             const lis = document.querySelectorAll('.spot-list li');
             for (let li of lis) {
                 if (e.target.dataset.pid === li.dataset.pid) {
-                    if (li.children[1].children[0].style.display === 'none') {
-                        li.children[1].children[0].style.display = 'block';
-                        li.children[1].children[1].style.display = 'none';
+                    if (li.children[1].children[0].children[0].style.display === 'none') {
+                        li.children[1].children[0].children[0].style.display = 'block';
+                        li.children[1].children[0].children[1].style.display = 'none';
                         this.pauseCurrentPlay();
                     } else {
                         li.style.backgroundColor = '#f0f0f0';
-                        li.children[1].children[0].style.display = 'none';
-                        li.children[1].children[1].style.display = 'block';
+                        li.children[1].children[0].children[0].style.display = 'none';
+                        li.children[1].children[0].children[1].style.display = 'block';
                         let status = {
                             status: false
                         }
                         sessionStorage.setItem('playStatus', JSON.stringify(status));
-                        let currPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === li.dataset.pid)[0];
-                        sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
                         const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                        let currPoint = pointList.filter(item => item.resource_id === li.dataset.pid)[0];
+                        sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
                         let sortList = [...pointList];
                         sortList.sort((a, b) => a.serial - b.serial);
                         let index = sortList.findIndex(item => item.resource_id === li.dataset.pid);
@@ -258,8 +276,8 @@ export default {
                     }
                 } else {
                     li.style.backgroundColor = '#fff';
-                    li.children[1].children[0].style.display = 'block';
-                    li.children[1].children[1].style.display = 'none';
+                    li.children[1].children[0].children[0].style.display = 'block';
+                    li.children[1].children[0].children[1].style.display = 'none';
                 }
             }
         },
@@ -286,7 +304,6 @@ export default {
                 return {
                     src: element.url,
                     name: element.name,
-                    index: element.serial,
                     id: element.resource_id
                 };
             });
