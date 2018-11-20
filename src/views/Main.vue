@@ -699,12 +699,12 @@
 
             // 实例化地图
             let oMap = L.map("wrapper", {
-                center: centerPoint,
+                center: [30.5829110000,104.0637260000],//centerPoint,
                 zoom: 17,
                 attributionControl: false,
                 zoomControl: false,
-                maxBounds : [imgLeftBottom1, imgRightTop1],
-                maxBoundsViscosity : 0.8
+                // maxBounds : [imgLeftBottom1, imgRightTop1],
+                // maxBoundsViscosity : 0.8
             });
             L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
                 maxZoom: 19,
@@ -715,7 +715,9 @@
             this.oMap_main = oMap;
 
             oMap.on('click',function(e) {
-                console.log(e.latlng);
+                //console.log(e.latlng);
+                this.isShowMenu = false;
+                this.isOpenDetail = false;
             })
             // 获取默认景点列表
             this.getScenicPointList(1, query);
@@ -887,10 +889,40 @@
             }
         },    
         methods: {
-            getCurrentPosition() {
+            updateLocation(position) { debugger
+                var latitude = position.coords.latitude; 
+                var longitude = position.coords.longitude; 
+                var accuracy = position.coords.accuracy; 
+
+                console.log("jingweidu:" +latitude + longitude )
+                // document.getElementById("“纬度”").innerHTML = latitude; 
+                // document.getElementById("“经度”").innerHTML = longitude; 
+                // document.getElementById("“准确度”").innerHTML = accuracy + "米"; 
+            },
+
+            handleLocationError(error) {  debugger
+                alert("1111");
+                switch (error.code) { 
+                case 0: 
+                    console.log("“尝试获取您的位置信息时发生错误：”" + error.message); 
+                    break; 
+                case 1: 
+                    console.log("“用户拒绝了获取位置信息请求。”"); 
+                    break; 
+                case 2: 
+                    console.log("“浏览器无法获取您的位置信息。”"); 
+                    break; 
+                case 3: 
+                    console.log("“获取您位置信息超时。”"); 
+                    break; 
+                } 
+            },
+
+            getCurrentPosition() { 
                 this.oMap_main.locate({
                     setView: true,
-                    maxZoom: 19
+                    maxZoom: 19,
+                    timeout:50000
                 })
                 this.oMap_main.on('locationfound', function(e) {debugger
                     var radius = e.accuracy / 2;
@@ -901,12 +933,12 @@
                     console.log('定位出错=====>', e);
                 });
 
-                // .locationerror(function(){
-                //     debugger
-                // })
-                // .locationfound(function(){
-                //     debugger
-                // })
+                // var myOptions = {
+                //     enableHighAccuracy: true,
+                //     timeout: 30000,
+                //     maximumAge: 0
+                // };
+                // navigator.geolocation.getCurrentPosition(this.updateLocation, this.handleLocationError, myOptions);
             },
             // 获取下一个播放链接
             getNext(currentId) {
