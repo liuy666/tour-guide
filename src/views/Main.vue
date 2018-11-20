@@ -870,7 +870,8 @@
                     this.scenicPointId = currentPoint.resource_id;
                     this.isShowMenu = false;
                     
-                    this.markers[0].openPopup()
+                    this.getMarkerIndex();
+                    this.markers[this.indexOfMarkers].openPopup();
                     
                     this.playAudio({
                         _src: currentPoint.guideUrl,
@@ -1211,6 +1212,7 @@
             },
             // 改变地图图标交互效果 
             changeMapIcon (isPlay) {
+                this.getMarkerIndex();
                 let ind = this.indexOfMarkers;
                 if(!this.markers[ind]._icon.children[0]){
                     return false;
