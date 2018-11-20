@@ -321,37 +321,38 @@
             margin-left: -33px !important;
             margin-top: -90px !important;
             .icon{
-                width: 66px;
+                //width: 66px;
+                width: 130px;
                 height: 73.3px;
                 &.type-point{
-                    background: url("../assets/images/icon_use_normal@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_use_normal@3x.png") no-repeat center / auto 100%;
                 }
                 &.type-buy{
-                    background: url("../assets/images/icon_gowu@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_gowu@3x.png") no-repeat center / auto 100%;
                 }
                 &.type-eat{
-                    background: url("../assets/images/icon_to_food@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_to_food@3x.png") no-repeat center / auto 100%;
                 }
                 &.type-door{
-                    background: url("../assets/images/icon_to_exit@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_to_exit@3x.png") no-repeat center / auto 100%;
                 }
                 &.type-wc{
-                    background: url("../assets/images/icon_to_wc@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_to_wc@3x.png") no-repeat center / auto 100%;
                 }
                 &.type-park{
-                    background: url("../assets/images/icon_to_shop@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_to_shop@3x.png") no-repeat center / auto 100%;
                 }
                 &.type-hotel{
-                    background: url("../assets/images/icon_to_hotel@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_to_hotel@3x.png") no-repeat center / auto 100%;
                 }
                 &.type-center{
-                    background: url("../assets/images/icon_to_centre@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_to_centre@3x.png") no-repeat center / auto 100%;
                 }
                 &.type-hospital{
-                    background: url("../assets/images/icon_to_doctor@3x.png") no-repeat center / 100% 100%;
+                    background: url("../assets/images/icon_to_doctor@3x.png") no-repeat center / auto 100%;
                 }
                 &.player{
-                    background: url("../assets/images/playing.gif") no-repeat center / 100% 100%;
+                    background: url("../assets/images/playing.gif") no-repeat center / auto 100%;
                 }
             }
             .name{
@@ -859,6 +860,7 @@
                     '/bg_doctor@3x.png'
                 ],
                 region: '',
+                indexOfMarkers : 0
             }
         },
         computed: mapState({
@@ -876,7 +878,7 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 5) {
+                if (val >= 50) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);
@@ -1274,32 +1276,37 @@
                 this.changeMapIcon(false);
             },
             //改变地图图标交互效果 
-            changeMapIcon (isPlay) {
-
-                if(!this.markers[this.scenicPointSerial-1].Ke.contentDom){
+            changeMapIcon (isPlay) { 
+                let ind = this.indexOfMarkers;
+                if(!this.markers[ind]._icon.children[0]){
                     return false;
                 }
-                let oldSerial = sessionStorage.getItem("oldSerial"),
-                    oldmarker = this.markers[oldSerial-1].Ke.contentDom.children[0].children[0],
-                    cmarker = this.markers[this.scenicPointSerial-1].Ke.contentDom.children[0].children[0];
-                
-                oldmarker.classList.remove("player");
-                oldmarker.innerHTML = oldSerial;
-
-                if(isPlay){
-                    cmarker.classList.add("player");
-                    cmarker.innerHTML = "";
-                    if(document.querySelector(".info-scenic-btns")){
-                        document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
+                this.markers.forEach((v,i) => {
+                    if(isPlay && i == ind){
+                        v._icon.children[0].children[0].classList.add("player");
+                    }else{
+                        v._icon.children[0].children[0].classList.remove("player");
                     }
-                }else{
-                    cmarker.classList.remove("player");
-                    cmarker.innerHTML = this.scenicPointSerial;
-                    if(document.querySelector(".info-scenic-btns")){
+                })
+
+                if(document.querySelector(".info-scenic-btns")){
+                    if(isPlay){
+                        document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
+                    }else{
                         document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
                     }
                 }
                 return true;
+            },
+            //找某个点标记在this.markers中的位置
+            getMarkerIndex() {
+                //获取当前点的id
+                let currentId = JSON.parse(sessionStorage.getItem("currentPoint")).resource_id;
+                this.markers.forEach((item,index) => { 
+                    if(item._icon.children[0].dataset.id == currentId){
+                        this.indexOfMarkers = index;
+                    }
+                });
             },
             // 播放进度圆环
             changeProgress() {
@@ -1537,7 +1544,7 @@
                 let currentPointInfo = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === this.mapClickPointId)[0];
                 let {url, name, serial, guideUrl, resource_id} = currentPointInfo;
                 this.scenicPointImg = url;
-                this.scenicPointName = serial + '. ' + name;
+                this.scenicPointName = name;
                 this.scenicPointSerial = serial;
                 
                 if(!e.currentTarget.classList.contains('playing')){
