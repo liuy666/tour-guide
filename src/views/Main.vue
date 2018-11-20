@@ -318,11 +318,11 @@
         .marker-content-new{
             width: auto !important;
             height: auto !important;
-            margin-left: -33px !important;
+            margin-left: -61px !important;
             margin-top: -90px !important;
             .icon{
                 //width: 66px;
-                width: 130px;
+                width: 122px;
                 height: 73.3px;
                 &.type-point{
                     background: url("../assets/images/icon_use_normal@3x.png") no-repeat center / auto 100%;
@@ -363,7 +363,7 @@
                 color: #ffffff;
                 position: absolute;
                 display: block;
-                margin-left: 33px;
+                margin-left: 61px;
                 text-align: center;
                 -webkit-transform: translateX(-50%);
                 transform: translateX(-50%);
@@ -803,6 +803,7 @@
                 scenicPointImg: '',
                 scenicPointName: '',
                 scenicPointSerial:'1',
+                scenicPointId:'',
                 mapClickPointId:'',
                 menuList: [],
                 loadText: '',
@@ -899,6 +900,7 @@
                             this.scenicPointImg = next.nextPoint.url;
                             this.scenicPointName = next.nextPoint.name;
                             this.scenicPointSerial = next.nextPoint.serial;
+                            this.scenicPointId = next.nextPoint.resource_id;
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
                             this.autoPlay();
                             this.playAudio({
@@ -925,6 +927,7 @@
                     this.scenicPointImg = currentPoint.url;
                     this.scenicPointName = currentPoint.name;
                     this.scenicPointSerial = currentPoint.serial;
+                    this.scenicPointId = currentPoint.resource_id;
                     this.isShowMenu = false;
                     
                     this.markers[0].openPopup()
@@ -1145,6 +1148,7 @@
                     this.startCurrentPlay('play');
                     console.log(0)
                     this.isPlayed = true;
+                    this.changeMapIcon(true);
                 } else {
                     let src = ''; // 播放src
                     let id = ''; // 景点id
@@ -1276,7 +1280,7 @@
                 this.changeMapIcon(false);
             },
             //改变地图图标交互效果 
-            changeMapIcon (isPlay) { 
+            changeMapIcon (isPlay) {  debugger
                 let ind = this.indexOfMarkers;
                 if(!this.markers[ind]._icon.children[0]){
                     return false;
@@ -1344,6 +1348,7 @@
              * @param {String} resourceType 资源类型 不传时默认 1-景点
              */
             async getScenicPointList(resourceType, query) {
+                let self = this;
                 resourceType = resourceType || this.resourceType;
                 if (resourceType) {
                     this.resourceType = resourceType;
@@ -1369,6 +1374,7 @@
                             this.scenicPointImg = qrcode_point.url;
                             this.scenicPointName = qrcode_point.name;
                             this.scenicPointSerial = qrcode_point.serial;
+                            this.scenicPointId = qrcode_point.resource_id;
                             sessionStorage.setItem("currentPoint",JSON.stringify(qrcode_point));
                             this.playAudio({
                                 _src: qrcode_point.guideUrl,
@@ -1394,6 +1400,7 @@
                                 this.scenicPointImg = pointList.page.list[0].url;
                                 this.scenicPointName = pointList.page.list[0].name;
                                 this.scenicPointSerial = pointList.page.list[0].serial;
+                                this.scenicPointId = pointList.page.list[0].resource_id;
 
                                 // 过滤出默认播放列表
                                 let _sortList = [...pointList.page.list];
@@ -1418,7 +1425,15 @@
                         let myIcon = L.divIcon({html:'<div data-id="'+v.resource_id+'"><div class="icon '+ className_resource +'" ></div><div class="name">'+v.name+'</div></div>',className: 'marker-content-new'});
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                      .bindPopup(infoContent,{className:"info-content-new"})
-                                     .on('click',function(){})
+                                     .on('click',function(){
+                                         if(document.querySelector(".info-scenic-btns")){
+                                            if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && self.scenicPointId === v.resource_id){
+                                                document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
+                                            }else{
+                                                document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
+                                            }
+                                         }
+                                     })
                         this.markers.push(marker);
                     });           
 
@@ -1428,6 +1443,7 @@
                         this.scenicPointImg = url;
                         this.scenicPointName = name;
                         this.scenicPointSerial = serial;
+                        this.scenicPointId = resource_id;
                         
                         this.playAudio({
                             _src: guideUrl,
@@ -1504,11 +1520,13 @@
                 btnArea.className = "info-scenic-btns";
 
                 var btn1 = document.createElement('button');
-                if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointSerial === pointInfo.serial){
-                    btn1.className = "toPlay playing"
-                }else{
-                    btn1.className = "toPlay"
-                }
+                // debugger
+                // if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId === pointInfo.resource_id){
+                //     btn1.className = "toPlay playing"
+                // }else{
+                //     btn1.className = "toPlay"
+                // }
+                btn1.className = "toPlay";
                 btn1.onclick = this.toPlay;
                 btnArea.appendChild(btn1);
 
