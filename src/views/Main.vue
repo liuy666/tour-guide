@@ -885,7 +885,25 @@
         },    
         methods: {
             getCurrentPosition() {
+                this.oMap_main.locate({
+                    setView: true,
+                    maxZoom: 19
+                })
+                this.oMap_main.on('locationfound', function(e) {debugger
+                    var radius = e.accuracy / 2;
+                    L.marker(e.latlng).addTo(this.oMap_main).bindPopup("你就在这个圈内");
+                    L.circle(e.latlng, radius).addTo(this.oMap_main);
+                });
+                this.oMap_main.on('locationerror', function(e) { debugger
+                    console.log('定位出错=====>', e);
+                });
 
+                // .locationerror(function(){
+                //     debugger
+                // })
+                // .locationfound(function(){
+                //     debugger
+                // })
             },
             getNext(lastId) {
                 const playList = JSON.parse(sessionStorage.getItem('playList'));
