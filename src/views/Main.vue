@@ -271,10 +271,10 @@
         .marker-content-new{
             width: auto !important;
             height: auto !important;
-            margin-left: -33px !important;
+            margin-left: -61px !important;
             margin-top: -90px !important;
             .icon{
-                width: 130px;
+                width: 122px;
                 height: 73.3px;
                 &.type-point{
                     background: url("../assets/images/icon_use_normal@3x.png") no-repeat center / auto 100%;
@@ -315,7 +315,7 @@
                 color: #ffffff;
                 position: absolute;
                 display: block;
-                margin-left: 33px;
+                margin-left: 61px;
                 text-align: center;
                 -webkit-transform: translateX(-50%);
                 transform: translateX(-50%);
@@ -746,6 +746,7 @@
                 audioPercent: 0,
                 scenicPointImg: '', // 播放栏--景点图片
                 scenicPointName: '', // 播放栏--景点名称
+                scenicPointId:'', // 播放栏--景点Id
                 mapClickPointId:'',
                 menuList: [],
                 loadText: '',
@@ -841,7 +842,7 @@
                         if (next) {
                             this.scenicPointImg = next.nextPoint.url;
                             this.scenicPointName = next.nextPoint.name;
-          
+                            this.scenicPointId = next.nextPoint.resource_id;
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
                             this.autoPlay();
                             this.playAudio({
@@ -859,14 +860,10 @@
             '$route'(to, from) {
                 // 关闭菜单并展开对应信息窗体
                 if (from.name === 'scenic-spot' && to.name === 'main' && to.params.pid) {
-                    // console.log(to, from)
-                    // const selectPoint = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === to.params.pid)[0];
-                    // sessionStorage.setItem('currentPoint', JSON.stringify(selectPoint));
                     const currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-         
-                    
                     this.scenicPointImg = currentPoint.url;
                     this.scenicPointName = currentPoint.name;
+                    this.scenicPointId = currentPoint.resource_id;
                     this.isShowMenu = false;
                     
                     this.markers[0].openPopup()
@@ -1086,6 +1083,7 @@
                     this.startCurrentPlay('play');
                     console.log(0)
                     this.isPlayed = true;
+                    this.changeMapIcon(true);
                 } else {
                     let src = ''; // 播放src
                     let id = ''; // 景点id
@@ -1217,7 +1215,7 @@
                 this.changeMapIcon(false);
             },
             //改变地图图标交互效果 
-            changeMapIcon (isPlay) { 
+            changeMapIcon (isPlay) {  debugger
                 let ind = this.indexOfMarkers;
                 if(!this.markers[ind]._icon.children[0]){
                     return false;
@@ -1318,6 +1316,7 @@
                             sessionStorage.setItem("currentPoint",JSON.stringify(qrcode_current_point));
                             this.scenicPointImg = qrcode_current_point.url;
                             this.scenicPointName = qrcode_current_point.name;
+                            this.scenicPointId = qrcode_current_point.resource_id;
 
                             // 播放当前扫码景点的解说音频
                             this.playAudio({
@@ -1339,6 +1338,7 @@
                                 sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
                                 this.scenicPointImg = res.page.list[0].url;
                                 this.scenicPointName = res.page.list[0].name;
+                                this.scenicPointId = res.page.list[0].resource_id;
 
                                 // 过滤出默认播放列表
                                 const playList = res.page.list.map(item => {
@@ -1366,8 +1366,16 @@
                             className: 'marker-content-new'
                         });
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
-                                      .bindPopup(infoContent,{className: "info-content-new"})
-                                      .on('click', function(){})
+                                      .bindPopup(infoContent,{className:"info-content-new"})
+                                      .on('click',() => {
+                                         if(document.querySelector(".info-scenic-btns")){
+                                            if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId === v.resource_id){
+                                                document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
+                                            }else{
+                                                document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
+                                            }
+                                         }
+                                     })
                         this.markers.push(marker);
                     });           
 
@@ -1377,6 +1385,7 @@
 
                         this.scenicPointImg = url;
                         this.scenicPointName = name;
+                        this.scenicPointId = resource_id;
                         
                         // 设置播放栏
                         this.playAudio({
@@ -1415,11 +1424,13 @@
                 btnArea.className = "info-scenic-btns";
 
                 var btn1 = document.createElement('button');
-                if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointSerial === pointInfo.serial){
-                    btn1.className = "toPlay playing"
-                }else{
-                    btn1.className = "toPlay"
-                }
+                // debugger
+                // if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId === pointInfo.resource_id){
+                //     btn1.className = "toPlay playing"
+                // }else{
+                //     btn1.className = "toPlay"
+                // }
+                btn1.className = "toPlay";
                 btn1.onclick = this.toPlay;
                 btnArea.appendChild(btn1);
 
