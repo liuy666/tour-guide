@@ -501,7 +501,7 @@
                     <div class="player-img-area">
                         <img style="width:100%; height:100%; border-radius: 50%;" :src="scenicPointImg" />
                         <!-- 播放图标-暂停中状态 -->
-                        <v-touch class="wrapper" v-show="!isPlayed" v-on:tap="playAudio()">
+                        <v-touch class="wrapper" v-show="!isPlayed" v-on:tap="playAudio({_type: 1})">
                             <div class="control img-16-26">
                                 <img src="../assets/images/icon_small_pause@3x.png" alt="" />
                             </div>
@@ -1073,135 +1073,105 @@
                 'autoPlay', // 自动连播
                 'playEnd' // 播放结束
             ]),
-            // 初始化音频播放
+            /**
+             * 初始化音频播放
+             * _type 标志播放来源 1-工具栏播放 2-景点详情页回退续播 3-景点列表点播/地图解说播放/连播 4-扫码播放
+             */
             playAudio(options) {
-                /**
-                 * _type 标志播放来源 1-工具栏播放 2-景点详情页跳转回来播放 3-景点列表点播 4-地图解说播放 5-连播 6-扫码播放
-                 */
-                
                 const mainAudio = document.querySelector('.main-audio');
                 const audioContainer = document.querySelector('.toolbars');
-                if (mainAudio && mainAudio.paused && !options) {
-                    let status = {
-                        status: false
+
+                let src = ''; // 待播放景点 -- src
+                let id = ''; // 待播放景点 -- id
+                let isContinuePlay = false; // 是否需要续播，针对播放来源2
+
+                // 根据播放来源处理不同逻辑
+                if (_type === 1) { // 工具栏播放
+                    if (mainAudio && mainAudio.paused) { // 如果当前 Audio 是暂停状态则直接继续播放
+                        console.log('++++++++++++++ _type:1 继续播放 ++++++++++++++');
+                        mainAudio.play();
+                        sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: false})); // 修改暂停状态标志量--isPauseStatus
+                        this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
+                        this.isPlayed = true;
+                        this.changeMapIcon(true); // 同步地图上标记点更改状态
+                        return;
+                    } else { // 如果当前 Audio 还不存在则创建元素,并播放当前景点
+                        console.log('++++++++++++++ _type:1 工具栏播放 ++++++++++++++');
+                        const currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+                        src = currentPoint.guideUrl;
+                        id = currentPoint.resource_id;
+                    }                        
+                } else if (_type === 2) { // 景点详情页回退续播
+                    console.log('++++++++++++++ _type:2 景点详情页回退续播 ++++++++++++++');
+                    src = options._src;
+                    id = options._id;
+                    isContinuePlay = true;
+                } else if (_type === 3) { // 景点列表点播/地图解说播放/连播
+                    console.log('++++++++++++++ _type:3 点播/连播 ++++++++++++++');
+                    src = options._src;
+                    id = options._id;
+                } else { // 扫码播放
+
+                }
+
+                if (mainAudio) {
+                    clearInterval(this.timer);
+                    if (!mainAudio.paused) {
+                        mainAudio.pause();
                     }
-                    sessionStorage.setItem('playStatus', JSON.stringify(status));
-                    mainAudio.play();
-                    this.startCurrentPlay('play');
-                    console.log(0)
-                    this.isPlayed = true;
-                    this.changeMapIcon(true);
-                } else {
-                    let src = ''; // 播放src
-                    let id = ''; // 景点id
-                    options = options || {_src: '', _id: '', _type: 1};
-                    let {_src, _id, _type} = options;
-                    let isContinuePlay = false; // 是否需要续播，针对播放来源2
+                    audioContainer.removeChild(mainAudio);
+                    this.audioPercent = 0;
+                    this.timer = null;
+                }
+                let audioDom = document.createElement('audio');
+                let sourceDom = document.createElement('source');
+                sourceDom.type = 'audio/mpeg';
+                sourceDom.src = src;
+                audioDom.preload = 'auto';
+                audioDom.dataset.id = id;
+                audioDom.appendChild(sourceDom);
+                audioDom.classList.add('main-audio');
+                audioDom.style.display = 'none';
+                audioContainer.appendChild(audioDom);
+                audioDom.load();
 
-                    if (_type === 1) { // 工具栏播放，默认取第一个景点来播放
-                        let playList = JSON.parse(sessionStorage.getItem('playList'));
-                        src = playList[0].aSrc,
-                        id = playList[0].aId
-                        console.log(1)
-                    } else if (_type === 2) { // 景点详情页跳转后续播
-                        src = _src;
-                        id = _id;
-                        isContinuePlay = true;
-                        console.log(2)
-                    } else if (_type === 3) { // 景点列表点播
-                        src = _src;
-                        id = _id;
-                        
-                        if (mainAudio) {
-                            clearInterval(this.timer);
-                            if (!mainAudio.paused) {
-                                mainAudio.pause();
-                            }
-                            audioContainer.removeChild(mainAudio);
-                            this.audioPercent = 0;
-                            this.timer = null;
-                        }
-                        console.log(3)
-                    } else if (_type === 4) { // 地图解说播放
-                        src = _src;
-                        id = _id;
-                        if (mainAudio) {
-                            clearInterval(this.timer);
-                            if (!mainAudio.paused) {
-                                mainAudio.pause();
-                            }
-                            audioContainer.removeChild(mainAudio);
-                            this.audioPercent = 0;
-                            this.timer = null;
-                        }
-                        console.log(4)
-                    } else if (_type === 5) { // 自动连播
-                        src = _src;
-                        id = _id;
-                        console.log(5)
-                    } else { // 扫码播放
+                // 开始播放
+                if (isContinuePlay) {
+                    const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
+                    audioDom.currentTime = playStatus.currentTime;
+                    audioDom.oncanplay = (e) => { 
+                        let _audioDom = e.target;
+                        this.totalTime = _audioDom.duration;
+                        this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
 
-                    }
-
-                    let audioDom = document.createElement('audio');
-                    let sourceDom = document.createElement('source');
-                    sourceDom.type = 'audio/mpeg';
-                    sourceDom.src = src;
-                    audioDom.preload = 'auto';
-                    audioDom.dataset.id = id;
-                    audioDom.appendChild(sourceDom);
-                    audioDom.classList.add('main-audio');
-                    audioDom.style.display = 'none';
-                    audioContainer.appendChild(audioDom);
-                    audioDom.load();
-                    console.log('load')
-                    // 开始播放
-                    if (isContinuePlay) {
-                        const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
-                        audioDom.currentTime = playStatus.currentTime;
-                        audioDom.oncanplay = (e) => { 
-                            let _audioDom = e.target;
-                            this.totalTime = _audioDom.duration;
-                            this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
-
-                            if (playStatus.status) { // 暂停中
-                                this.isPlayed = false;
-                            } else {
-                                _audioDom.play();
-                                this.startCurrentPlay('play');
-                                this.isPlayed = true;
-                            } 
-
-                            if(this.isPlayed){
-                                this.changeMapIcon(true);
-                            }
-                        }
-                        audioDom.onplay = (e) => {
-                            this.changeProgress();
-                        }
-                    } else {
-                        console.log('oncanplay')
-                        audioDom.oncanplay = (e) => {
-                            let _audioDom = e.target;
-                            this.totalTime = _audioDom.duration;
-                            let status = {
-                                currentTime: 0,
-                                status : false
-                            }
-                            sessionStorage.setItem('playStatus', JSON.stringify(status));
-                            console.time('test');
+                        if (playStatus.isPauseStatus) { // 暂停中
+                            this.isPlayed = false;
+                        } else {
                             _audioDom.play();
-                            console.timeEnd('test');
-                            this.startCurrentPlay('play');
+                            this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                             this.isPlayed = true;
-                            if(this.isPlayed){
-                                this.changeMapIcon(true);
-                            }
+                        } 
+                        if (this.isPlayed) {
+                            this.changeMapIcon(true);
                         }
-                        audioDom.onplay = (e) => {
-                            console.log('onplay')
-                            this.changeProgress();
+                    }
+                    audioDom.onplay = (e) => {
+                        this.changeProgress();
+                    }
+                } else {
+                    audioDom.oncanplay = (e) => {
+                        let _audioDom = e.target;
+                        this.totalTime = _audioDom.duration;
+                        sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus : false}));
+                        _audioDom.play();
+                        this.startCurrentPlay('play'); this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
+                        this.isPlayed = true;
+                        if (this.isPlayed) {
+                            this.changeMapIcon(true);
                         }
+                    }
+                    audioDom.onplay = (e) => {
+                        this.changeProgress();
                     }
                 }
             },
@@ -1212,17 +1182,17 @@
                 document.querySelector('.main-audio').pause();
                 let status = {
                     currentTime: document.querySelector('.main-audio').currentTime,
-                    status : true
+                    isPauseStatus : true
                 } 
                 sessionStorage.setItem('playStatus', JSON.stringify(status));
-                this.startCurrentPlay('pause');
+                this.startCurrentPlay('pause'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                 this.isPlayed = false;
 
                 //地图图标交互效果 
                 this.changeMapIcon(false);
             },
-            //改变地图图标交互效果 
-            changeMapIcon (isPlay) {  debugger
+            // 改变地图图标交互效果 
+            changeMapIcon (isPlay) {
                 let ind = this.indexOfMarkers;
                 if(!this.markers[ind]._icon.children[0]){
                     return false;
@@ -1244,7 +1214,7 @@
                 }
                 return true;
             },
-            //找某个点标记在this.markers中的位置
+            // 找某个点标记在this.markers中的位置
             getMarkerIndex() {
                 //获取当前点的id
                 let currentId = JSON.parse(sessionStorage.getItem("currentPoint")).resource_id;
@@ -1329,7 +1299,7 @@
                             this.playAudio({
                                 _src: qrcode_current_point.guideUrl,
                                 _id: qrcode_current_point.resource_id,
-                                _type: 6
+                                _type: 4
                             });
                         } else { 
                             if (!fromRouteName) { // 如果是刷新后初始化页面
@@ -1358,7 +1328,7 @@
                             }
                         }
                     } else {
-                        this.saveResourceList(res.page.list); // 提交 mutation 保存其他资源列表
+                        this.saveResourceList(res.page.list); // commit mutation 保存其他资源列表
                     }
 
                     //地图画点
@@ -1382,8 +1352,8 @@
                                             }else{
                                                 document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
                                             }
-                                         }
-                                     })
+                                        }
+                                    });
                         this.markers.push(marker);
                     });           
 
@@ -1413,36 +1383,30 @@
             },
             //景点的弹窗内容
             createInfoWindow_scenicPoint(pointInfo) {
-                var info = document.createElement("div");
+                let info = document.createElement("div");
                 info.className = "info-contanir";
 
-                var middle = document.createElement("div");
+                let middle = document.createElement("div");
                 middle.className = "info-content";
 
-                var htmlStr = ` <div class='info-scenic-img-area'><img style="width:100%;height:100%;border-radius:100%;" src='${pointInfo.url}' /></div>
+                let htmlStr = ` <div class='info-scenic-img-area'><img style="width:100%;height:100%;border-radius:100%;" src='${pointInfo.url}' /></div>
                                 <div class='info-scenic-info'>
                                     <div class='info-scenic-name'>${pointInfo.name}</div>
                                     <div class='info-scenic-dec'>${pointInfo.commentary}</div>
-                                </div>`
+                                </div>`;
                 middle.innerHTML = htmlStr;
 
                 info.appendChild(middle);
 
-                var btnArea = document.createElement('div');
+                let btnArea = document.createElement('div');
                 btnArea.className = "info-scenic-btns";
 
-                var btn1 = document.createElement('button');
-                // debugger
-                // if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId === pointInfo.resource_id){
-                //     btn1.className = "toPlay playing"
-                // }else{
-                //     btn1.className = "toPlay"
-                // }
+                let btn1 = document.createElement('button');
                 btn1.className = "toPlay";
                 btn1.onclick = this.toPlay;
                 btnArea.appendChild(btn1);
 
-                var btn2 = document.createElement('button');
+                let btn2 = document.createElement('button');
                 btn2.className = "toDetail";
                 btn2.onclick = this.toDetail;
                 btnArea.appendChild(btn2);
