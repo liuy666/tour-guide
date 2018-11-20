@@ -150,15 +150,17 @@
             let oMap = L.map("wrapper_home", {
                 center: [32.526044, 105.019557],
                 zoom: 10,
+                minZoom: 10,
+                maxZoom: 18,
                 attributionControl: false,
                 zoomControl: false,
                 maxBounds : [[31.459197, 104.49496], [33.573508, 105.725429]],
                 maxBoundsViscosity : 0.8
             });
-            L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
-                maxZoom: 18,
-                minZoom: 10
-            }).addTo(oMap);
+            // L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
+            //     maxZoom: 18,
+            //     minZoom: 10
+            // }).addTo(oMap);
 
             let imageUrl = './qcx.jpg',
             imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    

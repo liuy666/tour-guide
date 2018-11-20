@@ -699,17 +699,19 @@
 
             // 实例化地图
             let oMap = L.map("wrapper", {
-                center: [30.5829110000,104.0637260000],//centerPoint,
+                center: centerPoint,//centerPoint,[30.5829110000,104.0637260000]
                 zoom: 17,
+                minZoom: 17,
+                maxZoom: 19,
                 attributionControl: false,
                 zoomControl: false,
-                // maxBounds : [imgLeftBottom1, imgRightTop1],
-                // maxBoundsViscosity : 0.8
+                maxBounds : [imgLeftBottom1, imgRightTop1],
+                maxBoundsViscosity : 0.8
             });
-            L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
-                maxZoom: 19,
-                minZoom: 17
-            }).addTo(oMap);
+            // L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
+            //     maxZoom: 19,
+            //     minZoom: 17
+            // }).addTo(oMap);
             
             L.imageOverlay('./dhk.jpg', [imgLeftBottom1,imgRightTop1]).addTo(oMap);
             this.oMap_main = oMap;
