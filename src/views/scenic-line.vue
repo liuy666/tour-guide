@@ -66,7 +66,7 @@
                 <li v-for="line of lines" :key="line.lineId" @click="gotoMapLine(line.lineId)">
                     <section class="img-left">
                         <div>
-                            <img style="border-radius: 10px;" src="../assets/images/bg_select@2x.png" alt="加载中..." />
+                            <img style="border-radius: 10px;" src="../assets/images/bg_select@3x.png" alt="加载中..." />
                         </div>
                         <section>
                             <p class="font30">{{line.name}}</p>

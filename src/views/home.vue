@@ -74,22 +74,7 @@
         .no {
             background: url("../assets/images/icon_news_no@3x.png") no-repeat center center / 70px 70px;
         }
-    }
-
-    // #wrapper_home .marker-content{
-    //     width: 60px;
-    //     height: 50px;
-    //     margin-left: -30px;
-    //     font-size: 20px;
-    // }
-    // #wrapper_home .scenic-icon{
-    //     width: 100%;
-    //     height: 100%;
-    //     background: url(/icon_scenic_home@3x.png) no-repeat center / auto 100%;
-    //     text-align: center;
-    //     color: #fff;
-    // }
-    
+    } 
 </style>
 
 <template>
@@ -101,7 +86,6 @@
 </template>
 
 <script>
-    import L from 'leaflet';
     import LC from 'leaflet.chinatmsproviders'
     import { setTimeout } from 'timers'
     import { Toast, Badge } from 'vux'
@@ -212,36 +196,7 @@
                                      })
                     })
                 }
-                // function setPoint(point,index) { 
-                //     let num = index + 1;
-                //     let marker = new AMap.Marker({
-                //         content: "<div class='marker-content' data-flag='"+secnicflag[index]+"'><div class='scenic-icon'></div></div>",
-                //         position: point,
-                //     });
-                //     marker.on('click',_self.markerClick);
-                //     _self.oMap_home.add(marker);
-                // }
             },
-            /*markerClick(e) { 
-                if(this.oInfoWindow.getLatLng() !== undefined && e.latlng.lat == this.oInfoWindow.getLatLng().lat && e.latlng.lng == this.oInfoWindow.getLatLng().lng){
-                    if(this.oInfoWindow.isOpen()){
-                        this.oMap_home.popupclose();
-                    }else{
-                        this.openInfoWindow(e);
-                    }
-                }else{
-                    this.openInfoWindow(e);
-                }
-            },*/
-            /*openInfoWindow(e) {
-                let scenicId= e.target._icon.children[0].dataset.id;
-                let scenicInfo = JSON.parse(sessionStorage.getItem("scenicList")).filter(item => item.scenery_id===scenicId)[0];
-                sessionStorage.setItem("currentScenic",JSON.stringify(scenicInfo));
-                this.oInfoWindow
-                .setLatLng(e.latlng)
-                .setContent(this.createInfoWindow(scenicInfo))
-                .openOn(this.oMap_home);
-            },*/
             createInfoWindow(scenicInfo) { 
 
                 var info = document.createElement("div");

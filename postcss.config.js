@@ -3,10 +3,6 @@ module.exports = {
         "autoprefixer": {}, // 自动浏览器前缀
         "postcss-import": {}, // 这个插件让你很轻易的使用本地文件、node_modules或者web_modules的文件。这个插件配合postcss-url让你引入文件变得更轻松
         "postcss-url": {}, // 处理文件，比如图片文件、字体文件等引用路径的处理
-        // "postcss-pxtorem": {  
-        //     "rootValue": 75, // 设计稿宽度的1/10,
-        //     "propList": ['*'] // 需要做转化处理的属性，如`hight`、`width`、`margin`等，`*`表示全部
-        // },
         "cssnano": {
             "cssnano-preset-advanced": {
                 "autoprefixer": false, // 重复调用
