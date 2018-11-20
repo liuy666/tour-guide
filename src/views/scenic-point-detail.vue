@@ -25,26 +25,33 @@
                 width: 112px;
                 height: 112px;
                 position: relative;
-                .control {
+                .iwrap {
+                    width: 112px;
+                    height: 112px;
                     position: absolute;
-                    left: 50%;
-                    top: 50%;
-                    img {
-                        width: 100%;
-                        height: 100%;
-                        display: block;
+                    left: 0;
+                    top: 0;
+                    .control {
+                        position: absolute;
+                        left: 50%;
+                        top: 50%;
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            display: block;
+                        }
                     }
-                }
-                .img-16-26 {
-                    width: 16px;
-                    height: 26px;
-                    transform: translate(-8px, -13px);
-                }
-                .img-20-24 {
-                    width: 20px;
-                    height: 24px;
-                    transform: translate(-10px, -12px);
-                }
+                    .img-16-26 {
+                        width: 16px;
+                        height: 26px;
+                        transform: translate(-8px, -13px);
+                    }
+                    .img-20-24 {
+                        width: 20px;
+                        height: 24px;
+                        transform: translate(-10px, -12px);
+                    }
+                }  
             }
             .audio-area-name{
                 width: calc(~'100% - 114px');
@@ -108,7 +115,8 @@
                 flex-direction: row;
                 overflow-x: auto;
                 -webkit-overflow-scrolling : touch;
-                margin: 0 33px;
+                padding-left: 50px;
+                margin-right: 30px;
                 box-sizing: border-box;
                 li{
                     display: flex;
@@ -129,11 +137,11 @@
                     .point-list-name{
                         position: absolute;
                         font-size: 24px;
-                        width: 130px;
+                        width: 150px;
                         overflow: hidden;
                         white-space: nowrap;
                         text-overflow: ellipsis;
-                        left: -15px;
+                        left: -25px;
                         text-align: center;
                         bottom: 0;
                         &.current{
@@ -154,13 +162,18 @@
             <div class="audio-area-img">
                 <img :src="pointImg" style="width:100%;height:100%;border-radius:100%;" />
                 <!-- 播放图标-暂停中状态 -->
-                <div class="control img-16-26">
-                    <img v-show="!isPlayed" @click="playAudio()" src="../assets/images/icon_small_pause@3x.png" alt="" />
-                </div>
+                <v-touch class="iwrap" v-show="!isPlayed" v-on:tap="playAudio()">
+                    <div class="control img-16-26">
+                        <img src="../assets/images/icon_small_pause@3x.png" alt="" />
+                    </div>
+                </v-touch>
+                
                 <!-- 暂停图标-播放中状态 -->
-                <div class="control img-20-24">
-                    <img v-show="isPlayed" @click="pauseAudio" src="../assets/images/icon_suspend@3x.png" alt="" />
-                </div>
+                <v-touch class="iwrap" v-show="isPlayed" v-on:tap="pauseAudio">
+                    <div class="control img-20-24">
+                        <img src="../assets/images/icon_suspend@3x.png" alt="" />
+                    </div>
+                </v-touch>
             </div>
             <div class="audio-area-name">
                 <span class="point-name">{{pointName}}</span>

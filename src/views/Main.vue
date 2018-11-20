@@ -175,7 +175,7 @@
                     margin-top: 6px;
                     margin-left: 6px;
                     position: relative;
-                    .wrapper {
+                    .wrap {
                         width: 112px;
                         height: 112px;
                         position: absolute;
@@ -501,13 +501,13 @@
                     <div class="player-img-area">
                         <img style="width:100%; height:100%; border-radius: 50%;" :src="scenicPointImg" />
                         <!-- 播放图标-暂停中状态 -->
-                        <v-touch class="wrapper" v-show="!isPlayed" v-on:tap="playAudio({_type: 1})">
+                        <v-touch class="wrap" v-show="!isPlayed" v-on:tap="playAudio({_type: 1})">
                             <div class="control img-16-26">
                                 <img src="../assets/images/icon_small_pause@3x.png" alt="" />
                             </div>
                         </v-touch>
                             <!-- 暂停图标-播放中状态 -->
-                        <v-touch class="wrapper" v-show="isPlayed" v-on:tap="pauseAudio">
+                        <v-touch class="wrap" v-show="isPlayed" v-on:tap="pauseAudio">
                             <div class="control img-20-24">
                                 <img src="../assets/images/icon_suspend@3x.png" alt="" />
                             </div>
@@ -820,7 +820,7 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 5) {
+                if (val >= 10) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);

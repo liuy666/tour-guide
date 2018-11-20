@@ -51,20 +51,27 @@
                 height: 26px;
             }
         }
-        .weui-icon_toast.weui-icon-success-no-circle:before {
+        // 消息提示弹窗样式
+        .vux-toast .weui-icon_toast {
+            margin-top: 30px;
+        }
+        .vux-toast .weui-toast {
+            top: @toast-top;
+            width: 228px;
+        }
+        .weui-icon-success-no-circle:before {
             font-size: 100px;
-            content: "\EA0D";
+            content: '\EA0D';
         }
-        .weui-icon_toast{
-            margin-top: 40px;
-        }
-        .weui-toast__content{
+        .weui-toast__content {
             margin-top: 20px;
         }
+
         .msg-70-70 {
             width: 70px;
             height: 70px;
             position: absolute;
+            z-index: 1001;
             top: 21px;
             left: 24px;
         }
@@ -81,7 +88,7 @@
     <div id="home">
         <section id="wrapper_home"></section>
         <section class="msg-70-70" :class="[isHasMsg ? 'has' : 'no']" @click="gotoMsgList"></section>
-        <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true" width="8.2em"></toast>
+        <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
     </div>
 </template>
 
