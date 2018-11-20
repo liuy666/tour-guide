@@ -287,9 +287,9 @@ export default {
                         tm = (playStatus.totalTime%60).toFixed(0) < 10 ? '0'+(playStatus.totalTime%60).toFixed(0) : (playStatus.totalTime%60).toFixed(0);
                     this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
                     this.totalTimeStr = Math.floor(playStatus.totalTime/60) + ":" + tm;
-                    this.isPlayed = playStatus.status;
+                    this.isPlayed = playStatus.isPauseStatus;
                     audioDom.currentTime = playStatus.currentTime;
-                    if(!playStatus.status){//播放状态
+                    if(!playStatus.isPauseStatus){//播放状态
                         this.isPlayed = true;
                         audioDom.play();
                     }else{
@@ -420,7 +420,7 @@ export default {
         this.pauseAudio();
         let playStatus = {
             currentTime: document.querySelector('.detail-audio').currentTime,
-            status : status
+            isPauseStatus : status
         }
         sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
         this.$store.commit('setFromRouteName', 'scenic-point-detail');

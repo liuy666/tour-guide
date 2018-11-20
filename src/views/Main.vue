@@ -242,9 +242,9 @@
             right: 30px;
         }
         .function-area-left{
-            height: 90px;
+            height: 160px;
             left: 30px;
-            bottom: 256px;
+            bottom: 186px;
         }
         .function-btn{
             width: 70px;
@@ -254,6 +254,9 @@
             background-size: 100% 100%;
             &.FK{ // 反馈图片
                 background-image: url('../assets/images/icon_feedback@3x.png');
+            }
+            &.DW{
+                background-image: url('../assets/images/icon_static@3x.png');
             }
             &.JJ{ // 简介图片
                 background-image: url('../assets/images/icon_intro@3x.png');
@@ -520,6 +523,7 @@
         <!-- 左侧反馈功能图标 -->
         <section class="function-area-left">
             <v-touch class="function-btn FK" v-on:tap="gotoPage({name: 'feedback'})"></v-touch>
+            <v-touch class="function-btn DW" v-on:tap="getCurrentPosition"></v-touch>
         </section>
         <!-- 右侧简介/全景/自动功能图标 -->
         <section class="function-area-right">
@@ -880,6 +884,9 @@
             }
         },    
         methods: {
+            getCurrentPosition() {
+
+            },
             getNext(lastId) {
                 const playList = JSON.parse(sessionStorage.getItem('playList'));
                 let index = playList.findIndex(item => item.aId === lastId);
@@ -1367,7 +1374,8 @@
                         });
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                       .bindPopup(infoContent,{className:"info-content-new"})
-                                      .on('click',() => {
+                                      .on('click',() => { 
+                                         this.mapClickPointId = v.resource_id;
                                          if(document.querySelector(".info-scenic-btns")){
                                             if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId === v.resource_id){
                                                 document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
@@ -1461,7 +1469,6 @@
             },
             toPlay(e) {
                 //e.currentTarget.classList.add("playing");
-
                 let currentPointInfo = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === this.mapClickPointId)[0];
                 let {url, name, serial, guideUrl, resource_id} = currentPointInfo;
                 this.scenicPointImg = url;
