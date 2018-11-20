@@ -584,15 +584,9 @@
             }
             next();
         },
-        beforeRouteUpdate (to, from, next) { 
-            if(to.name == "main"){
-                if(from.name == "scenic-line" && to.params.lineId){
-                    this.isShowMenu = false;
-                    this.drawLine(to.params.lineId);
-                }
-            }
-            next();
-        },
+        // beforeRouteUpdate (to, from, next) { 
+        //     next();
+        // },
         created() {
             if(this.timer){
                 clearInterval(this.timer);
@@ -826,7 +820,7 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 50) {
+                if (val >= 5) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);
@@ -838,9 +832,11 @@
                     let currentId = au.dataset.id;
                     const currentAudioContainer = document.querySelector('.toolbars');
                     currentAudioContainer.removeChild(au);
-                    sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
-                    this.playEnd();
+                    sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
+                    this.playEnd(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                     this.isPlayed = false;
+
+                    // 如果开启了自动连播
                     if (this.isAuto) {
                         let next = this.getNext(currentId);
                         if (next) {
@@ -848,15 +844,15 @@
                             this.scenicPointName = next.nextPoint.name;
                             this.scenicPointId = next.nextPoint.resource_id;
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
-                            this.autoPlay();
+                            this.autoPlay(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                             this.playAudio({
                                 _src: next.nextPlay.aSrc,
                                 _id: next.nextPlay.aId,
                                 _type: 3
                             });
-                        } else {
-                            sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
-                            this.playEnd();
+                        } else { // 表明播放列表已播完，则更改播放状态
+                            sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
+                            this.playEnd(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                         }
                     }
                 }
@@ -868,8 +864,6 @@
                     this.scenicPointImg = currentPoint.url;
                     this.scenicPointName = currentPoint.name;
                     this.scenicPointId = currentPoint.resource_id;
-                    this.isShowMenu = false;
-                    
                     this.markers[0].openPopup()
                     
                     this.playAudio({
@@ -877,8 +871,13 @@
                         _id: to.params.pid,
                         _type: 3
                     });
+                    this.isShowMenu = false;
                 }
                 if (from.name === 'scenic-resource' && to.name === 'main' && to.params.rid) {
+                    this.isShowMenu = false;
+                }
+                if(from.name == "scenic-line" && to.name == "main" && to.params.lineId){
+                    this.drawLine(to.params.lineId);
                     this.isShowMenu = false;
                 }
             }
@@ -887,11 +886,12 @@
             getCurrentPosition() {
 
             },
-            getNext(lastId) {
+            // 获取下一个播放链接
+            getNext(currentId) {
                 const playList = JSON.parse(sessionStorage.getItem('playList'));
-                let index = playList.findIndex(item => item.aId === lastId);
+                const index = playList.findIndex(item => item.aId === currentId);
 
-                if (index + 1 === playList.length) {
+                if (index + 1 === playList.length) { // 如果上一个播放的已经是最后一个
                     return false;
                 } else {
                     const pointList = JSON.parse(sessionStorage.getItem('pointList'));
