@@ -32,6 +32,7 @@
                     img {
                         width: 100%;
                         height: 100%;
+                        display: block;
                     }
                 }
                 .img-16-26 {
@@ -423,7 +424,7 @@ export default {
             isPauseStatus : status
         }
         sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
-        this.$store.commit('setFromRouteName', 'scenic-point-detail');
+        this.$store.commit('SETFROMROUTENAME', 'scenic-point-detail');
         if(this.timer){
             clearInterval(this.timer);
         }

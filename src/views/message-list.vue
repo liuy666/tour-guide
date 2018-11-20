@@ -189,11 +189,11 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'saveContent'
+            'SAVECONTENT'
         ]),
         gotoMsgDetail(params) {
             // 存储文章
-            this.saveContent(params.content);
+            this.SAVECONTENT(params.content);
             this.$router.push({
                 name: 'msg-detail',
                 params

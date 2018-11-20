@@ -17,7 +17,6 @@ export default {
         }
     },
     mounted() {
-        // console.log(this.$route)
         const params = this.$route.params;
         if(!Object.keys(params).length) {
             this.$router.push({
