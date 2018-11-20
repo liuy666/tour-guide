@@ -705,12 +705,12 @@
 
             // 实例化地图
             let oMap = L.map("wrapper", {
-                center: centerPoint,
+                center: [30.5829110000,104.0637260000],//centerPoint,
                 zoom: 17,
                 attributionControl: false,
                 zoomControl: false,
-                maxBounds : [imgLeftBottom1, imgRightTop1],
-                maxBoundsViscosity : 0.8
+                // maxBounds : [imgLeftBottom1, imgRightTop1],
+                // maxBoundsViscosity : 0.8
             });
             L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
                 maxZoom: 19,
@@ -888,7 +888,8 @@
             getCurrentPosition() {
                 this.oMap_main.locate({
                     setView: true,
-                    maxZoom: 19
+                    maxZoom: 19,
+                    timeout:50000
                 })
                 this.oMap_main.on('locationfound', function(e) {debugger
                     var radius = e.accuracy / 2;
