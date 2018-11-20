@@ -48,7 +48,7 @@
         .main_view {
             width: 732px;
             height: 733px;
-            z-index: 1001;
+            z-index: 1002;
             background: url("../assets/images/bg@3x.png") no-repeat center center / 100% 100%;
             position: absolute;
             bottom: 20.233vw;
@@ -852,7 +852,7 @@
                             this.playAudio({
                                 _src: next.nextPlay.aSrc,
                                 _id: next.nextPlay.aId,
-                                _type: 5
+                                _type: 3
                             });
                         } else {
                             sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
@@ -1104,7 +1104,7 @@
                 let isContinuePlay = false; // 是否需要续播，针对播放来源2
 
                 // 根据播放来源处理不同逻辑
-                if (_type === 1) { // 工具栏播放
+                if (options._type === 1) { // 工具栏播放
                     if (mainAudio && mainAudio.paused) { // 如果当前 Audio 是暂停状态则直接继续播放
                         console.log('++++++++++++++ _type:1 继续播放 ++++++++++++++');
                         mainAudio.play();
@@ -1119,17 +1119,17 @@
                         src = currentPoint.guideUrl;
                         id = currentPoint.resource_id;
                     }                        
-                } else if (_type === 2) { // 景点详情页回退续播
+                } else if (options._type === 2) { // 景点详情页回退续播
                     console.log('++++++++++++++ _type:2 景点详情页回退续播 ++++++++++++++');
                     src = options._src;
                     id = options._id;
                     isContinuePlay = true;
-                } else if (_type === 3) { // 景点列表点播/地图解说播放/连播
+                } else if (options._type === 3) { // 景点列表点播/地图解说播放/连播
                     console.log('++++++++++++++ _type:3 点播/连播 ++++++++++++++');
                     src = options._src;
                     id = options._id;
                 } else { // 扫码播放
-
+                    return;
                 }
 
                 if (mainAudio) {
@@ -1450,67 +1450,66 @@
                 return info_other;
             },
             toPlay(e) {
-                //e.currentTarget.classList.add("playing");
                 let currentPointInfo = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === this.mapClickPointId)[0];
-                let {url, name, serial, guideUrl, resource_id} = currentPointInfo;
+                let {url, name, guideUrl, resource_id} = currentPointInfo;
                 this.scenicPointImg = url;
                 this.scenicPointName = name;
+                this.scenicPointId = resource_id;
                 
-                if(!e.currentTarget.classList.contains('playing')){
+                if(!e.currentTarget.classList.contains('playing')){ // 之前是暂停状态则<继续播放>或<开始新的播放>
                     sessionStorage.setItem('currentPoint',JSON.stringify(currentPointInfo));
                     let cau = document.querySelector(".main-audio");
-                    if(cau && cau.paused && resource_id == cau.dataset.id){
-                        this.playAudio();
-                    }else{
-                        const lineList = JSON.parse(sessionStorage.getItem('lineList'));
+                    if(cau && cau.paused && resource_id == cau.dataset.id){ // 继续播放
+                        this.playAudio({_type: 1});
+                    }else{ // 开始新的播放
+                        const currLineId = sessionStorage.getItem('lineId');
+                        const pointList = JSON.parse(sessionStorage.getItem('pointList'));
                         let newPlayList = [];
-                        if (lineList) {
-                            const currLineId = sessionStorage.getItem('lineId');
+
+                        if (currLineId) { // 如果当前地图上存在路线
+                            const lineList = JSON.parse(sessionStorage.getItem('lineList'));
                             let lineDetailList =  lineList.filter(item => item.lineId === currLineId)[0].lineDetailList;
                             let pidList = lineDetailList.map(item => item.resourceId);
-                            if (this.$tool.isExist(this.mapClickPointId, pidList)) {
-                                console.log(111)
 
+                            if (this.$tool.isExist(this.mapClickPointId, pidList)) { // 如果当前点击播放的景点在路线上，则需要按路线播
+                                console.log('++++++++++++++ 从景点'+ name +'开始按已选路线播 ++++++++++++++');
+                                const index1 = pidList.findIndex(item => item === this.mapClickPointId);
                                 newPlayList = lineDetailList.map(item => {
-                                    let url = JSON.parse(sessionStorage.getItem('pointList')).filter(i => i.resource_id === item.resourceId)[0].guideUrl;
                                     return {
-                                        aSrc: url,
+                                        aSrc: pointList.filter(i => i.resource_id === item.resourceId)[0].guideUrl,
                                         aId: item.resourceId
                                     }
                                 });
-                            } else {
-                                console.log(222)
-                                const pointList = JSON.parse(sessionStorage.getItem('pointList'));
-                                let sortList = [...pointList];
-                                sortList.sort((a, b) => a.serial - b.serial);
-                                let index = sortList.findIndex(item => item.resource_id === this.mapClickPointId);
-                                newPlayList = sortList.slice(index).map(item => {
+                                newPlayList = newPlayList.slice(index1);
+                            } else { // 如果当前点击播放的景点不在路线上
+                                console.log('++++++++++++++ 从景点'+ name +'开始按顺序播 ++++++++++++++');
+                                const index2 = pointList.findIndex(item => item.resource_id === this.mapClickPointId);
+                                newPlayList = pointList.slice(index2).map(item => {
                                     return {
                                         aSrc: item.guideUrl,
                                         aId: item.resource_id
                                     }
                                 });
                             }
-                        } else {
-                            const pointList = JSON.parse(sessionStorage.getItem('pointList'));
-                            let sortList = [...pointList];
-                            sortList.sort((a, b) => a.serial - b.serial);
-                            let index = sortList.findIndex(item => item.resource_id === this.mapClickPointId);
-                            newPlayList = sortList.slice(index).map(item => {
+                        } else { // 如果当前地图上不存在路线
+                            const index3 = pointList.findIndex(item => item.resource_id === this.mapClickPointId);
+                            newPlayList = pointList.slice(index3).map(item => {
                                 return {
                                     aSrc: item.guideUrl,
                                     aId: item.resource_id
                                 }
                             });
                         }
+
+                        // 更新播放列表并播放
                         sessionStorage.setItem('playList', JSON.stringify(newPlayList));
                         this.playAudio({
                             _src: guideUrl,
                             _id: resource_id,
-                            _type: 4
+                            _type: 3
                         });
                     }
-                }else{
+                }else{ // 之前是播放状态则暂停
                     this.pauseAudio();
                 }
             },
@@ -1521,7 +1520,7 @@
                     let playStatus = {
                         currentTime: document.querySelector('.main-audio').currentTime,
                         totalTime: this.totalTime,
-                        status : status
+                        isPauseStatus : status
                     }
                     sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
                 }
@@ -1554,7 +1553,7 @@
                     let myIcon = L.divIcon({html:'<div data-id="'+v.resourceId+'">'+ num +'</div>',className: 'point-serial'});
                     let marker_line = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                     this.markers_line.push(marker_line);
-                })
+                });
             }
         }
     }
