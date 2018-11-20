@@ -133,7 +133,7 @@ export default {
 
                 this.isShowLoading = false;
                 let descOrder = res.response.identify_results.sort((a, b) => b.probability - a.probability);
-                if (descOrder[0].probability.toFixed(2) >= 0.45) {
+                if (descOrder[0].probability.toFixed(2) >= 0.7) {
                     this.$router.push({
                         name: 'recognize-detail',
                         params: {
@@ -142,10 +142,9 @@ export default {
                     });
                 } else {
                     changeEvent.target.value = '';
-                    this.tipsText = '无法识别该图像！';
+                    this.tipsText = '无法识别该图像 ~';
                     this.isTips = true;
                 }
-                
             }
         }
     }

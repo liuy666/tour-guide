@@ -92,7 +92,7 @@ export default {
         }
     },
     created() {
-        this.setRouteName('scenic-line');
+        this.SETROUTENAME('scenic-line');
     },
     mounted() {
         const lineId = sessionStorage.getItem('lineId');
@@ -108,7 +108,7 @@ export default {
     }),
     methods: {
         ...mapMutations([
-            'setRouteName',
+            'SETROUTENAME',
             'removecurrentLine'
         ]),
         gotoMapLine(lineId) {

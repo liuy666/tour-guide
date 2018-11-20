@@ -156,7 +156,7 @@ export default {
         let pointList = JSON.parse(sessionStorage.getItem('pointList'));
         this.getList(pointList);
         this.sceneryId = this.$route.params.sceneryId;
-        this.setRouteName('scenic-spot');
+        this.SETROUTENAME('scenic-spot');
     },
     mounted() {
         const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
@@ -235,7 +235,7 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'setRouteName',
+            'SETROUTENAME',
             'pauseCurrentPlay'
         ]),
         selectOne(e) {

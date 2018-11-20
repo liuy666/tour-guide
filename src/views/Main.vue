@@ -480,7 +480,7 @@
                 </section>
                 <router-view></router-view>
                 <ul class="main_view_footer">
-                    <v-touch tag="li" v-for="menu in menuList" :key="menu.id" :data-mark="menu.mark" v-on:tap="gotoWhere(menu.mark, menu.value)">
+                    <v-touch tag="li" v-for="menu in menuList" :key="menu.id" :data-mark="menu.paramKey" v-on:tap="gotoWhere(menu.paramKey, menu.paramValue)">
                         <div>
                             <img :src="menu.graySrc" alt="" />
                         </div>
@@ -578,19 +578,13 @@
             Toast,
             Loading
         },
+        // 导航离开该组件的对应路由时调用 可以访问组件实例 `this`
         beforeRouteLeave(to, from, next){
-            if(to.name == "scenic-point-detail"){
-                this.$store.commit('setFromRouteName_detail', 'scenic-point-detail');
-            }
+            this.$store.commit('setFromRouteName_detail', to.name);
             next();
         },
+        // 在当前路由改变，但是该组件被复用时调用 可以访问组件实例 `this`
         beforeRouteUpdate (to, from, next) { 
-            if(to.name == "main"){
-                if(from.name == "scenic-line" && to.params.lineId){
-                    this.isShowMenu = false;
-                    this.drawLine(to.params.lineId);
-                }
-            }
             next();
         },
         created() {
@@ -812,8 +806,8 @@
             }
         },
         computed: mapState({
-            watchPause: state => state.app.pauseStatus,
-            watchLine: state => state.app.lineStatus
+            watchPause: state => state.app.pauseStatus, // 监听景点列表的暂停
+            watchLine: state => state.app.lineStatus // 监听取消路线选择
         }),
         watch: {
             watchPause(val) {
@@ -826,7 +820,7 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 50) {
+                if (val >= 5) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);
@@ -838,9 +832,11 @@
                     let currentId = au.dataset.id;
                     const currentAudioContainer = document.querySelector('.toolbars');
                     currentAudioContainer.removeChild(au);
-                    sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
-                    this.playEnd();
+                    sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
+                    this.playEnd(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                     this.isPlayed = false;
+
+                    // 如果开启了自动连播
                     if (this.isAuto) {
                         let next = this.getNext(currentId);
                         if (next) {
@@ -848,15 +844,15 @@
                             this.scenicPointName = next.nextPoint.name;
                             this.scenicPointId = next.nextPoint.resource_id;
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
-                            this.autoPlay();
+                            this.autoPlay(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                             this.playAudio({
                                 _src: next.nextPlay.aSrc,
                                 _id: next.nextPlay.aId,
                                 _type: 3
                             });
-                        } else {
-                            sessionStorage.setItem('playStatus', JSON.stringify({status: true}));
-                            this.playEnd();
+                        } else { // 表明播放列表已播完，则更改播放状态
+                            sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
+                            this.playEnd(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                         }
                     }
                 }
@@ -868,8 +864,7 @@
                     this.scenicPointImg = currentPoint.url;
                     this.scenicPointName = currentPoint.name;
                     this.scenicPointId = currentPoint.resource_id;
-                    this.isShowMenu = false;
-                    
+    
                     this.getMarkerIndex();
                     this.markers[this.indexOfMarkers].openPopup();
                     
@@ -878,8 +873,15 @@
                         _id: to.params.pid,
                         _type: 3
                     });
+                    this.isShowMenu = false;
                 }
                 if (from.name === 'scenic-resource' && to.name === 'main' && to.params.rid) {
+                    this.getMarkerIndex();
+                    this.markers[this.indexOfMarkers].openPopup();
+                    this.isShowMenu = false;
+                }
+                if(from.name == "scenic-line" && to.name == "main" && to.params.lineId){
+                    this.drawLine(to.params.lineId);
                     this.isShowMenu = false;
                 }
             }
@@ -907,11 +909,12 @@
                 //     debugger
                 // })
             },
-            getNext(lastId) {
+            // 获取下一个播放链接
+            getNext(currentId) {
                 const playList = JSON.parse(sessionStorage.getItem('playList'));
-                let index = playList.findIndex(item => item.aId === lastId);
+                const index = playList.findIndex(item => item.aId === currentId);
 
-                if (index + 1 === playList.length) {
+                if (index + 1 === playList.length) { // 如果上一个播放的已经是最后一个
                     return false;
                 } else {
                     const pointList = JSON.parse(sessionStorage.getItem('pointList'));
@@ -965,11 +968,11 @@
                     colorSrcList = [];
                 getListAndWheather[0].menue.forEach(item => {
                     menuList.push({
-                        name: item.remark,
-                        id: item.id,
-                        mark: item.paramKey,
-                        graySrc: item.iconUrl1,
-                        value: item.paramValue
+                        name: item.remark, // 菜单名称
+                        id: item.id, // 菜单id
+                        paramKey: item.paramKey, // 菜单类型 -- key 如:'resource_point'
+                        graySrc: item.iconUrl1, // 灰色图标
+                        paramValue: item.paramValue // 菜单类型 -- value 如: '1'
                     });
                     colorSrcList.push({
                         mark: item.paramKey,
@@ -989,14 +992,15 @@
                         }
                     }
                 });
-                this.setRouteName('scenic-spot');
+                this.SETROUTENAME('scenic-spot');
                 this.isShowLoading = false;
             },
             // 打开图标菜单
             openMenu() {
                 const routeName = this.$store.state.app.routeName;
                 if (!this.isShowMenu) {
-                    // 默认跳转到景点列表
+                    // 默认跳转到景点列表并关闭当前其他弹窗
+                    this.oMap_main.closePopup();
                     if (routeName === 'scenic-spot') {
                         this.$router.push({
                             name: 'scenic-spot',
@@ -1006,10 +1010,7 @@
                         });
                     } else if (routeName === 'scenic-line') {
                         this.$router.push({
-                            name: 'scenic-line',
-                            params: {
-
-                            }
+                            name: 'scenic-line'
                         });
                     } else {
                         this.$router.push({
@@ -1028,20 +1029,22 @@
                 }
             },
             // 点击图标加载对应景区资源
-            gotoWhere(remark, value) {
-                const lis = document.querySelectorAll('.main_view_footer li'),
-                      colorSrcList = JSON.parse(sessionStorage.getItem('colorSrcList'));
+            gotoWhere(paramKey, paramValue) {
+
+                // 点击图标更改为有色图标
+                const lis = document.querySelectorAll('.main_view_footer li');
+                const colorSrcList = JSON.parse(sessionStorage.getItem('colorSrcList'));
                 for (let li of lis) {
-                    if (li.dataset.mark !== remark) {
+                    if (li.dataset.mark !== paramKey) {
                         li.firstElementChild.children[0].src = colorSrcList.filter(item => item.mark === li.dataset.mark)[0].graySrc;
                     } else {
                         li.firstElementChild.children[0].src = colorSrcList.filter(item => item.mark === li.dataset.mark)[0].colorSrc;
                     }
                 }
                 this.removeMarker(1);
-                switch (remark) {
+                switch (paramKey) {
                     case 'resource_point':
-                        this.getScenicPointList(value);
+                        this.getScenicPointList(paramValue);
                         if(this.markers_line.length>0){
                             this.removeMarker(2);
                             this.line.remove();
@@ -1068,16 +1071,16 @@
                         this.$router.push({name: 'scenic-line'});
                         break;
                     default:
-                        this.getScenicPointList(value);
+                        this.getScenicPointList(paramValue);
                         if(this.markers_line.length>0){
                             this.removeMarker(2);
                             this.line.remove();
                         }
-                        sessionStorage.setItem('currentResource', remark);
+                        sessionStorage.setItem('currentResource', paramKey);
                         this.$router.push({
                             name: 'scenic-resource',
                             params: {
-                                type: remark
+                                type: paramKey
                             }
                         });
                         break;
@@ -1087,8 +1090,8 @@
                 'getLineList'
             ]),
             ...mapMutations([
-                'saveResourceList',
-                'setRouteName', // 更改路由name
+                'SAVERESOURCELIST',
+                'SETROUTENAME', // 更改路由name
                 'startCurrentPlay', // 开始播放
                 'autoPlay', // 自动连播
                 'playEnd' // 播放结束
@@ -1349,7 +1352,7 @@
                             }
                         }
                     } else {
-                        this.saveResourceList(res.page.list); // commit mutation 保存其他资源列表
+                        this.SAVERESOURCELIST(res.page.list); // commit mutation 保存其他资源列表
                     }
 
                     //地图画点

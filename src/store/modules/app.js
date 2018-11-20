@@ -15,21 +15,26 @@ const app = {
         lineStatus: ''
     },
     mutations: {
-        getLineList(state, list) {
+        // 保存路线列表
+        GETLINELIST(state, list) {
             state.lineList = list;
         },
-        saveResourceList(state, rlist) {
+        // 保存资源列表
+        SAVERESOURCELIST(state, rlist) {
             state.resourceList = rlist;
             sessionStorage.setItem('otherPointList', JSON.stringify(rlist));
         },
-        saveContent(state, val) {
+        // 保存消息详情内容
+        SAVECONTENT(state, val) {
             state.content = val;
             sessionStorage.setItem('msgContent', val);
         },
-        initContent(state) {
+        // 初始化设置消息详情内容
+        INITCONTENT(state) {
             state.content = sessionStorage.getItem('msgContent');
         },
-        setRouteName(state, val) {
+        // 设置当前所在路由的名字 用于区分景点/路线/其他资源点
+        SETROUTENAME(state, val) {
             state.routeName = val;
             sessionStorage.setItem('routeName', val);
         },
@@ -40,7 +45,8 @@ const app = {
         startCurrentPlay(state, val) {
             state.playStatus = val;
         },
-        setFromRouteName(state, val) {
+        // 设置当前路由的上一个路由的名字 用于区分是普通页面刷新/其他页面回退
+        SETFROMROUTENAME(state, val) {
             state.fromRouteName = val;
         },
         setFromRouteName_detail(state, val) {
@@ -71,7 +77,7 @@ const app = {
                 _this.isShowLoading = false;
                 return;
             }
-            commit('getLineList', lineList.page.list);
+            commit('GETLINELIST', lineList.page.list);
             sessionStorage.setItem('lineList', JSON.stringify(lineList.page.list));
             _this.isShowLoading = false;
         },
