@@ -1084,6 +1084,7 @@
                 switch (paramKey) {
                     case 'resource_point':
                         this.getScenicPointList(paramValue);
+                        this.changeMapIcon(this.isPlayed);
                         if(this.markers_line.length>0){
                             this.removeMarker(2);
                             this.line.remove();
@@ -1254,7 +1255,7 @@
                 this.changeMapIcon(false);
             },
             // 改变地图图标交互效果 
-            changeMapIcon (isPlay) {
+            changeMapIcon (isPlay) { debugger
                 this.getMarkerIndex();
                 let ind = this.indexOfMarkers;
                 if(!this.markers[ind]._icon.children[0]){
