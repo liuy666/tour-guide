@@ -12,8 +12,7 @@ const app = {
         playEnd: false,
         fromRouteName: '',
         fromRouteName_detail: '',
-        lineStatus: '',
-        toRouteNameOfMenu: ''
+        lineStatus: ''
     },
     mutations: {
         // 保存路线列表
@@ -64,10 +63,6 @@ const app = {
         // 监听播放结束
         playEnd(state) {
             state.playEnd = !state.playEnd;
-        },
-        // 设置即将前往的路由名字
-        SETTOROUTENAMEOFMENU(state, val) {
-            state.toRouteNameOfMenu = val;
         }
     },
     actions: {

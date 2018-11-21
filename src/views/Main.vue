@@ -588,7 +588,6 @@
         },
         // 在当前路由改变，但是该组件被复用时调用 可以访问组件实例 `this`
         beforeRouteUpdate (to, from, next) { 
-            // console.log(from, to)
             next();
         },
         created() {
@@ -930,28 +929,25 @@
             },
 
             getCurrentPosition() { 
-                this.oMap_main.locate({
-                    setView: true,
-                    maxZoom: 19,
-                    timeout:50000
-                })
+                this.oMap_main.locate();
                 this.oMap_main.on('locationfound', function(e) {
                     alert("cg")
                     var radius = e.accuracy / 2;
                     L.marker(e.latlng).addTo(this.oMap_main).bindPopup("你就在这个圈内");
                     L.circle(e.latlng, radius).addTo(this.oMap_main);
                 });
+                
                 this.oMap_main.on('locationerror', function(e) { 
                     alert('2222')
                     console.log('定位出错=====>', e);
                 });
 
-                var myOptions = {
-                    enableHighAccuracy: true,
-                    timeout: 30000,
-                    maximumAge: 0
-                };
-                navigator.geolocation.getCurrentPosition(this.updateLocation, this.handleLocationError, myOptions);
+                // var myOptions = {
+                //     enableHighAccuracy: true,
+                //     timeout: 30000,
+                //     maximumAge: 0
+                // };
+                // navigator.geolocation.getCurrentPosition(this.updateLocation, this.handleLocationError, myOptions);
             },
             // 获取下一个播放链接
             getNext(currentId) {
@@ -1090,19 +1086,48 @@
                 this.removeMarker(1);
                 switch (paramKey) {
                     case 'resource_point':
-                        this.SETTOROUTENAMEOFMENU(paramKey);
+                        if(this.markers_line.length>0){
+                            this.removeMarker(2);
+                            this.line.remove();
+                        }
+                        this.$router.push({
+                            name: 'scenic-spot',
+                            params: {
+                                sceneryId: this.sceneryId
+                            }
+                        });
                         this.getScenicPointList({
                             resourceType: 1
                         });
                         break;
                     case 'resource_line':
-                        this.SETTOROUTENAMEOFMENU(paramKey);
+                        if(this.markers_line.length>0){
+                            this.markers_line.forEach(v =>  {
+                                v.addTo(this.oMap_main);
+                            })
+                            this.line.addTo(this.oMap_main);
+                        }
+                        this.getLineList({
+                            _this: this,
+                            sceneryId: this.sceneryId
+                        });
+                        this.$router.push({name: 'scenic-line'});
                         this.getScenicPointList({
                             resourceType: 1
                         });
                         break;
                     default:
-                        this.SETTOROUTENAMEOFMENU('scenic_resource');
+                        if(this.markers_line.length>0){
+                            this.removeMarker(2);
+                            this.line.remove();
+                        }
+                        sessionStorage.setItem('currentResource', paramKey);
+                        this.$router.push({
+                            name: 'scenic-resource',
+                            params: {
+                                type: paramKey
+                            }
+                        });
                         this.getScenicPointList({
                             resourceType: paramValue,
                             paramKey
@@ -1353,7 +1378,7 @@
                                 _type: 4
                             });
                         } else { 
-                            if (!fromRouteName) { // 如果是刷新后初始化页面
+                            if (fromRouteName === 'root') { // 如果是刷新后初始化页面
                                 console.log(999999)
                                 const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
 
@@ -1363,7 +1388,6 @@
                                 sessionStorage.removeItem('currentResource');
                                 sessionStorage.removeItem('lineList');
                                 sessionStorage.removeItem('lineId');
-                                // sessionStorage.removeItem('toRouteNameOfMenu');
      
                                 // 存储完整景点列表和当前景点信息(取第一个景点) 
                                 sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
@@ -1427,46 +1451,6 @@
                             _src: guideUrl,
                             _id: resource_id,
                             _type: 2 
-                        });
-                    }
-
-                    const toRouteNameOfMenu = this.$store.state.app.toRouteNameOfMenu;
-                    if (toRouteNameOfMenu === 'resource_point') {debugger
-                        if(this.markers_line.length>0){
-                            this.removeMarker(2);
-                            this.line.remove();
-                        }
-                        this.$router.push({
-                            name: 'scenic-spot',
-                            params: {
-                                sceneryId: this.sceneryId
-                            }
-                        });
-                    }
-                    if (toRouteNameOfMenu === 'resource_line') {debugger
-                        if(this.markers_line.length>0){
-                            this.markers_line.forEach(v =>  {
-                                v.addTo(this.oMap_main);
-                            })
-                            this.line.addTo(this.oMap_main);
-                        }
-                        this.getLineList({
-                            _this: this,
-                            sceneryId: this.sceneryId
-                        });
-                        this.$router.push({name: 'scenic-line'});
-                    }
-                    if (toRouteNameOfMenu === 'resource_resource') {debugger
-                        if(this.markers_line.length>0){
-                            this.removeMarker(2);
-                            this.line.remove();
-                        }
-                        sessionStorage.setItem('currentResource', arg.paramKey);
-                        this.$router.push({
-                            name: 'scenic-resource',
-                            params: {
-                                type: paramKey
-                            }
                         });
                     }
                 }
