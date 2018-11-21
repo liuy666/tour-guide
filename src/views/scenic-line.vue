@@ -103,13 +103,18 @@ export default {
             }
         }
     },
+    beforeRouteLeave (to, from , next) {
+        this.SETFROMROUTENAME('scenic-line');
+        next();
+    },
     computed: mapState({
         lines: state => state.app.lineList,
     }),
     methods: {
         ...mapMutations([
             'SETROUTENAME',
-            'REMOVECURRENTLINE'
+            'REMOVECURRENTLINE',
+            'SETFROMROUTENAME'
         ]),
         gotoMapLine(lineId) {
             const imgs = document.querySelectorAll('.img-right img');
