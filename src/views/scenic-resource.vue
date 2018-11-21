@@ -67,12 +67,17 @@ export default {
     created() {
         this.SETROUTENAME('scenic-resource');
     },
+    beforeRouteLeave (to, from , next) {
+        this.SETFROMROUTENAME('scenic-resource');
+        next();
+    },
     computed: mapState({
         resourceList: state => state.app.resourceList
     }),
     methods: {
         ...mapMutations([
-            'SETROUTENAME'
+            'SETROUTENAME',
+            'SETFROMROUTENAME'
         ]),
         selectOne(e) {
             const lis = document.querySelectorAll('ul li');

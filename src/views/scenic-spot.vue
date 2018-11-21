@@ -179,6 +179,10 @@ export default {
             }
         }        
     },
+    beforeRouteLeave (to, from , next) {
+        this.SETFROMROUTENAME('scenic-spot');
+        next();
+    },
     computed: mapState({
         watchPlay: state => state.app.playStatus,
         watchAutoPlay: state => state.app.autoPlay,
@@ -236,7 +240,8 @@ export default {
     methods: {
         ...mapMutations([
             'SETROUTENAME',
-            'pauseCurrentPlay'
+            'pauseCurrentPlay',
+            'SETFROMROUTENAME'
         ]),
         selectOne(e) {
             const lis = document.querySelectorAll('.spot-list li');
