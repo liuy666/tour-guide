@@ -36,7 +36,7 @@
     <div id="scenic-resource">
         <section class="resource-list">
             <ul>
-                <li v-for="res of resourceList" :key="res.resource_id" :data-rid="res.resource_id" @click="selectOne">
+                <v-touch tag="li" v-for="res of resourceList" :key="res.resource_id" :data-rid="res.resource_id" @tap="selectOne">
                     <div :data-rid="res.resource_id">
                         <img v-if="res.url" style="border-radius: 10px;" :data-rid="res.resource_id" :src="res.url" alt="加载中..." />
                         <img v-else-if="res.resource_type === 7" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_stop@3x.png" alt="加载中..." />
@@ -49,7 +49,7 @@
                         <img v-else-if="res.resource_type === 6" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_toilet@3x.png" alt="加载中..." />
                     </div>
                     <span :data-rid="res.resource_id">{{res.name}}</span>
-                </li>
+                </v-touch>
             </ul>
         </section> 
     </div>

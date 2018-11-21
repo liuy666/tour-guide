@@ -203,10 +203,10 @@
         </section>
         <section class="point-list-area">
             <ul class="point-list">
-                <li v-for="(item,index) in pointList" :key="index" @click="changePointInfo(index,true,$event)">
+                <v-touch tag="li" v-for="(item,index) in pointList" :key="index" @tap="changePointInfo(index,true,$event)">
                     <div class="point-list-img"><img :src="item.url" style="width:100%;height:100%;border-radius:50%;" /></div>
                     <div class="point-list-name" :class="item.resource_id == currentPointId ? 'current' : ''" >{{item.name}}</div>
-                </li>
+                </v-touch>
             </ul>
         </section>
     </div>

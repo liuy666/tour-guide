@@ -101,8 +101,7 @@
                                     <span>{{ msg.date2 }}</span>
                                     <span>{{ msg.date3 }}</span>
                                 </p>
-                                <!-- <router-link :to="{ name: 'msg-detail', params: }">阅读全文</router-link> -->
-                                <a href="#" @click.prevent="gotoMsgDetail({ content: msg.content, msgId: msg.id, msgTitle: msg.title })">阅读全文</a>
+                                <v-touch tag="a" href="#" @tap.prevent="gotoMsgDetail({ content: msg.content, msgId: msg.id, msgTitle: msg.title })">阅读全文</v-touch>
                             </section>
                         </dd>
                     </dl>

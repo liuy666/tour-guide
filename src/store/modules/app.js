@@ -52,7 +52,8 @@ const app = {
         setFromRouteName_detail(state, val) {
             state.fromRouteName_detail = val;
         },
-        removecurrentLine(state) {
+        // 移除当前选中路线
+        REMOVECURRENTLINE(state) {
             state.lineStatus = !state.lineStatus;
         },
         // 监听自动播

@@ -107,16 +107,16 @@
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <section class="seach">
             <input type="text" placeholder="请输入景点名称" v-model="val" />
-            <section class="img-32-34">
-                <img src="../assets/images/icon_so@2x.png" alt="" @click="searchInput" />
-            </section>
-            <section class="img-34-34">
-                <img src="../assets/images/icon_close@2x.png" alt="" @click="clearInput" />
-            </section>
+            <v-touch tag="section" class="img-32-34" @tap="searchInput">
+                <img src="../assets/images/icon_so@2x.png" alt="加载中..."/>
+            </v-touch>
+            <v-touch tag="section" class="img-34-34"  @tap="clearInput">
+                <img src="../assets/images/icon_close@2x.png" alt="加载中..." />
+            </v-touch>
         </section>
         <section class="spot-list">
             <ul class="list">
-                <li v-for="point of pointsList" :key="point.id" :data-pid="point.id" @click="selectOne">
+                <v-touch tag="li" v-for="point of pointsList" :key="point.id" :data-pid="point.id" @tap="selectOne">
                     <section class="img-left" :data-pid="point.id">
                         <div :data-pid="point.id">
                             <img v-if="point.src" style="border-radius: 10px;" :data-pid="point.id" :src="point.src" alt="加载中..." />
@@ -130,7 +130,7 @@
                             <img :data-pid="point.id" class="play" src="../assets/images/icon_big_play@2x.png" alt="加载中..." />
                         </div>
                     </section>
-                </li>
+                </v-touch>
             </ul>
         </section>
     </div>

@@ -63,7 +63,7 @@
     <div id="scenic-line">
         <section class="line-list">
             <ul>
-                <li v-for="line of lines" :key="line.lineId" @click="gotoMapLine(line.lineId)">
+                <v-touch tag="li" v-for="line of lines" :key="line.lineId" @tap="gotoMapLine(line.lineId)">
                     <section class="img-left">
                         <div>
                             <img style="border-radius: 10px;" src="../assets/images/bg_select@3x.png" alt="加载中..." />
@@ -78,7 +78,7 @@
                             <img :data-lineid="line.lineId" src="../assets/images/icon_select@2x.png" alt="加载中..." />
                         </div>
                     </section>
-                </li>
+                </v-touch>
             </ul>
         </section> 
     </div>
@@ -109,7 +109,7 @@ export default {
     methods: {
         ...mapMutations([
             'SETROUTENAME',
-            'removecurrentLine'
+            'REMOVECURRENTLINE'
         ]),
         gotoMapLine(lineId) {
             const imgs = document.querySelectorAll('.img-right img');
@@ -117,7 +117,8 @@ export default {
                 if (img.dataset.lineid === lineId) {
                     if (img.style.display === 'block') {
                         img.style.display = 'none';
-                        this.removecurrentLine();
+                        sessionStorage.removeItem('lineId');
+                        this.REMOVECURRENTLINE();
                     } else {
                         sessionStorage.setItem('lineId', lineId);
                         img.style.display = 'block';

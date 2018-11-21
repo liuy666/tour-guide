@@ -119,7 +119,7 @@
                     margin: 0 29px 0 30px;
                     border-top: 1px solid #f8f8f8;
                     li {
-                        margin-right: 54px;
+                        margin-right: 10px;
                         display: flex;
                         flex-direction: column;
                         justify-content: center;

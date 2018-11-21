@@ -87,7 +87,7 @@
 <template>
     <div id="home">
         <section id="wrapper_home"></section>
-        <section class="msg-70-70" :class="[isHasMsg ? 'has' : 'no']" @click="gotoMsgList"></section>
+        <v-touch tag="section" class="msg-70-70" :class="[isHasMsg ? 'has' : 'no']" v-on:tap="gotoMsgList"></v-touch>
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
     </div>
 </template>
