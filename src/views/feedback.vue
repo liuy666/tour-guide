@@ -161,7 +161,7 @@
                 <span>电话号码</span>
                 <input v-model.trim="yourTel" type="text" placeholder="请留下你您的电话号码" @input="validateTel" @blur="validateLength" class="border-bottom-1"/>
             </div>
-            <v-touch tag="button" class="submit-upload" @tap.prevent="handleSubmit">提交反馈</v-touch tag="button">
+            <v-touch tag="button" class="submit-upload" @tap.prevent="handleSubmit">提交反馈</v-touch>
         </form>
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
     </div>

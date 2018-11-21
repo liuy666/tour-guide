@@ -296,12 +296,13 @@ export default {
             }
             if(!isChange){//进页面的初始化
                 const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
+                debugger
                 if(playStatus){
                     let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0),
                         tm = (playStatus.totalTime%60).toFixed(0) < 10 ? '0'+(playStatus.totalTime%60).toFixed(0) : (playStatus.totalTime%60).toFixed(0);
                     this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
                     this.totalTimeStr = Math.floor(playStatus.totalTime/60) + ":" + tm;
-                    this.isPlayed = playStatus.isPauseStatus;
+                    //this.isPlayed = !playStatus.isPauseStatus;
                     audioDom.currentTime = playStatus.currentTime;
                     if(!playStatus.isPauseStatus){//播放状态
                         this.isPlayed = true;

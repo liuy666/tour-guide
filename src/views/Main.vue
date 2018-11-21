@@ -455,6 +455,7 @@
 
 <template>
     <div id="main">
+        <section id="map_test"></section>
         <!-- 网络请求loading层 -->
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <!-- 地图容器 -->
@@ -664,11 +665,27 @@
             if (zoom > 17) maxZoom = 19;
             if (zoom > 19) zoom = 19;
             
+            let _self = this;
+
+            let map_test = new AMap.Map('map_test', {
+                showBuildingBlock: true,
+                pitchEnable: false,
+                buildingAnimation: true,
+                rotateEnable: false,
+                touchZoomCenter: 1,
+                center: centerPoint,
+                zoom: 10,
+                zooms:[10,14],
+                layers: [
+                    new AMap.TileLayer()
+                ]
+            });
+
             // 获取当前地图定位
-            /*var options = {
+            var options = {
                 'showButton': true,//是否显示定位按钮
                 'buttonPosition': 'LB',//定位按钮的位置
-                'buttonOffset': new AMap.Pixel(15, 93),//定位按钮距离对应角落的距离
+                'buttonOffset': new AMap.Pixel(15, 23),//定位按钮距离对应角落的距离
                 'showMarker': true,//是否显示定位点
                 'markerOptions':{//自定义定位点样式，同Marker的Options
                     'offset': new AMap.Pixel(-18, -36),
@@ -687,7 +704,8 @@
             }
             AMap.plugin(["AMap.Geolocation"], function() {
                 var geolocation = new AMap.Geolocation(options);
-                _self.oMap_main.addControl(geolocation);
+                _self.geolocation = geolocation;
+                map_test.addControl(geolocation);
                 //geolocation.getCurrentPosition()
                 geolocation.on('complete',function(GeolocationResult) {
                     let cp = GeolocationResult.position;
@@ -699,9 +717,13 @@
                     }
                     //document.querySelector(".currentPosition").value = GeolocationResult.position;
                 })
-            });*/
+                geolocation.on('error',function(){
+                    _self.isTips = true;
+                    _self.tipsText = "定位失败";
+                })
+            });
 
-            let _self = this;
+            
             // 实例化地图
             let oMap = L.map("wrapper", {
                 center: centerPoint,//centerPoint,[30.5829110000,104.0637260000]
@@ -737,6 +759,7 @@
         },
         data () {
             return {
+                geolocation:{},
                 longlati: '', // 当前定位经纬度坐标
                 sceneryId: '', // 当前景区id
                 scenicImg: '', // 景区简介弹窗--图片
@@ -930,28 +953,31 @@
             },
 
             getCurrentPosition() { 
-                this.oMap_main.locate({
-                    setView: true,
-                    maxZoom: 19,
-                    timeout:50000
-                })
-                this.oMap_main.on('locationfound', function(e) {
-                    alert("cg")
-                    var radius = e.accuracy / 2;
-                    L.marker(e.latlng).addTo(this.oMap_main).bindPopup("你就在这个圈内");
-                    L.circle(e.latlng, radius).addTo(this.oMap_main);
-                });
-                this.oMap_main.on('locationerror', function(e) { 
-                    alert('2222')
-                    console.log('定位出错=====>', e);
-                });
+                this.geolocation.getCurrentPosition()
+                // console.dir(L)
+                // return
+                // this.oMap_main.locate({
+                //     setView: true,
+                //     maxZoom: 19,
+                //     timeout:50000
+                // })
+                // this.oMap_main.on('locationfound', function(e) {
+                //     alert("cg")
+                //     var radius = e.accuracy / 2;
+                //     L.marker(e.latlng).addTo(this.oMap_main).bindPopup("你就在这个圈内");
+                //     L.circle(e.latlng, radius).addTo(this.oMap_main);
+                // });
+                // this.oMap_main.on('locationerror', function(e) { 
+                //     alert('2222')
+                //     console.log('定位出错=====>', e);
+                // });
 
-                var myOptions = {
-                    enableHighAccuracy: true,
-                    timeout: 30000,
-                    maximumAge: 0
-                };
-                navigator.geolocation.getCurrentPosition(this.updateLocation, this.handleLocationError, myOptions);
+                // var myOptions = {
+                //     enableHighAccuracy: true,
+                //     timeout: 30000,
+                //     maximumAge: 0
+                // };
+                // navigator.geolocation.getCurrentPosition(this.updateLocation, this.handleLocationError, myOptions);
             },
             // 获取下一个播放链接
             getNext(currentId) {
