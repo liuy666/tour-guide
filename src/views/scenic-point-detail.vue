@@ -296,7 +296,7 @@ export default {
             }
             if(!isChange){//进页面的初始化
                 const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
-                debugger
+                
                 if(playStatus){
                     let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0),
                         tm = (playStatus.totalTime%60).toFixed(0) < 10 ? '0'+(playStatus.totalTime%60).toFixed(0) : (playStatus.totalTime%60).toFixed(0);

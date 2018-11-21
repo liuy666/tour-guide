@@ -900,7 +900,7 @@
                     this.scenicPointName = currentPoint.name;
                     this.scenicPointId = currentPoint.resource_id;
     
-                    this.getMarkerIndex();
+                    this.getMarkerIndex(to.params.pid);
                     this.markers[this.indexOfMarkers].openPopup();
                     
                     this.playAudio({
@@ -911,7 +911,7 @@
                     this.isShowMenu = false;
                 }
                 if (from.name === 'scenic-resource' && to.name === 'main' && to.params.rid) {
-                    this.getMarkerIndex();
+                    this.getMarkerIndex(to.params.rid);
                     this.markers[this.indexOfMarkers].openPopup();
                     this.isShowMenu = false;
                 }
@@ -1295,7 +1295,7 @@
             },
             // 改变地图图标交互效果 
             changeMapIcon (isPlay) { 
-                this.getMarkerIndex();
+                this.getMarkerIndex(false);
                 let ind = this.indexOfMarkers;
                 if(!this.markers[ind]._icon.children[0]){
                     return false;
@@ -1318,9 +1318,15 @@
                 return true;
             },
             // 找某个点标记在this.markers中的位置
-            getMarkerIndex() {
+            getMarkerIndex(id) {
                 //获取当前点的id
-                let currentId = JSON.parse(sessionStorage.getItem("currentPoint")).resource_id;
+                let currentId = "";
+                if(!id){
+                    currentId = JSON.parse(sessionStorage.getItem("currentPoint")).resource_id;
+                }else{ 
+                    currentId = id;
+                }
+                
                 this.markers.forEach((item,index) => { 
                     if(item._icon.children[0].dataset.id == currentId){
                         this.indexOfMarkers = index;
