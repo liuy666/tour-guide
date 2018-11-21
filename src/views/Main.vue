@@ -209,9 +209,10 @@
                 }
             }
             .scenic-point-name-area{
-                width: 300px;
+                width: 270px;
                 height: 100px;
                 line-height: 100px;
+                padding: 0 0 0 10px;
                 text-align: center;
                 margin-top: 24px;
                 background: url('../assets/images/icon_down@3x.png') no-repeat 50% 80px;
@@ -219,10 +220,12 @@
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                box-sizing: border-box;
             }
             .list-btn{
                 width: 44px;
                 height: 100px;
+                padding: 0 14px;
                 margin-top: 24px;
                 background: url('../assets/images/icon_list@3x.png') no-repeat center center / 32px 26px;
             }
@@ -697,6 +700,7 @@
                 })
             });*/
 
+            let _self = this;
             // 实例化地图
             let oMap = L.map("wrapper", {
                 center: centerPoint,//centerPoint,[30.5829110000,104.0637260000]
@@ -718,8 +722,8 @@
 
             oMap.on('click',function(e) {
                 //console.log(e.latlng);
-                this.isShowMenu = false;
-                this.isOpenDetail = false;
+                _self.isShowMenu = false;
+                _self.isOpenDetail = false;
             })
             // 获取默认景点列表
             this.getScenicPointList(1, query);
@@ -824,10 +828,11 @@
             },
             // 播放进度监听
             audioPercent(val) {
-                if (val >= 10) {
+                if (val >= 40) {
                     const au = document.querySelector('.main-audio');
                     clearInterval(this.timer);
                     this.changeMapIcon(false);
+                    this.oMap_main.closePopup();
                     if (!au.paused || !au.ended) {
                         au.pause();
                     }
@@ -891,7 +896,7 @@
             }
         },    
         methods: {
-            updateLocation(position) { debugger
+            updateLocation(position) { 
                 var latitude = position.coords.latitude; 
                 var longitude = position.coords.longitude; 
                 var accuracy = position.coords.accuracy; 
@@ -991,7 +996,7 @@
                 }
 
                 // 初始化天气
-                this.temp = getListAndWheather[1].data.temperature + '℃';
+                this.temp = getListAndWheather[1].data.temperature;
                 this.AQI = getListAndWheather[1].data.airIndex;
                 this.weather = getListAndWheather[1].data.skycon;
                 this.weatherImg = getListAndWheather[1].data.iconUrl;
@@ -1034,6 +1039,7 @@
                 if (!this.isShowMenu) {
                     // 默认跳转到景点列表并关闭当前其他弹窗
                     this.oMap_main.closePopup();
+                    this.isOpenDetail = false;
                     if (routeName === 'scenic-spot') {
                         this.$router.push({
                             name: 'scenic-spot',
@@ -1311,6 +1317,8 @@
             // 打开/关闭景区详情弹窗
             seeIntroduce() {
                 this.isOpenDetail = !this.isOpenDetail;
+                this.oMap_main.closePopup();
+                this.isShowMenu = false;
             },
             // 自动连播切换
             changeAuto() {
@@ -1402,8 +1410,10 @@
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                       .bindPopup(infoContent,{className:"info-content-new"})
                                       .on('click',() => { 
-                                         this.mapClickPointId = v.resource_id;
-                                         if(document.querySelector(".info-scenic-btns")){
+                                        this.isShowMenu = false;
+                                        this.isOpenDetail = false;
+                                        this.mapClickPointId = v.resource_id;
+                                        if(document.querySelector(".info-scenic-btns")){
                                             if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId === v.resource_id){
                                                 document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
                                             }else{
