@@ -223,12 +223,12 @@ export default {
             for (let li of lis) {
                 if (li.dataset.pid === currPoint.resource_id) {
                     li.style.backgroundColor = '#f0f0f0';
-                    li.children[1].children[0].style.display = 'block';
-                    li.children[1].children[1].style.display = 'none';
+                    li.children[1].children[0].children[0].style.display = 'block';
+                    li.children[1].children[0].children[1].style.display = 'none';
                 } else {
                     li.style.backgroundColor = '#fff';
-                    li.children[1].children[0].style.display = 'block';
-                    li.children[1].children[1].style.display = 'none';
+                    li.children[1].children[0].children[0].style.display = 'block';
+                    li.children[1].children[0].children[1].style.display = 'none';
                 }
             }
         }
