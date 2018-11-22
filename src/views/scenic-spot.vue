@@ -186,6 +186,7 @@ export default {
     }),
     watch: {
         watchPlay(val) {
+            console.log('spot--------------')
             const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
             const lis = document.querySelectorAll('.spot-list li');
             for (let li of lis) {
@@ -267,7 +268,7 @@ export default {
                             }
                         });
                         sessionStorage.setItem('playList', JSON.stringify(newPlayList));
-                        this.$router.push({
+                        this.$router.replace({
                             name: 'main',
                             params: {
                                 pid: li.dataset.pid

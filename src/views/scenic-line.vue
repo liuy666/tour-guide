@@ -122,7 +122,7 @@ export default {
                     } else {
                         sessionStorage.setItem('lineId', lineId);
                         img.style.display = 'block';
-                        this.$router.push({
+                        this.$router.replace({
                             name: 'main',
                             params: {
                                 lineId

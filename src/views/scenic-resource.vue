@@ -79,7 +79,7 @@ export default {
             const lis = document.querySelectorAll('ul li');
             for (let li of lis) {
                 if (li.dataset.rid === e.target.dataset.rid) {
-                    this.$router.push({
+                    this.$router.replace({
                         name: 'main',
                         params: {
                             rid: li.dataset.rid

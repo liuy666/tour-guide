@@ -586,6 +586,9 @@
         // 导航离开该组件的对应路由时调用 可以访问组件实例 `this`
         beforeRouteLeave(to, from, next){
             this.$store.commit('setFromRouteName_detail', to.name);
+            if (this.timer) {
+                clearInterval(this.timer);
+            }
             next();
         },
         // 在当前路由改变，但是该组件被复用时调用 可以访问组件实例 `this`
@@ -749,7 +752,7 @@
 
             oMap.on('click',function(e) {
                 console.log(e);
-                _self.$router.push({
+                _self.$router.replace({
                     name: 'main'
                 });
                 //_self.oMap_main.closePopup();
@@ -1086,18 +1089,18 @@
                     this.oMap_main.closePopup();
                     this.isOpenDetail = false;
                     if (routeName === 'scenic-spot') {
-                        this.$router.push({
+                        this.$router.replace({
                             name: 'scenic-spot',
                             params: {
                                 sceneryId: this.sceneryId
                             }
                         });
                     } else if (routeName === 'scenic-line') {
-                        this.$router.push({
+                        this.$router.replace({
                             name: 'scenic-line'
                         });
                     } else {
-                        this.$router.push({
+                        this.$router.replace({
                             name: 'scenic-resource',
                             params: {
                                 type: sessionStorage.getItem('currentResource')
@@ -1106,7 +1109,7 @@
                     }
                     this.isShowMenu = true;
                 } else {
-                    this.$router.push({
+                    this.$router.replace({
                         name: 'main'
                     });
                     this.isShowMenu = false;
@@ -1133,7 +1136,7 @@
                             this.removeMarker(2);
                             this.line.remove();
                         }
-                        this.$router.push({
+                        this.$router.replace({
                             name: 'scenic-spot',
                             params: {
                                 sceneryId: this.sceneryId
@@ -1154,7 +1157,7 @@
                             _this: this,
                             sceneryId: this.sceneryId
                         });
-                        this.$router.push({name: 'scenic-line'});
+                        this.$router.replace({name: 'scenic-line'});
                         this.getScenicPointList({
                             resourceType: 1
                         });
@@ -1165,7 +1168,7 @@
                             this.line.remove();
                         }
                         sessionStorage.setItem('currentResource', paramKey);
-                        this.$router.push({
+                        this.$router.replace({
                             name: 'scenic-resource',
                             params: {
                                 type: paramKey
@@ -1254,9 +1257,12 @@
                 // 开始播放
                 if (isContinuePlay) {
                     const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
-                    
                     audioDom.oncanplay = (e) => { 
+                        console.log(1)
+                        console.log(audioDom.currentTime)
                         audioDom.currentTime = playStatus.currentTime;
+                        console.log(audioDom.currentTime)
+                        console.log(0)
                         let _audioDom = e.target;
                         this.totalTime = _audioDom.duration;
                         this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
@@ -1281,7 +1287,7 @@
                         this.totalTime = _audioDom.duration;
                         sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus : false}));
                         _audioDom.play();
-                        this.startCurrentPlay('play'); this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
+                        this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                         this.isPlayed = true;
                         if (this.isPlayed) {
                             this.changeMapIcon(true);
@@ -1428,7 +1434,7 @@
                                 _type: 4
                             });
                         } else { 
-                            if (fromRouteName === 'root') { // 如果是刷新后初始化页面
+                            if (fromRouteName === 'root' || fromRouteName === 'feedback') { // 如果是刷新后初始化页面或从反馈页回退的情况
                                 console.log(999999)
                                 const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
 

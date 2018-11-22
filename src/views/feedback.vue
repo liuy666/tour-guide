@@ -169,6 +169,7 @@
 
 <script>
 import { Toast } from 'vux';
+import {mapMutations} from 'vuex';
 export default {
     components: {
         Toast
@@ -184,12 +185,19 @@ export default {
             tipsText: '',
         }
     },
+    beforeRouteLeave (to, from , next) {
+        this.SETFROMROUTENAME('feedback');
+        next();
+    },
     computed: {
         entered() {
             return this.words;
         }
     },
     methods: {
+        ...mapMutations([
+            'SETFROMROUTENAME',
+        ]),
         // 点击添加图片
         async addImg(changeEvent) {
             // console.dir(changeEvent);
