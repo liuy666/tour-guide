@@ -37,9 +37,9 @@
                     text-align: center;
                 }
             }
-            .info-content-new{
-                bottom: 70px !important;
-            }
+            // .info-content-new{
+            //     bottom: 70px !important;
+            // }
             .leaflet-popup-content-wrapper{
                 padding: 0;
             }
@@ -197,7 +197,7 @@
                 if(scenicList.data && scenicList.data.length && scenicList.data.length>0){
                     sessionStorage.setItem('scenicList',JSON.stringify(scenicList.data));
                     scenicList.data.forEach((v,i) => {
-                        let myIcon = L.divIcon({html:'<div data-id="'+v.scenery_id+'"><div class="icon"></div><div class="name">'+v.name+'</div></div>',className: 'marker-content-new'});
+                        let myIcon = L.divIcon({html:'<div data-id="'+v.scenery_id+'"><div class="icon"></div><div class="name">'+v.name+'</div></div>',className: 'marker-content-new',popupAnchor: [0, -50]});
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_home)
                                      .bindPopup(_self.createInfoWindow(v),{className:"info-content-new"})
                                      .on('click',function(){

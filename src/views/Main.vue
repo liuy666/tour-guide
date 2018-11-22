@@ -339,7 +339,7 @@
             border-radius: 15px;
         }
         .info-content-new{
-            bottom: 70px !important;
+            // bottom: 70px !important;
         }
         .leaflet-popup-content-wrapper{
             padding: 0;
@@ -643,6 +643,8 @@
             // 获取屏幕大小 动态设置不同手机的地图zoom
             const containerWidth = document.querySelector('#wrapper').clientWidth;
             const containerHeight = document.querySelector('#wrapper').clientHeight;
+
+            this.bl = parseFloat((containerWidth/375).toFixed(2));
             
             // 地图缩放
             let zoom = 0,
@@ -731,6 +733,7 @@
                 maxZoom: 19,
                 attributionControl: false,
                 zoomControl: false,
+                closePopupOnClick:false,
                 maxBounds : [imgLeftBottom1, imgRightTop1],
                 maxBoundsViscosity : 0.8
             });
@@ -761,7 +764,8 @@
         },
         data () {
             return {
-                geolocation:{},
+                bl:0,//当前屏幕大小与375的比例 用于动态设置信息弹窗的偏移
+                geolocation:{},//定位对象
                 longlati: '', // 当前定位经纬度坐标
                 sceneryId: '', // 当前景区id
                 scenicImg: '', // 景区简介弹窗--图片
@@ -1378,8 +1382,8 @@
             /**
              * 地图相关方法
              * 请求景区资源列表
-             * @param {String} resourceType 资源类型
-             * @param {Object} query 扫码访问时的 query 参数对象  resourceType, query
+             * @param {Object} arg {resourceType, query} 资源类型
+             * @param {Object} query 扫码访问时的 query 参数对象
              */
             async getScenicPointList(arg) {
                 this.resourceType = arg.resourceType;
@@ -1457,7 +1461,8 @@
                                         <div class="icon ${className_resource}"></div>
                                         <div class="name">${v.name}</div>
                                     </div>`,
-                            className: 'marker-content-new'
+                            className: 'marker-content-new',
+                            popupAnchor: [0, -(42*this.bl)]
                         });
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                       .bindPopup(infoContent,{className:"info-content-new"})
