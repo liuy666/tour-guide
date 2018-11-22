@@ -633,7 +633,7 @@
             this.sceneryId = scenicInfo.scenery_id;
 
             // 获取地图初始化信息
-            const scenicBgImg = './dhk.jpg', // 图片图层
+            const scenicBgImg = './'+scenicInfo.file_name, // 图片图层
                   imgRightTop = [scenicInfo.northeast_lng,scenicInfo.northeast_lat], // 地图右上角
                   imgLeftBottom = [scenicInfo.southwest_lng,scenicInfo.southwest_lat], // 地图左下角
                   imgRightTop1 = [scenicInfo.northeast_lat,scenicInfo.northeast_lng], // 地图右上角
@@ -744,7 +744,7 @@
             //     minZoom: 17
             // }).addTo(oMap);
             
-            L.imageOverlay('./dhk.jpg', [imgLeftBottom1,imgRightTop1]).addTo(oMap);
+            L.imageOverlay(scenicBgImg, [imgLeftBottom1,imgRightTop1]).addTo(oMap);
             this.oMap_main = oMap;
 
             oMap.on('click',function(e) {

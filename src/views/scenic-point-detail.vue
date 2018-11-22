@@ -283,6 +283,8 @@ export default {
     methods : {
         //初始化音频
         setAudio(isChange) {
+            const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
+
             const audio = document.querySelector(".detail-audio");
             if(audio){
                 document.querySelector(".audio-area").removeChild(audio);
@@ -297,12 +299,17 @@ export default {
             audioDom.classList.add('detail-audio');
             audioDom.style.display = 'none';
             audioContainer.appendChild(audioDom);
-            audioDom.oncanplay = (e) => {
-                const _audioDom = e.target;
+            audioDom.oncanplay = (e) => { 
+                let _audioDom = e.target;
                 this.totalTime = _audioDom.duration;
                 let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
-
+                // if(!isChange && playStatus){
+                    // audioDom.currentTime = playStatus.currentTime;
+                    // this.currentTime = playStatus.currentTime;
+                    // let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
+                    // this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
+                // }
                 
             }
             audioDom.onplay = (e) => {
