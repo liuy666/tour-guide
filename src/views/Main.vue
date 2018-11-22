@@ -105,6 +105,7 @@
                                 font-size: 24px;
                                 line-height: 41px;
                                 animation: rollup 8s linear 1s  infinite;
+                                text-align: right;
                             }
                         }
                     }

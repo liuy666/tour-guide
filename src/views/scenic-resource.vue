@@ -47,6 +47,7 @@
                         <img v-else-if="res.resource_type === 10" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_doctor@3x.png" alt="加载中..." />
                         <img v-else-if="res.resource_type === 4" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_food@3x.png" alt="加载中..." />
                         <img v-else-if="res.resource_type === 6" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_toilet@3x.png" alt="加载中..." />
+                        <img v-else-if="res.resource_type === 11" style="border-radius: 10px;" :data-rid="res.resource_id" src="../assets/images/bg_else@3x.png" alt="加载中..." />
                     </div>
                     <span :data-rid="res.resource_id">{{res.name}}</span>
                 </li>
