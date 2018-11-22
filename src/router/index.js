@@ -19,12 +19,12 @@ router.beforeEach((to, from, next) => {
         console.log('A')
         vuex.commit('SETFROMROUTENAME', 'root');
     } else if (from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
-        console.log('B')
+        console.log('B');
         vuex.commit('SETFROMROUTENAME', from.name);
     } else if (!from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
-        console.log('C')
+        console.log('C');
         next('/main');
-    } 
+    }
     next();
 });
 
