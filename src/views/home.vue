@@ -15,11 +15,13 @@
             .marker-content-new{
                 width: auto !important;
                 height: auto !important;
-                margin-left: -44px !important;
-                margin-top: -90px !important;
+                margin-left: -33px !important;
+                margin-top: -70px !important;
                 .icon{
-                    width: 88px;
-                    height: 96px;
+                    //width: 88px;
+                    //height: 96px;
+                    width: 66px;
+                    height: 73px;
                     background: url("../assets/images/icon_scenic_home@3x.png") no-repeat center center / 100% 100%;
                 }
                 .name{
@@ -33,7 +35,7 @@
                     color: #572b12;
                     -webkit-transform: translateX(-50%);
                     transform: translateX(-50%);
-                    margin-left: 44px;
+                    margin-left: 33px;
                     text-align: center;
                 }
             }
@@ -145,6 +147,7 @@
             }else if(containerWidth > 800){
                 zoom = 11;
             }
+            this.bl = parseFloat((containerWidth/375).toFixed(2));
             
             //地图
             let oMap = L.map("wrapper_home", {
@@ -182,6 +185,7 @@
                 isTips : false,
                 tipsText : '请求失败',
                 isHasMsg: false,
+                bl:0
             }
         },
         methods: {
@@ -197,7 +201,11 @@
                 if(scenicList.data && scenicList.data.length && scenicList.data.length>0){
                     sessionStorage.setItem('scenicList',JSON.stringify(scenicList.data));
                     scenicList.data.forEach((v,i) => {
-                        let myIcon = L.divIcon({html:'<div data-id="'+v.scenery_id+'"><div class="icon"></div><div class="name">'+v.name+'</div></div>',className: 'marker-content-new',popupAnchor: [0, -50]});
+                        let myIcon = L.divIcon({
+                                        html:'<div data-id="'+v.scenery_id+'"><div class="icon"></div><div class="name">'+v.name+'</div></div>',
+                                        className: 'marker-content-new',
+                                        popupAnchor: [0, -(35*this.bl)]
+                                    });
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_home)
                                      .bindPopup(_self.createInfoWindow(v),{className:"info-content-new"})
                                      .on('click',function(){

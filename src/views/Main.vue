@@ -309,6 +309,9 @@
                 &.type-hospital{
                     background: url("../assets/images/icon_to_doctor@3x.png") no-repeat center / auto 100%;
                 }
+                &.type-other{
+                    background: url("../assets/images/icon_else_location@3x.png") no-repeat center / auto 100%;
+                }
                 &.player{
                     background: url("../assets/images/playing.gif") no-repeat center / auto 100%;
                 }
@@ -710,6 +713,7 @@
                 //geolocation.getCurrentPosition()
                 geolocation.on('complete',function(GeolocationResult) {
                     let cp = GeolocationResult.position;
+                    alert(cp);
                     if(cp.lat >= imgLeftBottom.lat && cp.lat <= imgRightTop.lat && cp.lng >= imgLeftBottom.lng && cp.lng <= imgRightTop.lng){
                         _self.oMap_main.setCenter(cp);
                     }else{
@@ -745,11 +749,12 @@
             L.imageOverlay('./dhk.jpg', [imgLeftBottom1,imgRightTop1]).addTo(oMap);
             this.oMap_main = oMap;
 
-            oMap.on('touchstart',function(e) {
+            oMap.on('click',function(e) { debugger
                 //console.log(e.latlng);
                 _self.$router.push({
                     name: 'main'
                 });
+                _self.oMap_main.closePopup();
                 _self.isShowMenu = false;
                 _self.isOpenDetail = false;
             })
@@ -828,6 +833,9 @@
                     },{
                         type:10,
                         className:'type-hospital'
+                    },{
+                        type:11,
+                        className:'type-other'
                     }
                 ],
                 defaultImgList : [ // 地图画点默认图片列表
@@ -840,7 +848,8 @@
                     '/bg_stop@3x.png',
                     '/bg_hotel@3x.png',
                     '/bg_centre@3x.png',
-                    '/bg_doctor@3x.png'
+                    '/bg_doctor@3x.png',
+                    '/bg_else@3x.png'
                 ],
                 region: '', // 景点所属地区
                 indexOfMarkers : 0

@@ -116,7 +116,7 @@
         </section>
         <section class="spot-list">
             <ul class="list">
-                <v-touch tag="li" v-for="point of pointsList" :key="point.id" :data-pid="point.id" @tap="selectOne">
+                <li v-for="point of pointsList" :key="point.id" :data-pid="point.id" @click="selectOne">
                     <section class="img-left" :data-pid="point.id">
                         <div :data-pid="point.id">
                             <img v-if="point.src" style="border-radius: 10px;" :data-pid="point.id" :src="point.src" alt="加载中..." />
@@ -130,7 +130,7 @@
                             <img :data-pid="point.id" class="play" src="../assets/images/icon_big_play@2x.png" alt="加载中..." />
                         </div>
                     </section>
-                </v-touch>
+                </li>
             </ul>
         </section>
     </div>
