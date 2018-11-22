@@ -744,6 +744,9 @@
 
             oMap.on('click',function(e) {
                 //console.log(e.latlng);
+                _self.$router.push({
+                    name: 'main'
+                });
                 _self.isShowMenu = false;
                 _self.isOpenDetail = false;
             })
@@ -1111,8 +1114,8 @@
                         li.firstElementChild.children[0].src = colorSrcList.filter(item => item.mark === li.dataset.mark)[0].colorSrc;
                     }
                 }
-                console
                 this.removeMarker(1);
+
                 switch (paramKey) {
                     case 'resource_point':
                         if(this.markers_line.length>0){

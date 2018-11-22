@@ -18,6 +18,9 @@ router.beforeEach((to, from, next) => {
     if ((!from.name || from.name === 'index') && to.name === 'main') {
         vuex.commit('SETFROMROUTENAME', 'root');
     }
+    if (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource') {
+        vuex.commit('SETFROMROUTENAME', from.name);
+    }
     next();
 });
 
