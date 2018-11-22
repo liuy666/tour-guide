@@ -84,9 +84,8 @@
         }
         .img-list-area{
             margin-top: 24px;
-            .vux-slider{
-                border-radius: 20px;
-            }
+            border-radius: 20px;
+            overflow: hidden;
             .vux-swiper-desc{
                 text-align: right;
             }
@@ -133,6 +132,19 @@
                     .point-list-img{
                         width: 100px;
                         height: 100px;
+                        box-sizing: border-box;
+                        border-radius:50%;
+                        overflow: hidden;
+                        img {
+                            width: 100%;
+                            height: 100%;
+                        }
+                    }
+                    div.ignore {
+                        border: 2px solid #fff;
+                    }
+                    div.orange {
+                        border-color: #FE5100!important;
                     }
                     .point-list-name{
                         position: absolute;
@@ -204,7 +216,7 @@
         <section class="point-list-area">
             <ul class="point-list">
                 <v-touch tag="li" v-for="(item,index) in pointList" :key="index" @tap="changePointInfo(index,true,$event)">
-                    <div class="point-list-img"><img :src="item.url" style="width:100%;height:100%;border-radius:50%;" /></div>
+                    <div class="point-list-img ignore" :class="item.resource_id == currentPointId ? 'orange' : ''"><img :src="item.url"/></div>
                     <div class="point-list-name" :class="item.resource_id == currentPointId ? 'current' : ''" >{{item.name}}</div>
                 </v-touch>
             </ul>
@@ -406,7 +418,7 @@ export default {
             //this.currentIndex = index;
             this.currentPointId = newPointInfo.resource_id;
             this.pointImg = newPointInfo.url;
-            this.pointName = newPointInfo.serial + '. ' + newPointInfo.name;
+            this.pointName = newPointInfo.name;
             this.pointCaption = newPointInfo.commentary;
             this.getCurrentImgList();
             this.setAudio(true);

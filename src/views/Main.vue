@@ -745,7 +745,8 @@
             L.imageOverlay('./dhk.jpg', [imgLeftBottom1,imgRightTop1]).addTo(oMap);
             this.oMap_main = oMap;
 
-            oMap.on('click',function(e) {
+            oMap.addEventListener('click',function(e) {
+                
                 //console.log(e.latlng);
                 _self.$router.push({
                     name: 'main'
@@ -1247,8 +1248,9 @@
                 // 开始播放
                 if (isContinuePlay) {
                     const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
-                    audioDom.currentTime = playStatus.currentTime;
+                    
                     audioDom.oncanplay = (e) => { 
+                        audioDom.currentTime = playStatus.currentTime;
                         let _audioDom = e.target;
                         this.totalTime = _audioDom.duration;
                         this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
