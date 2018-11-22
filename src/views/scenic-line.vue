@@ -63,7 +63,7 @@
     <div id="scenic-line">
         <section class="line-list">
             <ul>
-                <v-touch tag="li" v-for="line of lines" :key="line.lineId" @tap="gotoMapLine(line.lineId)">
+                <li v-for="line of lines" :key="line.lineId" @click="gotoMapLine(line.lineId)">
                     <section class="img-left">
                         <div>
                             <img style="border-radius: 10px;" src="../assets/images/bg_select@3x.png" alt="加载中..." />
@@ -78,7 +78,7 @@
                             <img :data-lineid="line.lineId" src="../assets/images/icon_select@2x.png" alt="加载中..." />
                         </div>
                     </section>
-                </v-touch>
+                </li>
             </ul>
         </section> 
     </div>
