@@ -742,7 +742,7 @@
             L.imageOverlay('./dhk.jpg', [imgLeftBottom1,imgRightTop1]).addTo(oMap);
             this.oMap_main = oMap;
 
-            oMap.on('click',function(e) {
+            oMap.on('touchstart',function(e) {
                 //console.log(e.latlng);
                 _self.isShowMenu = false;
                 _self.isOpenDetail = false;
