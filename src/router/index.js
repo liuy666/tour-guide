@@ -16,11 +16,15 @@ export default router;
 router.beforeEach((to, from, next) => {
     console.log(from, to);
     if ((!from.name || from.name === 'index') && to.name === 'main') {
+        console.log('A')
         vuex.commit('SETFROMROUTENAME', 'root');
-    }
-    if (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource') {
+    } else if (from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
+        console.log('B')
         vuex.commit('SETFROMROUTENAME', from.name);
-    }
+    } else if (!from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
+        console.log('C')
+        next('/main');
+    } 
     next();
 });
 
