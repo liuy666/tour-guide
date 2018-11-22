@@ -747,6 +747,7 @@
             this.oMap_main = oMap;
 
             oMap.on('click',function(e) {
+                console.log(e);
                 _self.$router.push({
                     name: 'main'
                 });

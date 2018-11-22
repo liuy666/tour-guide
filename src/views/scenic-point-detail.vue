@@ -302,10 +302,13 @@ export default {
                 this.totalTime = _audioDom.duration;
                 let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
+
+                
             }
             audioDom.onplay = (e) => {
                 this.changeProgress();
             }
+
             if(!isChange){//进页面的初始化
                 const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
                 
@@ -340,6 +343,7 @@ export default {
                     this.playAudio();
                 }
             }
+            
         },
         //播放
         playAudio() {
