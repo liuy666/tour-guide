@@ -1,8 +1,8 @@
 import axios from 'axios';
 import Qs from 'qs';
-import CryptoJS from './crypto.js';
+// import CryptoJS from './crypto.js';
 
-console.log(CryptoJS);
+// console.log(CryptoJS);
 /**
  * Axios - request 拦截器
  */
@@ -27,14 +27,14 @@ axios.interceptors.response.use((res) => {
  * @return {object}  code正常则返回数据对象数据主体对象，否则弹出对话框显示msg信息
  */
 function checkCode(res) {
-	console.log('------ 检查 Code 信息码 ------');
-	console.log(res);
+	// console.log('------ 检查 Code 信息码 ------');
+	// console.log(res);
 	if (res.status === 200) {
 		if (res.data.code === 0) {
-			console.log('**** 这里是数据 ****');
+			// console.log('**** 这里是数据 ****');
 			return res.data;
 		} else {
-			console.log('错误信息:\ncode:' + res.data.code + '\nmsg:' + res.data.msg);
+			// console.log('错误信息:\ncode:' + res.data.code + '\nmsg:' + res.data.msg);
 			return false;
 		}
 	}
@@ -46,8 +46,8 @@ function checkCode(res) {
  * @return {object}  请求正常则返回数据对象data，否则返回自定义错误提示信息对象
  */
 function checkStatus(err) {
-	console.log('------ 检查 Http 状态码 ------');
-	console.log(err.response);
+	// console.log('------ 检查 Http 状态码 ------');
+	// console.log(err.response);
 }
 
 /**
@@ -56,19 +56,19 @@ function checkStatus(err) {
  * @return {object/array}
  */
 function checkAllCode(resList) {
-	console.log('------ 检查并发 Code 信息码 ------');
+	// console.log('------ 检查并发 Code 信息码 ------');
 	let isSuccess = resList.every(item => {
 		return item.data.code === 0;
 	});
 	if (isSuccess) {
-		console.log('**** 这里是并发请求数据 ****');
+		// console.log('**** 这里是并发请求数据 ****');
 		return resList.map(item => {
 			return item.data;
 		});
 	} else {
 		// title: '温馨提示',
         // content: '当前服务不可用，请手动刷新后重试'
-		console.log(resList);
+		// console.log(resList);
         return false;
 	}
 }
@@ -79,8 +79,8 @@ function checkAllCode(resList) {
  * @return {object}
  */
 function checkAllStatus(err) {
-	console.log('------ 检查并发 Http 状态码 ------');
-	console.log(err.response);
+	// console.log('------ 检查并发 Http 状态码 ------');
+	// console.log(err.response);
 	// let isSuccess = resList.every(item => {
 	// 	return item.status === 200;
 	// });

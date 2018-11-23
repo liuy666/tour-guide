@@ -599,6 +599,13 @@
             if(this.timer){
                 clearInterval(this.timer);
             }
+            console.log(8989)
+            if (!sessionStorage.getItem('currentScenic')) {
+                this.$router.replace({
+                    path: '/'
+                });
+                return;
+            }
         },
         async mounted() {
             const query = this.$route.query;
@@ -1271,7 +1278,7 @@
                             this.isPlayed = false;
                         } else {
                             _audioDom.play();
-                            this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
+                            this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试  从地图播放 监听不到？？
                             this.isPlayed = true;
                         } 
                         if (this.isPlayed) {
@@ -1444,8 +1451,9 @@
                                 sessionStorage.removeItem('currentResource');
                                 sessionStorage.removeItem('lineList');
                                 sessionStorage.removeItem('lineId');
+                                sessionStorage.removeItem('otherPointList');
      
-                                // 存储完整景点列表和当前景点信息(取第一个景点) 
+                                // 存储更新完整景点列表和当前景点信息(取第一个景点) 
                                 sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
                                 sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
                                 this.scenicPointImg = res.page.list[0].url;
