@@ -261,6 +261,9 @@
             }
             &.DW{
                 background-image: url('../assets/images/icon_static@3x.png');
+                &.position{
+                    background-image: url('../assets/images/loading.gif');
+                }
             }
             &.JJ{ // 简介图片
                 background-image: url('../assets/images/icon_intro@3x.png');
@@ -274,6 +277,12 @@
                     background-image: url('../assets/images/icon_auto_no@3x.png');
                 }
             }
+        }
+        .my-position{
+            width: 66px;
+            height: 73px;
+            margin-left: -33px;
+            margin-top: -70px;
         }
         .marker-content-new{
             width: auto !important;
@@ -329,6 +338,7 @@
                 text-align: center;
                 -webkit-transform: translateX(-50%);
                 transform: translateX(-50%);
+                font-size: 24px;
             }
         }
         .point-serial{
@@ -342,6 +352,7 @@
             text-align: center;
             border-radius: 15px;
         }
+        /*信息弹窗相关*/
         .leaflet-popup-content-wrapper{
             padding: 0;
             border-radius: 20px;
@@ -352,6 +363,14 @@
         .leaflet-popup-tip{
             width: 26px;
             height: 26px;
+        }
+        .leaflet-popup-content{
+            width: auto !important;
+        }
+        .leaflet-popup-close-button{
+            width: 36px;
+            height: 28px;
+            font-size: 24px;
         }
         // 景区简介弹窗样式
         .introDetail{
@@ -528,7 +547,7 @@
         <!-- 左侧反馈功能图标 -->
         <section class="function-area-left">
             <v-touch class="function-btn FK" v-on:tap="gotoPage({name: 'feedback'})"></v-touch>
-            <v-touch class="function-btn DW" v-on:tap="getCurrentPosition"></v-touch>
+            <v-touch class="function-btn DW" :class="isPositioning ? 'position' : ''" v-on:tap="getCurrentPosition"></v-touch>
         </section>
         <!-- 右侧简介/全景/自动功能图标 -->
         <section class="function-area-right">
@@ -713,15 +732,19 @@
                 map_test.addControl(geolocation);
                 //geolocation.getCurrentPosition()
                 geolocation.on('complete',function(GeolocationResult) {
+                    _self.isPositioning = false;
                     let cp = GeolocationResult.position;
-                    alert(cp);
                     if(cp.lat >= imgLeftBottom.lat && cp.lat <= imgRightTop.lat && cp.lng >= imgLeftBottom.lng && cp.lng <= imgRightTop.lng){
-                        _self.oMap_main.setCenter(cp);
+                        _self.oMap_main.setView([cp.lat,cp.lng]);
+                        var myIcon = L.icon({
+                            iconUrl: './location.gif',
+                            className:'my-position'
+                        });
+                        L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
                     }else{
                         _self.isTips = true;
                         _self.tipsText = "您当前不在景区范围内";
                     }
-                    //document.querySelector(".currentPosition").value = GeolocationResult.position;
                 })
                 geolocation.on('error',function(){
                     _self.isTips = true;
@@ -739,8 +762,8 @@
                 attributionControl: false,
                 zoomControl: false,
                 // closePopupOnClick:false,
-                maxBounds : [imgLeftBottom1, imgRightTop1],
-                maxBoundsViscosity : 0.8
+                // maxBounds : [imgLeftBottom1, imgRightTop1],
+                // maxBoundsViscosity : 0.8
             });
             // L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
             //     maxZoom: 19,
@@ -797,6 +820,7 @@
                 loadText: '',
                 isShowLoading: false,
                 isPlayed: false,
+                isPositioning : false,
                 timer: '',
                 totalTime: '',
                 currentScenicId: '',
@@ -939,36 +963,8 @@
             }
         },    
         methods: {
-            updateLocation(position) { 
-                var latitude = position.coords.latitude; 
-                var longitude = position.coords.longitude; 
-                var accuracy = position.coords.accuracy; 
-
-                alert("jingweidu:" +latitude + longitude )
-                // document.getElementById("“纬度”").innerHTML = latitude; 
-                // document.getElementById("“经度”").innerHTML = longitude; 
-                // document.getElementById("“准确度”").innerHTML = accuracy + "米"; 
-            },
-
-            handleLocationError(error) {  
-                alert("1111");
-                switch (error.code) { 
-                case 0: 
-                    console.log("“尝试获取您的位置信息时发生错误：”" + error.message); 
-                    break; 
-                case 1: 
-                    console.log("“用户拒绝了获取位置信息请求。”"); 
-                    break; 
-                case 2: 
-                    console.log("“浏览器无法获取您的位置信息。”"); 
-                    break; 
-                case 3: 
-                    console.log("“获取您位置信息超时。”"); 
-                    break; 
-                } 
-            },
-
             getCurrentPosition() { 
+                this.isPositioning = true;
                 this.geolocation.getCurrentPosition()
                 // console.dir(L)
                 // return
@@ -987,13 +983,6 @@
                 //     alert('2222')
                 //     console.log('定位出错=====>', e);
                 // });
-
-                // var myOptions = {
-                //     enableHighAccuracy: true,
-                //     timeout: 30000,
-                //     maximumAge: 0
-                // };
-                // navigator.geolocation.getCurrentPosition(this.updateLocation, this.handleLocationError, myOptions);
             },
             // 获取下一个播放链接
             getNext(currentId) {
@@ -1315,10 +1304,10 @@
                 this.changeMapIcon(false);
             },
             // 改变地图图标交互效果 
-            changeMapIcon (isPlay) { 
+            changeMapIcon (isPlay) {  debugger
                 this.getMarkerIndex(false);
                 let ind = this.indexOfMarkers;
-                if(!this.markers[ind]._icon.children[0]){
+                if(!this.markers[ind] || !this.markers[ind]._icon.children[0]){
                     return false;
                 }
                 this.markers.forEach((v,i) => {
@@ -1493,7 +1482,11 @@
                                         }
                                     });
                         this.markers.push(marker);
-                    });           
+                    });  
+
+                    if(this.resourceType < 3) {
+                        this.changeMapIcon(this.isPlayed);
+                    }         
 
                     // 如果是从景点详情页回退的情况
                     if (fromRouteName === 'scenic-point-detail') {
