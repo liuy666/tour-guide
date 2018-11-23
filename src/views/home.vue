@@ -108,13 +108,10 @@
             Badge
         },
         async created() {
-            sessionStorage.clear();
             const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
                 domainUrl: 'www.qxgz.com', // 上线改成获取域名
                 limit: 20
             });
-
-            console.log(getMsgList)
             if (!getMsgList) {
                 return;
             }
