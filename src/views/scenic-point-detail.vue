@@ -84,10 +84,24 @@
         }
         .img-list-area{
             margin-top: 24px;
-            border-radius: 20px;
+            //border-radius: 20px;
             overflow: hidden;
             .vux-swiper-desc{
                 text-align: right;
+            }
+            .vux-img{
+                border-radius: 20px;
+            }
+            .vux-swiper-desc{
+                line-height: 40px;
+                background: rgba(0,0,0,0.3);
+                padding: 0;
+                right: 20px;
+                bottom: 36px;
+                padding: 0 20px;
+                border-radius: 20px;
+                left: auto;
+                font-size: 28px;
             }
         }
         .captiom-area {
