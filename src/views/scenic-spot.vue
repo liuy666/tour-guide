@@ -79,22 +79,6 @@
                             line-height: 112px;
                         }
                     }
-                    .img-right {
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        div {
-                            width: 50px;
-                            height: 50px;
-                            img {
-                                width: 100%;
-                                height: 100%;
-                            }
-                        }
-                    }
-                    .play {
-                        display: none;
-                    }
                 }
             }
         }
@@ -106,10 +90,10 @@
         <!-- 网络请求loading层 -->
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <section class="seach">
-            <input type="text" placeholder="请输入景点名称" v-model="val" />
-            <v-touch tag="section" class="img-32-34" @tap="searchInput">
+            <input type="text" placeholder="请输入景点名称" v-model.trim="text" />
+            <section class="img-32-34">
                 <img src="../assets/images/icon_so@2x.png" alt="加载中..."/>
-            </v-touch>
+            </section>
             <v-touch tag="section" class="img-34-34"  @tap="clearInput">
                 <img src="../assets/images/icon_close@2x.png" alt="加载中..." />
             </v-touch>
@@ -123,12 +107,6 @@
                             <img v-else style="border-radius: 10px;" :data-pid="point.id" src="../assets/images/bg_scenic@3x.png" alt="加载中..." />
                         </div>
                         <span :data-pid="point.id">{{ point.name }}</span>
-                    </section>
-                    <section :data-pid="point.id" class="img-right">
-                        <div :data-pid="point.id">
-                            <img :data-pid="point.id" src="../assets/images/icon_big_stop@2x.png" alt="加载中..." />
-                            <img :data-pid="point.id" class="play" src="../assets/images/icon_big_play@2x.png" alt="加载中..." />
-                        </div>
                     </section>
                 </li>
             </ul>
@@ -146,7 +124,7 @@ export default {
     data() {
         return {
             pointsList: [],
-            val: '',
+            text: '',
             isShowLoading: false,
             loadText: '',
             sceneryId: '',
@@ -159,138 +137,82 @@ export default {
         this.SETROUTENAME('scenic-spot');
     },
     mounted() {
-        const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
         const lis = document.querySelectorAll('.spot-list li');
         const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
         for (let li of lis) {
             if (li.dataset.pid === currPoint.resource_id) {
                 li.style.backgroundColor = '#f0f0f0';
-                if (playStatus && !playStatus.status) {
-                    li.children[1].children[0].children[0].style.display = 'none';
-                    li.children[1].children[0].children[1].style.display = 'block';
-                } else {
-                    li.children[1].children[0].children[0].style.display = 'block';
-                    li.children[1].children[0].children[1].style.display = 'none';
-                }
             } else {
                 li.style.backgroundColor = '#fff';
-                li.children[1].children[0].children[0].style.display = 'block';
-                li.children[1].children[0].children[1].style.display = 'none';
             }
         }        
     },
     computed: mapState({
-        watchPlay: state => state.app.playStatus,
-        watchAutoPlay: state => state.app.autoPlay,
-        watchPlayEnd: state => state.app.playEnd,
+        watchAutoPlay: state => state.app.autoPlay
     }),
     watch: {
-        watchPlay(val) {
-            console.log('spot--------------')
-            const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-            const lis = document.querySelectorAll('.spot-list li');
-            for (let li of lis) {
-                if (li.dataset.pid === currPoint.resource_id) {
-                    if (val === 'play') {
-                        li.children[1].children[0].children[0].style.display = 'none';
-                        li.children[1].children[0].children[1].style.display = 'block';
-                    }
-                    if (val === 'pause') {
-                        li.children[1].children[0].children[0].style.display = 'block';
-                        li.children[1].children[0].children[1].style.display = 'none';
-                    }
-                }
-            }
-        },
         watchAutoPlay(val) {
             const lis = document.querySelectorAll('.spot-list li');
             const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
             for (let li of lis) {
                 if (li.dataset.pid === currPoint.resource_id) {
                     li.style.backgroundColor = '#f0f0f0';
-                    li.children[1].children[0].children[0].style.display = 'none';
-                    li.children[1].children[0].children[1].style.display = 'block';
                 } else {
                     li.style.backgroundColor = '#fff';
-                    li.children[1].children[0].children[0].style.display = 'block';
-                    li.children[1].children[0].children[1].style.display = 'none';
                 }
             }
         },
-        // 监听是否播放结束
-        watchPlayEnd(val) {
-            const lis = document.querySelectorAll('.spot-list li');
-            const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-            for (let li of lis) {
-                if (li.dataset.pid === currPoint.resource_id) {
-                    li.style.backgroundColor = '#f0f0f0';
-                    li.children[1].children[0].children[0].style.display = 'block';
-                    li.children[1].children[0].children[1].style.display = 'none';
-                } else {
-                    li.style.backgroundColor = '#fff';
-                    li.children[1].children[0].children[0].style.display = 'block';
-                    li.children[1].children[0].children[1].style.display = 'none';
-                }
-            }
+        text(val) {
+            this.searchInput();
         }
     },
     methods: {
         ...mapMutations([
-            'SETROUTENAME',
-            'pauseCurrentPlay'
+            'SETROUTENAME'
         ]),
         selectOne(e) {
             const lis = document.querySelectorAll('.spot-list li');
             for (let li of lis) {
                 if (e.target.dataset.pid === li.dataset.pid) {
-                    if (li.children[1].children[0].children[0].style.display === 'none') {
-                        li.children[1].children[0].children[0].style.display = 'block';
-                        li.children[1].children[0].children[1].style.display = 'none';
-                        this.pauseCurrentPlay();
-                    } else {
-                        li.style.backgroundColor = '#f0f0f0';
-                        li.children[1].children[0].children[0].style.display = 'none';
-                        li.children[1].children[0].children[1].style.display = 'block';
-                        let status = {
-                            status: false
-                        }
-                        sessionStorage.setItem('playStatus', JSON.stringify(status));
-                        const pointList = JSON.parse(sessionStorage.getItem('pointList'));
-                        let currPoint = pointList.filter(item => item.resource_id === li.dataset.pid)[0];
-                        sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
-                        let sortList = [...pointList];
-                        sortList.sort((a, b) => a.serial - b.serial);
-                        let index = sortList.findIndex(item => item.resource_id === li.dataset.pid);
-                        let newPlayList = sortList.slice(index).map(item => {
-                            return {
-                                aSrc: item.guideUrl,
-                                aId: item.resource_id
-                            }
-                        });
-                        sessionStorage.setItem('playList', JSON.stringify(newPlayList));
-                        this.$router.replace({
-                            name: 'main',
-                            params: {
-                                pid: li.dataset.pid
-                            }
-                        });
+                    li.style.backgroundColor = '#f0f0f0';
+                    let status = {
+                        status: false
                     }
+                    sessionStorage.setItem('playStatus', JSON.stringify(status));
+
+                    const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                    const currPoint = pointList.filter(item => item.resource_id === li.dataset.pid)[0];
+                    sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
+
+                    const index = pointList.findIndex(item => item.resource_id === li.dataset.pid);
+                    const newPlayList = pointList.slice(index).map(item => {
+                        return {
+                            aSrc: item.guideUrl,
+                            aId: item.resource_id
+                        }
+                    });
+                    sessionStorage.setItem('playList', JSON.stringify(newPlayList));
+
+                    this.$router.replace({
+                        name: 'main',
+                        params: {
+                            pid: li.dataset.pid
+                        }
+                    });
                 } else {
                     li.style.backgroundColor = '#fff';
-                    li.children[1].children[0].children[0].style.display = 'block';
-                    li.children[1].children[0].children[1].style.display = 'none';
                 }
             }
         },
         clearInput() {
-            this.val = '';
+            this.text = '';
         },
         async searchInput() {
             this.isShowLoading = true;
             const result = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/list', {
                 sceneryId: this.sceneryId,
                 resourceType: 1,
-                name: this.val
+                name: this.text
             });
             if (!result) {
                 this.isShowLoading = false;
@@ -300,7 +222,6 @@ export default {
             this.isShowLoading = false;
         },
         getList(pointList) {
-            pointList.sort((a, b) => a.serial - b.serial);
             this.pointsList = pointList.map(element => {
                 return {
                     src: element.url,

@@ -16,12 +16,12 @@ export default router;
 router.beforeEach((to, from, next) => {
     console.log(from, to);
     if (to.path === '/') {  
-        console.log('E')
+        console.log('A')
         sessionStorage.clear();
     }
     // 从home页进入下一路由或在main页刷新路由
     if ((!from.name || from.name === 'index') && to.name === 'main' && sessionStorage.getItem('currentScenic')) {
-        console.log('A')
+        console.log('B')
         vuex.commit('SETFROMROUTENAME', 'root');
     }
     // 在main页的子路由上刷新
@@ -30,12 +30,8 @@ router.beforeEach((to, from, next) => {
         next('/main');
     }
     if (from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
-        console.log('B');
-        // if (vuex.state.app.fromRouteName === 'root') {
-        //     next('/');
-        // } else {
-        //     vuex.commit('SETFROMROUTENAME', from.name);
-        // }
+        console.log('D');
+        vuex.commit('SETFROMROUTENAME', from.name);
     }
     next();
 });
