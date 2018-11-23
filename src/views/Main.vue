@@ -331,8 +331,9 @@
                 white-space: nowrap;
                 border-radius: 30px;
                 padding: 0px 20px;
-                background: rgba(0,0,0,0.5);
-                color: #ffffff;
+                background: rgba(255,255,255,.8);
+                color: #642F15;
+                // color: #333;
                 position: absolute;
                 display: block;
                 margin-left: 61px;
@@ -340,6 +341,8 @@
                 -webkit-transform: translateX(-50%);
                 transform: translateX(-50%);
                 font-size: 24px;
+
+                border: 1px solid #642F15;
             }
         }
         .point-serial{
@@ -679,25 +682,10 @@
             this.bl = parseFloat((containerWidth/375).toFixed(2));
             
             // 地图缩放
-            let zoom = 0,
-                maxZoom = 0; 
-            if (containerHeight < 600) {
-                zoom = mapZoom;
-            } else if (containerHeight < 700) {
-                zoom = mapZoom + 0.2;
-            } else if (containerHeight < 800) {
-                zoom = mapZoom + 0.4;
-            } else if (containerHeight < 900) {
-                zoom = mapZoom + 0.5;
-            } else if (containerWidth > 500 && containerWidth < 800) {
-                zoom = mapZoom + 0.9;
-            } else if (containerWidth > 800) {
-                zoom = mapZoom + 1.3;
-            }
-            maxZoom = zoom+2;
-            if (zoom > 17) maxZoom = 19;
-            if (zoom > 19) zoom = 19;
-            
+            let zoom = mapZoom;
+            if (containerWidth > 600 ) {
+                zoom = mapZoom + 1;
+            } 
             let _self = this;
 
             let map_test = new AMap.Map('map_test', {
@@ -764,15 +752,15 @@
             
             // 实例化地图
             let oMap = L.map("wrapper", {
-                center: centerPoint,//centerPoint,[30.5829110000,104.0637260000]
-                zoom: 17,
-                minZoom: 17,
+                center: centerPoint,
+                zoom: zoom,
+                minZoom: zoom,
                 maxZoom: 19,
                 attributionControl: false,
                 zoomControl: false,
                 // closePopupOnClick:false,
-                // maxBounds : [imgLeftBottom1, imgRightTop1],
-                // maxBoundsViscosity : 0.8
+                maxBounds : [imgLeftBottom1, imgRightTop1],
+                maxBoundsViscosity : 0.8
             });
             // L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
             //     maxZoom: 19,
@@ -799,6 +787,9 @@
 
             // 初始化图标菜单
             this.initMenu();
+
+            //自动定位一次
+            this.geolocation.getCurrentPosition();
         },
         data () {
             return {

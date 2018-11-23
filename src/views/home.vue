@@ -37,6 +37,7 @@
                     transform: translateX(-50%);
                     margin-left: 33px;
                     text-align: center;
+                    font-size: 24px;
                 }
             }
             // .info-content-new{
@@ -51,6 +52,9 @@
             .leaflet-popup-tip{
                 width: 26px;
                 height: 26px;
+            }
+            .leaflet-popup-content{
+                width: auto !important;
             }
         }
         // 消息提示弹窗样式
@@ -130,18 +134,11 @@
             //获取屏幕大小 动态设置不同手机的地图zoom
             const containerWidth = document.querySelector('#wrapper_home').clientWidth;
             const containerHeight = document.querySelector('#wrapper_home').clientHeight; 
-            let zoom = 0; //地图缩放
-            if(containerHeight<600){
-                zoom = 9.5;
-            }else if(containerHeight<700){
-                zoom = 9.6;
-            }else if(containerHeight<800){
-                zoom = 9.8;
-            }else if(containerHeight<900){
-                zoom = 9.8;
-            }else if(containerWidth > 500 && containerWidth < 800){
-                zoom = 11;
-            }else if(containerWidth > 800){
+            let zoom = 9; //地图缩放
+            if(containerWidth > 600){
+                zoom = 10;
+            }
+            if(containerWidth > 800){
                 zoom = 11;
             }
             this.bl = parseFloat((containerWidth/375).toFixed(2));
@@ -149,8 +146,8 @@
             //地图
             let oMap = L.map("wrapper_home", {
                 center: [32.526044, 105.019557],
-                zoom: 10,
-                minZoom: 10,
+                zoom: zoom,
+                minZoom: zoom,
                 maxZoom: 18,
                 attributionControl: false,
                 zoomControl: false,
@@ -162,7 +159,7 @@
             //     minZoom: 10
             // }).addTo(oMap);
 
-            let imageUrl = './qcx.jpg',
+            let imageUrl = './qcx.png',
             imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
             L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
 
