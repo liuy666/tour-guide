@@ -315,17 +315,21 @@ export default {
             audioDom.classList.add('detail-audio');
             audioDom.style.display = 'none';
             audioContainer.appendChild(audioDom);
+            audioDom.load();
+
             audioDom.oncanplay = (e) => { 
                 let _audioDom = e.target;
                 this.totalTime = _audioDom.duration;
                 let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
-                // if(!isChange && playStatus){
-                    // audioDom.currentTime = playStatus.currentTime;
-                    // this.currentTime = playStatus.currentTime;
-                    // let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
-                    // this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
-                // }
+                if (this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
+                    if(!isChange && playStatus){
+                        audioDom.currentTime = playStatus.currentTime;
+                        this.currentTime = playStatus.currentTime;
+                        let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
+                        this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
+                    }
+                }
                 
             }
             audioDom.onplay = (e) => {
