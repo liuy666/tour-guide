@@ -36,6 +36,7 @@ const vm = new Vue({
     render: h => h(App),
     mounted() {
         this.$store.commit('INITCONTENT');
+        
         // console.log(window);
         // window.addEventListener('popstate', function (e) {  
         //     console.log(e);

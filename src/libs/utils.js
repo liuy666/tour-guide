@@ -97,6 +97,15 @@ export default {
         phoneNumber(num) {
             let reg = /^(13[0-9]|14[5-9]|15[0-9]|166|17[0-8]|18[0-9]|19[8-9])[0-9]{8}$/;
             return reg.test(num);
+        },
+        // Android手机系统验证
+        isAndroid(userAgent) {
+            return userAgent.indexOf('Android') > -1 || userAgent.indexOf('Adr') > -1;
+        },
+        // iOS手机系统验证
+        isiOS(userAgent) {
+            let reg = /\(i[^;]+;( U;)? CPU.+Mac OS X/;
+            return reg.test(userAgent);
         }
     },
 

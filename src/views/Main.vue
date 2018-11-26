@@ -550,7 +550,7 @@
         </section>
         <!-- 左侧反馈功能图标 -->
         <section class="function-area-left">
-            <section class="function-btn FK" @click="gotoPage({name: 'feedback'})"></section>
+            <section class="function-btn FK" @click="gotoPage({name: 'feedback', params: {sid: sceneryId}})"></section>
             <section class="function-btn DW" :class="isPositioning ? 'position' : ''" @click="getCurrentPosition"></section>
         </section>
         <!-- 右侧简介/全景/自动功能图标 -->
@@ -881,13 +881,9 @@
             }
         },
         computed: mapState({
-            watchPause: state => state.app.pauseStatus, // 监听景点列表的暂停
             watchLine: state => state.app.lineStatus // 监听取消路线选择
         }),
         watch: {
-            watchPause(val) {
-                this.pauseAudio();
-            },
             watchLine(val) {
                 // 清除当前路线
                 this.removeMarker(2);
@@ -1246,27 +1242,49 @@
                 // 开始播放
                 if (isContinuePlay) {
                     const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
-                    audioDom.oncanplay = (e) => { 
-                        console.log(1)
-                        console.log(audioDom.currentTime)
-                        audioDom.currentTime = playStatus.currentTime;
-                        console.log(audioDom.currentTime)
-                        console.log(0)
-                        let _audioDom = e.target;
-                        this.totalTime = _audioDom.duration;
-                        this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
+                    if (this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
+                        
+                        audioDom.oncanplay = (e) => {
+                            console.log(111)
+                            audioDom.currentTime = playStatus.currentTime;
+                            let _audioDom = e.target;
+                            this.totalTime = _audioDom.duration;
+                            this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
 
-                        if (playStatus.isPauseStatus) { // 暂停中
-                            this.isPlayed = false;
-                        } else {
-                            _audioDom.play();
-                            this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试  从地图播放 监听不到？？
-                            this.isPlayed = true;
-                        } 
-                        if (this.isPlayed) {
-                            this.changeMapIcon(true);
+                            if (playStatus.isPauseStatus) { // 暂停中
+                                this.isPlayed = false;
+                            } else {
+                                _audioDom.play();
+                                this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试  从地图播放 监听不到？？
+                                this.isPlayed = true;
+                            } 
+                            if (this.isPlayed) {
+                                this.changeMapIcon(true);
+                            }
                         }
                     }
+                    if (this.$tool.validateReg.isAndroid(window.navigator.userAgent)) {
+                        audioDom.currentTime = playStatus.currentTime;
+                        audioDom.oncanplay = (e) => {
+                            console.log(11)
+                            
+                            let _audioDom = e.target;
+                            this.totalTime = _audioDom.duration;
+                            this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
+
+                            if (playStatus.isPauseStatus) { // 暂停中
+                                this.isPlayed = false;
+                            } else {
+                                _audioDom.play();
+                                this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试  从地图播放 监听不到？？
+                                this.isPlayed = true;
+                            } 
+                            if (this.isPlayed) {
+                                this.changeMapIcon(true);
+                            }
+                        }
+                    }
+                    
                     audioDom.onplay = (e) => {
                         this.changeProgress();
                     }
@@ -1351,12 +1369,12 @@
                 },1000);
             },
             // 跳转其他页
-            gotoPage(...params) {
-                if (params[0].needGetSrc) {
+            gotoPage(...args) {
+                if (args[0].needGetSrc) {
                     const fullViewSrc = JSON.parse(sessionStorage.getItem('currentScenic')).panorama_url;
                     if (fullViewSrc) {
                         this.$router.push({
-                            name: params[0].name,
+                            name: args[0].name,
                             params: {
                                 src: fullViewSrc
                             }
@@ -1367,7 +1385,17 @@
                         return;
                     }  
                 } else {
-                    this.$router.push({name: params[0].name});
+                    if (args[0].params) {
+                        console.log(args[0].params)
+                        this.$router.push({
+                            name: args[0].name,
+                            params: {
+                                ...args[0].params
+                            }
+                        });
+                    } else {
+                        this.$router.push({name: args[0].name});
+                    }
                 }
             },
             // 打开/关闭景区详情弹窗

@@ -6,7 +6,6 @@ const app = {
         resourceList: [],
         content: '',
         routeName: '',
-        pauseStatus: false,
         playStatus: '',
         autoPlay: false,
         playEnd: false,
@@ -37,9 +36,6 @@ const app = {
         SETROUTENAME(state, val) {
             state.routeName = val;
             sessionStorage.setItem('routeName', val);
-        },
-        pauseCurrentPlay(state) {
-            state.pauseStatus = !state.pauseStatus;
         },
         // 景点列表页监听Main页面的播放暂停
         startCurrentPlay(state, val) {

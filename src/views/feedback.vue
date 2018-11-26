@@ -160,9 +160,9 @@
             </div>
             <div>
                 <span>电话号码</span>
-                <input v-model.trim="yourTel" type="text" placeholder="请留下你您的电话号码" @input="validateTel" @blur="validateLength" class="border-bottom-1"/>
+                <input v-model.trim="yourTel" type="number" placeholder="请留下你您的电话号码" @input="validateTel" @blur="validateLength" class="border-bottom-1"/>
             </div>
-            <v-touch tag="button" class="submit-upload" @tap.prevent="handleSubmit">提交反馈</v-touch>
+            <v-touch tag="button" type="button" class="submit-upload" @tap="handleSubmit">提交反馈</v-touch>
         </form>
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
     </div>
@@ -184,11 +184,15 @@ export default {
             yourTel: '',
             isTips: false,
             tipsText: '',
+            sceneryId: '',
         }
     },
     beforeRouteLeave (to, from , next) {
         this.SETFROMROUTENAME('feedback');
         next();
+    },
+    created() {
+        this.sceneryId = this.$route.params.sid;
     },
     computed: {
         entered() {
@@ -321,7 +325,7 @@ export default {
             }
         },
         // 提交反馈
-        async handleSubmit() {
+        async handleSubmit(e) {
             if (!this.textareaValue || !this.yourName || !this.isCorrent) {
                 this.tipsText = '请填写完整反馈信息';
                 this.isTips = true;
@@ -338,12 +342,18 @@ export default {
                     content: this.textareaValue,
                     contacts: this.yourName,
                     mobile: this.yourTel,
-                    sceneryId: '1057570712933412865',
+                    sceneryId: this.sceneryId,
                     ...imgList
                 }
                 const submitFeedback = await this.$http.post(this.$base + '/hqyatu-navigator/app/sys/saveSuggestion', bodyParams);
-                console.log(submitFeedback);
-                return;
+                if (!submitFeedback) {
+                    this.tipsText = '???';
+                    this.isTips = true;
+                    return;
+                }
+                this.$router.replace({
+                    name: 'main'
+                });
             }
         }
     }
