@@ -619,11 +619,12 @@
             next();
         },
         created() {
+            const query = this.$route.query;
             if(this.timer){
                 clearInterval(this.timer);
             }
             console.log('created')
-            if (!sessionStorage.getItem('currentScenic')) {
+            if (!sessionStorage.getItem('currentScenic') && !query.sid) {
                 this.$router.go(-1);
                 return;
             }
@@ -647,6 +648,7 @@
                 scenicInfo = {
                     ...currentScenic
                 }
+                this.SETFROMROUTENAME('root');
             } else {
                 //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
@@ -1177,7 +1179,8 @@
                 'startCurrentPlay', // 开始播放
                 'autoPlay', // 自动连播
                 'playEnd', // 播放结束
-                'SETTOROUTENAMEOFMENU'
+                'SETTOROUTENAMEOFMENU',
+                'SETFROMROUTENAME'
             ]),
             /**
              * 初始化音频播放
@@ -1244,10 +1247,10 @@
                 // 开始播放
                 if (isContinuePlay) {
                     const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
+
+                    // 如果是iOS手机 不能使用电脑模拟器来测试
                     if (this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
-                        
                         audioDom.oncanplay = (e) => {
-                            console.log(111)
                             audioDom.currentTime = playStatus.currentTime;
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
@@ -1265,11 +1268,11 @@
                             }
                         }
                     }
+
+                    // 如果是Android手机
                     if (this.$tool.validateReg.isAndroid(window.navigator.userAgent)) {
                         audioDom.currentTime = playStatus.currentTime;
                         audioDom.oncanplay = (e) => {
-                            console.log(11)
-                            
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
                             this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
@@ -1435,6 +1438,14 @@
                     // 判断是否是初始化页面 还是回退进入本页面
                     const fromRouteName = this.$store.state.app.fromRouteName;
 
+                    // 移除部分本地存储
+                    sessionStorage.removeItem('playStatus');
+                    sessionStorage.removeItem('isAuto');
+                    sessionStorage.removeItem('currentResource');
+                    sessionStorage.removeItem('lineList');
+                    sessionStorage.removeItem('lineId');
+                    sessionStorage.removeItem('otherPointList');
+
                     // 初始化默认显示
                     if(arg.resourceType == 1) {
                         if (arg.query && arg.query.pid) { // 如果通过二维码扫码进入页面则使用指定景点
@@ -1454,17 +1465,8 @@
                             });
                         } else { 
                             if (fromRouteName === 'root' || fromRouteName === 'feedback') { // 如果是刷新后初始化页面或从反馈页回退的情况
-                                console.log('init')
-                                const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
-
-                                // 移除部分本地存储
-                                sessionStorage.removeItem('playStatus');
-                                sessionStorage.removeItem('isAuto');
-                                sessionStorage.removeItem('currentResource');
-                                sessionStorage.removeItem('lineList');
-                                sessionStorage.removeItem('lineId');
-                                sessionStorage.removeItem('otherPointList');
-     
+                                console.log('init');
+                                
                                 // 存储更新完整景点列表和当前景点信息(取第一个景点) 
                                 sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
                                 sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
