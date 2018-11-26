@@ -938,6 +938,8 @@
                     this.scenicPointImg = currentPoint.url;
                     this.scenicPointName = currentPoint.name;
                     this.scenicPointId = currentPoint.resource_id;
+
+                    this.mapClickPointId = to.params.pid;
     
                     this.getMarkerIndex(to.params.pid);
                     this.markers[this.indexOfMarkers].openPopup();
@@ -1468,10 +1470,11 @@
                         });
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                       .bindPopup(infoContent,{className:"info-content-new"})
-                                      .on('click',() => { 
+                                      .on('click',() => { debugger
                                         this.isShowMenu = false;
                                         this.isOpenDetail = false;
                                         this.mapClickPointId = v.resource_id;
+                                        sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
                                         if(document.querySelector(".info-scenic-btns")){
                                             if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId === v.resource_id){
                                                 document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
@@ -1563,6 +1566,7 @@
             },
             toPlay(e) {
                 let currentPointInfo = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === this.mapClickPointId)[0];
+                debugger
                 let {url, name, guideUrl, resource_id} = currentPointInfo;
                 this.scenicPointImg = url;
                 this.scenicPointName = name;
