@@ -1472,7 +1472,7 @@
                         });
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                       .bindPopup(infoContent,{className:"info-content-new"})
-                                      .on('click',() => { debugger
+                                      .on('click',() => { 
                                         this.isShowMenu = false;
                                         this.isOpenDetail = false;
                                         this.mapClickPointId = v.resource_id;
@@ -1568,7 +1568,6 @@
             },
             toPlay(e) {
                 let currentPointInfo = JSON.parse(sessionStorage.getItem('pointList')).filter(item => item.resource_id === this.mapClickPointId)[0];
-                debugger
                 let {url, name, guideUrl, resource_id} = currentPointInfo;
                 this.scenicPointImg = url;
                 this.scenicPointName = name;

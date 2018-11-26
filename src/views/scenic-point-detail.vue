@@ -247,12 +247,14 @@ export default {
         Loading
     },
     data() {
+        const cPoint = JSON.parse(sessionStorage.getItem("pointList")).filter(item => item.resource_id == sessionStorage.getItem("mapClickPointId"))[0];
         return {
             currentIndex: 0,
-            currentPointId: JSON.parse(sessionStorage.getItem("currentPoint")).resource_id,
-            pointImg: JSON.parse(sessionStorage.getItem("currentPoint")).url,
-            pointName: JSON.parse(sessionStorage.getItem("currentPoint")).name,
-            pointCaption: JSON.parse(sessionStorage.getItem("currentPoint")).commentary,
+            point: cPoint,
+            currentPointId: cPoint.resource_id,
+            pointImg: cPoint.url,
+            pointName: cPoint.name,
+            pointCaption: cPoint.commentary,
             pointList: JSON.parse(sessionStorage.getItem("pointList")),
             playList: JSON.parse(sessionStorage.getItem("playList")),
             isPlayed: false,
@@ -307,8 +309,8 @@ export default {
             let audioDom = document.createElement("audio"),
                 sourceDom = document.createElement("source");
             sourceDom.type = 'audio/mpeg';
-            sourceDom.src = JSON.parse(sessionStorage.getItem("currentPoint")).guideUrl;
-            audioDom.dataset.id = JSON.parse(sessionStorage.getItem("currentPoint")).resource_id;
+            sourceDom.src = this.point.guideUrl;
+            audioDom.dataset.id = this.point.resource_id;
             audioDom.appendChild(sourceDom);
             audioDom.classList.add('detail-audio');
             audioDom.style.display = 'none';
@@ -372,6 +374,8 @@ export default {
             if(detailAudio && detailAudio.paused){
                 this.isPlayed = true;
                 detailAudio.play();
+                sessionStorage.setItem("currentPoint",JSON.stringify(this.point));
+                sessionStorage.setItem("mapClickPointId",this.point.resource_id);
             }else{
                 console.log("****");
             }
@@ -439,12 +443,13 @@ export default {
                 newPointInfo = this.pointList.filter(item => item.resource_id === this.playList[index].aId)[0];
                 document.querySelector(".point-list").scrollLeft = 120 * (parseInt(newPointInfo.serial)-1);
             }
-            sessionStorage.setItem("currentPoint",JSON.stringify(newPointInfo));
-            //this.currentIndex = index;
+            //sessionStorage.setItem("currentPoint",JSON.stringify(newPointInfo));
+            this.point = newPointInfo;
             this.currentPointId = newPointInfo.resource_id;
             this.pointImg = newPointInfo.url;
             this.pointName = newPointInfo.name;
             this.pointCaption = newPointInfo.commentary;
+            this.currentTimeStr = "0:00";
             this.getCurrentImgList();
             this.setAudio(true);
         }
