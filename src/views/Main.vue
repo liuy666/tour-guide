@@ -543,7 +543,7 @@
                     </div>
                 </x-circle>
             </div>
-            <v-touch class="scenic-point-name-area" v-on:tap="toDetail">
+            <v-touch class="scenic-point-name-area" v-on:tap="toDetail(false)">
                 {{scenicPointName}}
             </v-touch>
             <v-touch class="list-btn" v-on:tap="openMenu" ></v-touch>
@@ -1193,6 +1193,7 @@
 
                 // 根据播放来源处理不同逻辑
                 if (options._type === 1) { // 工具栏播放
+                    this.oMap_main.closePopup();
                     if (mainAudio && mainAudio.paused) { // 如果当前 Audio 是暂停状态则直接继续播放
                         console.log('++++++++++++++ _type:1 继续播放 ++++++++++++++');
                         mainAudio.play();
@@ -1339,7 +1340,7 @@
                 })
 
                 if(document.querySelector(".info-scenic-btns")){
-                    if(isPlay){
+                    if(isPlay && this.scenicPointId == this.mapClickPointId){
                         document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
                     }else{
                         document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
@@ -1658,7 +1659,7 @@
                     this.pauseAudio();
                 }
             },
-            toDetail() {
+            toDetail(isWindow) {
                 if(document.querySelector(".main-audio")){
                     const status = document.querySelector('.main-audio').paused;
                     this.pauseAudio();
@@ -1668,6 +1669,9 @@
                         isPauseStatus : status
                     }
                     sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
+                }
+                if(!isWindow){
+                    sessionStorage.setItem("mapClickPointId",this.scenicPointId);
                 }
                 this.$router.push({
                     name :  'scenic-point-detail'
