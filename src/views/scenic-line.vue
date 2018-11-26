@@ -118,6 +118,16 @@ export default {
                     if (img.style.display === 'block') {
                         img.style.display = 'none';
                         sessionStorage.removeItem('lineId');
+                        const currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+                        const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                        const index = pointList.findIndex(item => currentPoint.resource_id === item.resource_id);
+                        const updatePlayList = pointList.slice(index).map(item => {
+                            return {
+                                aSrc: item.guideUrl,
+                                aId: item.resource_id
+                            }
+                        });
+                        sessionStorage.setItem('playList', JSON.stringify(updatePlayList));
                         this.REMOVECURRENTLINE();
                     } else {
                         sessionStorage.setItem('lineId', lineId);

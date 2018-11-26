@@ -18,12 +18,14 @@ import '@/styles/globalStyle.less';
 import QS from 'qs';
 import utils from '@/libs/utils.js';
 import https from '@/libs/http.js';
+const lodash  = require('lodash');
 
 
 Vue.config.productionTip = false;
 Vue.prototype.$QS = QS;
 Vue.prototype.$tool = utils;
 Vue.prototype.$http = https;
+Vue.prototype.$lodash = lodash;
 Vue.prototype.$base = process.env.NODE_ENV === "production" ? '' : '/api';
 const VueTouch = require('vue-touch');
 Vue.use(VueTouch, { name: 'v-touch' })

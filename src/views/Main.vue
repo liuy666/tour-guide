@@ -14,19 +14,20 @@
         position: relative;
 
         // 消息提示弹窗样式
-        .vux-toast .weui-icon_toast {
-            margin-top: 30px;
-        }
-        .vux-toast .weui-toast {
+        .vux-toast .weui-toast { // 提示框
             top: @toast-top;
             width: 228px;
         }
-        .weui-icon-success-no-circle:before {
+        .vux-toast .weui-icon_toast { // 提示框icon图片容器
+            margin-top: 30px;
+        }
+        .vux-toast .weui-icon_toast:before { // 提示框icon图片
             font-size: 100px;
             content: '\EA0D';
         }
-        .weui-toast__content {
+        .vux-toast .weui-toast__content { // 提示框文本信息
             margin-top: 20px;
+            font-size: 26px;
         }
 
         // loading层弹窗样式
@@ -549,14 +550,14 @@
         </section>
         <!-- 左侧反馈功能图标 -->
         <section class="function-area-left">
-            <v-touch class="function-btn FK" v-on:tap="gotoPage({name: 'feedback'})"></v-touch>
-            <v-touch class="function-btn DW" :class="isPositioning ? 'position' : ''" v-on:tap="getCurrentPosition"></v-touch>
+            <section class="function-btn FK" @click="gotoPage({name: 'feedback'})"></section>
+            <section class="function-btn DW" :class="isPositioning ? 'position' : ''" @click="getCurrentPosition"></section>
         </section>
         <!-- 右侧简介/全景/自动功能图标 -->
         <section class="function-area-right">
-            <v-touch tag="section" class="function-btn JJ" v-on:tap="seeIntroduce"></v-touch>
-            <v-touch tag="section" class="function-btn QJ" v-on:tap="gotoPage({name: 'full-view', needGetSrc: true})"></v-touch>
-            <v-touch tag="section" class="function-btn ZD" v-on:tap="changeAuto" :class="isAuto ? '' : 'NO'"></v-touch>
+            <section class="function-btn JJ" @click="seeIntroduce"></section>
+            <section class="function-btn QJ" @click="gotoPage({name: 'full-view', needGetSrc: true})"></section>
+            <section class="function-btn ZD" @click="changeAuto" :class="isAuto ? '' : 'NO'"></section>
         </section>
         <!-- 底部景区简介弹窗 -->
         <section v-show="isOpenDetail" class="introDetail">
@@ -566,7 +567,7 @@
                     <div class="scenic-name">{{scenicName}}</div>
                     <span class="scenic-level">{{scenicLevel+"级风景区"}}</span>
                 </div>
-                <v-touch class="close-btn" v-on:tap="seeIntroduce"></v-touch>
+                <div class="close-btn" @click="seeIntroduce"></div>
             </div>
             <div class="scenic-address-time">
                 <div class="scenic-address">
@@ -621,11 +622,9 @@
             if(this.timer){
                 clearInterval(this.timer);
             }
-            console.log(8989)
+            console.log('created')
             if (!sessionStorage.getItem('currentScenic')) {
-                this.$router.replace({
-                    path: '/'
-                });
+                this.$router.go(-1);
                 return;
             }
         },
@@ -651,6 +650,9 @@
             } else {
                 //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
+            }
+            if (!scenicInfo) {
+                return;
             }
             
             // 初始化底部景区简介弹窗
@@ -1304,7 +1306,7 @@
                 this.changeMapIcon(false);
             },
             // 改变地图图标交互效果 
-            changeMapIcon (isPlay) { 
+            changeMapIcon (isPlay) {
                 this.getMarkerIndex(false);
                 let ind = this.indexOfMarkers;
                 if(!this.markers[ind] || !this.markers[ind]._icon.children[0]){
@@ -1393,7 +1395,7 @@
                 this.markers = [];
 
                 // 根据资源类型获取资源列表
-                const res = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${arg.resourceType}`);
+                const res = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${arg.resourceType}&limit=500`);
                 if(!res){
                     this.tipsText = "请求失败";
                     this.isTips = true;
@@ -1424,7 +1426,7 @@
                             });
                         } else { 
                             if (fromRouteName === 'root' || fromRouteName === 'feedback') { // 如果是刷新后初始化页面或从反馈页回退的情况
-                                console.log(999999)
+                                console.log('init')
                                 const cPoint = JSON.parse(sessionStorage.getItem("currentPoint"));
 
                                 // 移除部分本地存储

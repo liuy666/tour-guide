@@ -12,19 +12,20 @@
                 margin-top: 55px;
             }
         }
-        .vux-toast .weui-icon_toast {
-            margin-top: 30px;
-        }
-        .vux-toast .weui-toast {
+        .vux-toast .weui-toast { // 提示框
             top: @toast-top;
             width: 228px;
         }
-        .weui-icon-success-no-circle:before {
+        .vux-toast .weui-icon_toast { // 提示框icon图片容器
+            margin-top: 30px;
+        }
+        .vux-toast .weui-icon_toast:before { // 提示框icon图片
             font-size: 100px;
             content: '\EA0D';
         }
-        .weui-toast__content {
+        .vux-toast .weui-toast__content { // 提示框文本信息
             margin-top: 20px;
+            font-size: 26px;
         }
         .img-690-866 {
             background: url("../assets/images/recognize.png") no-repeat center center / 690px 866px;
@@ -106,7 +107,7 @@ export default {
             isShowLoading: false,
             loadText: '',
             isTips: false,
-            tipsText: ''
+            tipsText: '无法识别该图像 ~'
         }
     },
     methods: {
