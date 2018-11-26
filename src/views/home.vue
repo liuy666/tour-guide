@@ -159,7 +159,7 @@
             //     minZoom: 10
             // }).addTo(oMap);
 
-            let imageUrl = './qcx.png',
+            let imageUrl = './qcx.jpg',
             imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
             L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
 
