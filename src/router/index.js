@@ -61,7 +61,7 @@ router.beforeEach((to, from, next) => {
         }
     }
 
-    if (from.name === 'recognize' && to.name !== 'main') {
+    if (from.name === 'recognize' && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
         next({
             path: '/main',
             replace: true
