@@ -6,12 +6,12 @@ const app = {
         resourceList: [],
         content: '',
         routeName: '',
-        playStatus: '',
         autoPlay: false,
-        playEnd: false,
         fromRouteName: '',
         fromRouteName_detail: '',
-        lineStatus: ''
+        lineStatus: '',
+        sId: '',
+        currentScenic: null
     },
     mutations: {
         // 保存路线列表
@@ -37,10 +37,6 @@ const app = {
             state.routeName = val;
             sessionStorage.setItem('routeName', val);
         },
-        // 景点列表页监听Main页面的播放暂停
-        startCurrentPlay(state, val) {
-            state.playStatus = val;
-        },
         // 设置当前路由的上一个路由的名字 用于区分是普通页面刷新/其他页面回退
         SETFROMROUTENAME(state, val) {
             state.fromRouteName = val;
@@ -56,9 +52,11 @@ const app = {
         autoPlay(state) {
             state.autoPlay = !state.autoPlay;
         },
-        // 监听播放结束
-        playEnd(state) {
-            state.playEnd = !state.playEnd;
+        SETSCENICID(state, val) {
+            state.sId = val;
+        },
+        SETCURRENTSCENIC(state, val) {
+            state.currentScenic = val;
         }
     },
     actions: {

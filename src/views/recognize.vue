@@ -97,6 +97,7 @@
 
 <script>
 import {Loading, Toast} from 'vux';
+import { mapMutations } from 'vuex';
 export default {
     components: {
         Loading,
@@ -110,7 +111,14 @@ export default {
             tipsText: '无法识别该图像 ~'
         }
     },
+    beforeRouteLeave (to, from , next) {
+        this.SETFROMROUTENAME('recognize');
+        next();
+    },
     methods: {
+        ...mapMutations([
+            'SETFROMROUTENAME'
+        ]),
         async addImg(changeEvent) {
             // console.log(changeEvent);
             this.isShowLoading = true;

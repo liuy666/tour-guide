@@ -14,24 +14,58 @@ export default router;
 
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
-    console.log(from, to);
-    if (to.path === '/') {  
-        console.log('A')
-        sessionStorage.clear();
-    }
-    // 从home页进入下一路由或在main页刷新路由
-    if ((!from.name || from.name === 'index') && to.name === 'main' && sessionStorage.getItem('currentScenic')) {
-        console.log('B')
+    console.log('***from-to***')
+    console.log(from);
+    console.log(to);
+    console.log('***from-to***')
+
+    // 从home页进入main页或在main页刷新
+    if ((!from.name || from.name === 'index') && to.name === 'main') {
+        console.log('SETFROMROUTENAME => root')
         vuex.commit('SETFROMROUTENAME', 'root');
     }
+
+    // 在反馈页刷新
+    if (to.name === 'feedback') {
+        vuex.commit('SETSCENICID', JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id);
+    }
+
     // 在main页的子路由上刷新
     if (!from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) { 
-        console.log('C');
-        next('/main');
+        console.log('在main页的子路由上刷新,跳转回main页');
+        next({
+            path: '/main',
+            replace: true
+        });
     }
-    if (from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
-        console.log('D');
-        vuex.commit('SETFROMROUTENAME', from.name);
+
+    // 从首页前进跳转到main的子页面
+    if (from.name === 'index' && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
+        console.log('从首页前进跳转到main的子页面');
+        next({
+            path: '/main'
+        });
+    }
+
+    if ((from.name === 'scenic-spot' || from.name === 'scenic-line' || from.name === 'scenic-resource' || from.name === 'main') && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
+        console.log('main页及子页间的跳转');
+        if (!sessionStorage.getItem('currentResource') && to.name === 'scenic-resource') {
+            console.log(1)
+            next({
+                path: '/',
+                replace: true
+            });
+        } else {
+            console.log(2)
+            vuex.commit('SETFROMROUTENAME', from.name);
+        }
+    }
+
+    if (from.name === 'recognize' && to.name !== 'main') {
+        next({
+            path: '/main',
+            replace: true
+        })
     }
     next();
 });

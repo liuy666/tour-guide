@@ -92,9 +92,9 @@
 </template>
 
 <script>
-    import LC from 'leaflet.chinatmsproviders'
-    import { setTimeout } from 'timers'
+    // import LC from 'leaflet.chinatmsproviders'
     import { Toast, Badge } from 'vux'
+    import { mapMutations } from 'vuex'
     export default {
         components: {
             Toast,
@@ -103,9 +103,12 @@
         async created() {
             const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
                 domainUrl: 'www.qxgz.com', // 上线改成获取域名
-                limit: 20
+                limit: 500
             });
             if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
+                this.$router.replace({
+                    name: 'not-found'
+                });
                 return;
             }
             const validList = getMsgList.page.list.filter(item => {
@@ -148,12 +151,6 @@
                 maxBoundsViscosity : 0.8
             });
 
-            // 加载高德地图图层 暂时没用
-            // L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
-            //     maxZoom: 18,
-            //     minZoom: 10
-            // }).addTo(oMap);
-
             let imageUrl = './qcx.jpg',
             imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
             L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
@@ -167,10 +164,13 @@
                 isTips : false,
                 tipsText : '请求失败',
                 isHasMsg: false,
-                bl:0,
+                bl: 0,
             }
         },
         methods: {
+            ...mapMutations([
+                'SETCURRENTSCENIC' // 保存当前景区信息到vuex
+            ]),
             async getScenicList () {
                 let _self = this;
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
@@ -192,7 +192,8 @@
                                      .bindPopup(_self.createInfoWindow(v),{className:"info-content-new"})
                                      .on('click',function(){
                                          sessionStorage.setItem("currentScenic",JSON.stringify(v));
-                                     })
+                                         _self.SETCURRENTSCENIC(v);
+                                     });
                     })
                 }
             },
