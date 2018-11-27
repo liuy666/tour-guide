@@ -476,7 +476,7 @@ export default {
         }
         this.setAudio();
     },
-    beforeRouteLeave (to, from , next) {
+    beforeRouteLeave (to, from , next) {debugger
         const status = document.querySelector('.detail-audio').paused;
         this.pauseAudio();
         let playStatus = {

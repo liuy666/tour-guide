@@ -747,7 +747,8 @@
                 })
                 geolocation.on('error',function(){
                     _self.isTips = true;
-                    _self.tipsText = "定位失败";
+                    _self.tipsText = "定位失败,请检查应用是否允许使用定位功能";
+                    _self.isPositioning = false;
                 })
             });
 
@@ -1695,7 +1696,7 @@
                     let one = [v.latitude,v.longitude];
                     mapPath.push(one);
                 })
-                let polyline = L.polyline(mapPath,{color:"#68A8FC",weight:4,dashArray:[20,10]}).addTo(this.oMap_main);
+                let polyline = L.polyline(mapPath,{color:"#68A8FC",weight:4}).addTo(this.oMap_main);
                 this.line = polyline;
 
                 //路线途径景点
