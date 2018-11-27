@@ -792,7 +792,10 @@
             this.initMenu();
 
             //自动定位一次
-            this.geolocation.getCurrentPosition();
+            if(!sessionStorage.getItem("hasPosition")){
+                this.geolocation.getCurrentPosition();
+                sessionStorage.setItem("hasPosition",true);
+            }
         },
         data () {
             return {
