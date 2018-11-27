@@ -462,9 +462,13 @@ export default {
         this.getCurrentImgList();
     },
     mounted() {
+        //获取屏幕大小 动态设置不同手机的地图zoom
+        const containerWidth = document.querySelector('#scenic-point-detail').clientWidth;
+        let bl = parseFloat((containerWidth/375).toFixed(2));
+
         let self = this;
         this.currentIndex = this.pointList.findIndex(item => item.resource_id === this.currentPointId);
-        document.querySelector(".point-list").scrollLeft = 120 * this.currentIndex;
+        document.querySelector(".point-list").scrollLeft =  15 + bl * 96 * this.currentIndex;
         const fromRouteName = this.$store.state.app.fromRouteName_detail;
         if(fromRouteName != 'scenic-point-detail'){
             sessionStorage.removeItem('playStatus');
