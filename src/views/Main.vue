@@ -1437,14 +1437,6 @@
                     // 判断是否是初始化页面 还是回退进入本页面
                     const fromRouteName = this.$store.state.app.fromRouteName;
 
-                    // 移除部分本地存储
-                    sessionStorage.removeItem('playStatus');
-                    sessionStorage.removeItem('isAuto');
-                    sessionStorage.removeItem('currentResource');
-                    sessionStorage.removeItem('lineList');
-                    sessionStorage.removeItem('lineId');
-                    sessionStorage.removeItem('otherPointList');
-
                     // 存储更新完整景点列表
                     sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
 
@@ -1452,6 +1444,14 @@
                     if(arg.resourceType == 1) { 
                         if (fromRouteName === 'root' || fromRouteName === 'feedback') { // 如果是刷新后初始化页面或从反馈页回退的情况
                             console.log('init');
+
+                            // 移除部分本地存储
+                            sessionStorage.removeItem('playStatus');
+                            sessionStorage.removeItem('isAuto');
+                            sessionStorage.removeItem('currentResource');
+                            sessionStorage.removeItem('lineList');
+                            sessionStorage.removeItem('lineId');
+                            sessionStorage.removeItem('otherPointList');
 
                             if (arg.query && arg.query.pid) { // 如果通过二维码扫码进入页面则使用指定景点
                                 const qrcode_current_point = res.page.list.filter(item => item.resource_id === arg.query.pid)[0];

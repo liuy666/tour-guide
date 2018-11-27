@@ -1,84 +1,107 @@
 <style lang="less" scoped>
     #message-list {
-        background-color: #f8f8f8;
         width: 100%;
         height: 100%;
-        ul {
-            overflow: hidden;
-            li {
+        .ul-wrapper {
+            background-color: #f8f8f8;
+            width: 100%;
+            height: 100%;
+            ul {
                 overflow: hidden;
-                .msg-date {
-                    width: 168px;
-                    height: 36px;
-                    background-color: #dbdbdb;
-                    border-radius: 18px;
-                    font-size: 20px;
-                    font-weight: 400;
-                    line-height: 36px;
-                    color: #fff;
-                    margin: 22px auto;
-                    text-align: center;
-                }
-                dl {
-                    border-radius: 20px;
+                li {
                     overflow: hidden;
-                    width: 690px;
-                    margin: 0 auto;
-                    dt {
-                        width: 690px;
-                        height: 310px;
-                        img {
-                            width: 100%;
-                            height: 100%;
-                        }
+                    .msg-date {
+                        width: 168px;
+                        height: 36px;
+                        background-color: #dbdbdb;
+                        border-radius: 18px;
+                        font-size: 20px;
+                        font-weight: 400;
+                        line-height: 36px;
+                        color: #fff;
+                        margin: 22px auto;
+                        text-align: center;
                     }
-                    dd {
+                    dl {
+                        border-radius: 20px;
                         overflow: hidden;
-                        background-color: #fff;
-                        h2 {
-                            
-                            font-size: 30px;
-                            font-weight: 500;
-                            line-height: 70px;
-                            margin-bottom: 8px;
-                            padding-left: 20px;
+                        width: 690px;
+                        margin: 0 auto;
+                        dt {
+                            width: 690px;
+                            height: 310px;
+                            img {
+                                width: 100%;
+                                height: 100%;
+                            }
                         }
-                        section {
+                        dd {
                             overflow: hidden;
-                            padding: 0 20px;
-                            margin-bottom: 20px;
-                            p {
-                                float: left;
+                            background-color: #fff;
+                            h2 {
+                                
+                                font-size: 30px;
+                                font-weight: 500;
+                                line-height: 70px;
+                                margin-bottom: 8px;
+                                padding-left: 20px;
+                            }
+                            section {
                                 overflow: hidden;
-                                span {
+                                padding: 0 20px;
+                                margin-bottom: 20px;
+                                p {
                                     float: left;
-                                    font-size: 24px;
-                                    font-weight:400;
-                                    color: #888;
-                                    &:nth-child(1) {
-                                        margin-right: 36px;
+                                    overflow: hidden;
+                                    span {
+                                        float: left;
+                                        font-size: 24px;
+                                        font-weight:400;
+                                        color: #888;
+                                        &:nth-child(1) {
+                                            margin-right: 36px;
+                                        }
                                     }
                                 }
-                            }
-                            a {
-                                float: right;
-                                font-size: 24px;
-                                color: #FE5100;
-                                font-weight: 400;
-                                padding-right: 23px;
-                                text-decoration: none;
-                                background: url('../assets/images/icon_right@3x.png') no-repeat right center / 12px 24px;
+                                a {
+                                    float: right;
+                                    font-size: 24px;
+                                    color: #FE5100;
+                                    font-weight: 400;
+                                    padding-right: 23px;
+                                    text-decoration: none;
+                                    background: url('../assets/images/icon_right@3x.png') no-repeat right center / 12px 24px;
+                                }
                             }
                         }
                     }
-                }
-                .dl-gray {
-                    color: #ccc;
-                    a {
+                    .dl-gray {
                         color: #ccc;
-                        background: url('../assets/images/icon_hui@3x.png') no-repeat right center / 12px 24px;
+                        a {
+                            color: #ccc;
+                            background: url('../assets/images/icon_hui@3x.png') no-repeat right center / 12px 24px;
+                        }
                     }
                 }
+            }
+        }
+        .no-message-list {
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            overflow: hidden;
+            div {
+                width: 359px;
+                height: 280px;
+                background: url("../assets/images/nolist.png") no-repeat center center / 359px 280px;
+                margin: 398px auto 23px;
+            }
+            p {
+                font-size: 28px;
+                font-weight: 500;
+                color: #666;
+                line-height: 40px;
+                text-align: center;
             }
         }
     }
@@ -86,47 +109,54 @@
 
 <template>
     <div id="message-list">
-        <ul>
-            <li v-for="msg of messageList" :key="msg.id">
-                <template v-if="msg.interval >= 0">
-                    <section class="msg-date">{{ msg.date1 }}</section>
-                    <dl>
-                        <dt>
-                            <img :src="msg.img" alt="加载中..." />
-                        </dt>
-                        <dd>
-                            <h2>{{ msg.title }}</h2>
-                            <section>
-                                <p>
-                                    <span>{{ msg.date2 }}</span>
-                                    <span>{{ msg.date3 }}</span>
-                                </p>
-                                <v-touch tag="a" href="#" @tap.prevent="gotoMsgDetail({ content: msg.content, msgId: msg.id, msgTitle: msg.title })">阅读全文</v-touch>
-                            </section>
-                        </dd>
-                    </dl>
-                </template>
-                <template v-else>
-                    <section class="msg-date">{{ msg.date1 }}</section>
-                    <dl class="dl-gray">
-                        <dt>
-                            <img :src="msg.img" alt="加载中..." />
-                        </dt>
-                        <dd>
-                            <h2>{{ msg.title }}</h2>
-                            <section>
-                                <p>
-                                    <span>{{ msg.date2 }}</span>
-                                    <span>{{ msg.date3 }}</span>
-                                </p>
-                                <a href="javascript:void(0);">阅读全文</a>
-                            </section>
-                        </dd>
-                    </dl>
-                </template>
-                
-            </li>
-        </ul>
+        <div class="ul-wrapper" v-if="!isNoMessage">
+            <ul>
+                <li v-for="msg of messageList" :key="msg.id">
+                    <template v-if="msg.interval >= 0">
+                        <section class="msg-date">{{ msg.date1 }}</section>
+                        <dl>
+                            <dt>
+                                <img :src="msg.img" alt="加载中..." />
+                            </dt>
+                            <dd>
+                                <h2>{{ msg.title }}</h2>
+                                <section>
+                                    <p>
+                                        <span>{{ msg.date2 }}</span>
+                                        <span>{{ msg.date3 }}</span>
+                                    </p>
+                                    <v-touch tag="a" href="#" @tap.prevent="gotoMsgDetail({ content: msg.content, msgId: msg.id, msgTitle: msg.title })">阅读全文</v-touch>
+                                </section>
+                            </dd>
+                        </dl>
+                    </template>
+                    <template v-else>
+                        <section class="msg-date">{{ msg.date1 }}</section>
+                        <dl class="dl-gray">
+                            <dt>
+                                <img :src="msg.img" alt="加载中..." />
+                            </dt>
+                            <dd>
+                                <h2>{{ msg.title }}</h2>
+                                <section>
+                                    <p>
+                                        <span>{{ msg.date2 }}</span>
+                                        <span>{{ msg.date3 }}</span>
+                                    </p>
+                                    <a href="javascript:void(0);">阅读全文</a>
+                                </section>
+                            </dd>
+                        </dl>
+                    </template>
+                    
+                </li>
+            </ul>
+        </div>
+        <div class="no-message-list" v-else>
+            <div class="img-wrapper"></div>
+            <p>这里空空如也</p>
+            <p>愿你的每一段坚守都不负岁月</p>
+        </div>
     </div>
 </template>
 
@@ -136,7 +166,8 @@ import { mapMutations } from 'vuex';
 export default {
     data() {
         return {
-            messageList: []
+            messageList: [],
+            isNoMessage: false
         }
     },
     async created() {
@@ -146,7 +177,8 @@ export default {
         });
 
         console.log(getMsgList)
-        if (!getMsgList) {
+        if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
+            this.isNoMessage = true;
             return;
         }
 
