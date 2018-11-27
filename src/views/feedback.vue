@@ -8,7 +8,7 @@
             width: 690px;
             height: 260px;
             background: rgba(248,248,248,1);
-            border-radius: 10px; 
+            border-radius: 10px;
             padding: 30px;
             box-sizing: border-box;
             position: relative;
@@ -20,7 +20,8 @@
                 font-size:24px;
                 font-weight:400;
             }
-            .textarea-200 {       
+            .textarea-200 {
+                font-size: 30px;   
                 width: 630px;
                 height: 150px; 
                 resize: none;

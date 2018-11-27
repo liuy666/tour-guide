@@ -18,8 +18,6 @@
                 margin-left: -33px !important;
                 margin-top: -70px !important;
                 .icon{
-                    //width: 88px;
-                    //height: 96px;
                     width: 66px;
                     height: 73px;
                     background: url("../assets/images/icon_scenic_home@3x.png") no-repeat center center / 100% 100%;
@@ -27,9 +25,7 @@
                 .name{
                     white-space: nowrap;
                     position: absolute;
-                    //left: calc(~'-50% + 44px');
                     padding: 10px 20px;
-                    // line-height: 60px;
                     background: url("../assets/images/icon_bg@3x.png") no-repeat center center / 100% 100%;
                     font-weight: bold;
                     color: #572b12;
@@ -40,9 +36,6 @@
                     font-size: 24px;
                 }
             }
-            // .info-content-new{
-            //     bottom: 70px !important;
-            // }
             .leaflet-popup-content-wrapper{
                 padding: 0;
             }
@@ -112,7 +105,7 @@
                 domainUrl: 'www.qxgz.com', // 上线改成获取域名
                 limit: 20
             });
-            if (!getMsgList) {
+            if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
                 return;
             }
             const validList = getMsgList.page.list.filter(item => {
@@ -154,6 +147,8 @@
                 maxBounds : [[31.459197, 104.49496], [33.573508, 105.725429]],
                 maxBoundsViscosity : 0.8
             });
+
+            // 加载高德地图图层 暂时没用
             // L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
             //     maxZoom: 18,
             //     minZoom: 10
@@ -162,14 +157,7 @@
             let imageUrl = './qcx.jpg',
             imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
             L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
-
-            //地图信息窗体
-            // let popup = L.popup({
-            //     autoClose:false,
-            //     className:"info-content-new"
-            // });
             this.oMap_home = oMap;
-            //this.oInfoWindow = popup;
             this.getScenicList();
         },
         data () {
@@ -179,7 +167,7 @@
                 isTips : false,
                 tipsText : '请求失败',
                 isHasMsg: false,
-                bl:0
+                bl:0,
             }
         },
         methods: {
@@ -242,11 +230,9 @@
                 })
             },
             gotoMsgList() {
-                if (this.isHasMsg) {
-                    this.$router.push({
-                        name: 'message-list'
-                    });
-                }
+                this.$router.push({
+                    name: 'message-list'
+                });
             }
         }
     }

@@ -1217,12 +1217,10 @@
                     src = options._src;
                     id = options._id;
                     isContinuePlay = true;
-                } else if (options._type === 3) { // 景点列表点播/地图解说播放/连播
-                    console.log('++++++++++++++ _type:3 点播/连播 ++++++++++++++');
+                } else if (options._type === 3) { // 景点列表点播/地图解说播放/连播/扫码播放
+                    console.log('++++++++++++++ _type:3 点播/连播/扫码播 ++++++++++++++');
                     src = options._src;
                     id = options._id;
-                } else { // 扫码播放
-                    return;
                 }
 
                 if (mainAudio) {
@@ -1440,37 +1438,50 @@
                     // 判断是否是初始化页面 还是回退进入本页面
                     const fromRouteName = this.$store.state.app.fromRouteName;
 
-                    // 移除部分本地存储
-                    sessionStorage.removeItem('playStatus');
-                    sessionStorage.removeItem('isAuto');
-                    sessionStorage.removeItem('currentResource');
-                    sessionStorage.removeItem('lineList');
-                    sessionStorage.removeItem('lineId');
-                    sessionStorage.removeItem('otherPointList');
+                    // 存储更新完整景点列表
+                    sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
 
                     // 初始化默认显示
-                    if(arg.resourceType == 1) {
-                        if (arg.query && arg.query.pid) { // 如果通过二维码扫码进入页面则使用指定景点
-                            const qrcode_current_point = res.page.list.filter(item => item.resource_id === arg.query.pid)[0];
+                    if(arg.resourceType == 1) { 
+                        if (fromRouteName === 'root' || fromRouteName === 'feedback') { // 如果是刷新后初始化页面或从反馈页回退的情况
+                            console.log('init');
 
-                            // 存储当前扫码景点的信息
-                            sessionStorage.setItem("currentPoint",JSON.stringify(qrcode_current_point));
-                            this.scenicPointImg = qrcode_current_point.url;
-                            this.scenicPointName = qrcode_current_point.name;
-                            this.scenicPointId = qrcode_current_point.resource_id;
+                            // 移除部分本地存储
+                            sessionStorage.removeItem('playStatus');
+                            sessionStorage.removeItem('isAuto');
+                            sessionStorage.removeItem('currentResource');
+                            sessionStorage.removeItem('lineList');
+                            sessionStorage.removeItem('lineId');
+                            sessionStorage.removeItem('otherPointList');
 
-                            // 播放当前扫码景点的解说音频
-                            this.playAudio({
-                                _src: qrcode_current_point.guideUrl,
-                                _id: qrcode_current_point.resource_id,
-                                _type: 4
-                            });
-                        } else { 
-                            if (fromRouteName === 'root' || fromRouteName === 'feedback') { // 如果是刷新后初始化页面或从反馈页回退的情况
-                                console.log('init');
+                            if (arg.query && arg.query.pid) { // 如果通过二维码扫码进入页面则使用指定景点
+                                const qrcode_current_point = res.page.list.filter(item => item.resource_id === arg.query.pid)[0];
+
+                                // 存储当前扫码景点的信息
+                                sessionStorage.setItem("currentPoint",JSON.stringify(qrcode_current_point));
+                                this.scenicPointImg = qrcode_current_point.url;
+                                this.scenicPointName = qrcode_current_point.name;
+                                this.scenicPointId = qrcode_current_point.resource_id;
                                 
-                                // 存储更新完整景点列表和当前景点信息(取第一个景点) 
-                                sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
+                                // 过滤出默认播放列表
+                                const index = res.page.list.findIndex(item => item.resource_id === arg.query.pid);
+                                const newPlayList = res.page.list.slice(index).map(item => {
+                                    return {
+                                        aSrc: item.guideUrl,
+                                        aId: item.resource_id
+                                    }
+                                });
+                                sessionStorage.setItem('playList',JSON.stringify(newPlayList));
+
+                                // 播放当前扫码景点的解说音频
+                                this.playAudio({
+                                    _src: qrcode_current_point.guideUrl,
+                                    _id: qrcode_current_point.resource_id,
+                                    _type: 3
+                                });
+                            } else {
+
+                                // 否则默认取取第一个景点
                                 sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
                                 this.scenicPointImg = res.page.list[0].url;
                                 this.scenicPointName = res.page.list[0].name;
