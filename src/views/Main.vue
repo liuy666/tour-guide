@@ -488,7 +488,7 @@
         <section class="main_view " v-show="isShowMenu">
             <section class="main_view_wrapper">
                 <section class="main_view_header">
-                    <v-touch tag="section" class="camera" v-on:tap="gotoPage({name: 'recognize'})"></v-touch>
+                    <v-touch tag="section" class="camera" v-on:tap="gotoPage('recognize')"></v-touch>
                     <p>遇见全世界的美</p>
                     <section class="weather">
                         <section class="content">
@@ -550,13 +550,13 @@
         </section>
         <!-- 左侧反馈功能图标 -->
         <section class="function-area-left">
-            <section class="function-btn FK" @click="gotoPage({name: 'feedback', params: {sid: sceneryId}})"></section>
+            <section class="function-btn FK" @click="gotoPage('feedback')"></section>
             <section class="function-btn DW" :class="isPositioning ? 'position' : ''" @click="getCurrentPosition"></section>
         </section>
         <!-- 右侧简介/全景/自动功能图标 -->
         <section class="function-area-right">
             <section class="function-btn JJ" @click="seeIntroduce"></section>
-            <section class="function-btn QJ" @click="gotoPage({name: 'full-view', needGetSrc: true})"></section>
+            <section class="function-btn QJ" @click="gotoPage('full-view')"></section>
             <section class="function-btn ZD" @click="changeAuto" :class="isAuto ? '' : 'NO'"></section>
         </section>
         <!-- 底部景区简介弹窗 -->
@@ -595,7 +595,7 @@
 </template>
 
 <script>
-    import LC from 'leaflet.chinatmsproviders';
+    // import LC from 'leaflet.chinatmsproviders';
     import { XButton, Icon, XCircle, Toast, Loading } from 'vux';
     import { mapActions, mapMutations, mapState } from 'vuex';
     export default {
@@ -619,17 +619,18 @@
             next();
         },
         created() {
-            const query = this.$route.query;
+            console.log('created')
+
             if(this.timer){
                 clearInterval(this.timer);
             }
-            console.log('created')
-            if (!sessionStorage.getItem('currentScenic') && !query.sid) {
-                this.$router.go(-1);
-                return;
+            if (!sessionStorage.getItem('currentScenic')) {
+                sessionStorage.setItem('currentScenic', JSON.stringify(this.$store.state.app.currentScenic));
             }
         },
         async mounted() {
+            console.log('mounted')
+
             const query = this.$route.query;
             let scenicInfo = null;
 
@@ -644,11 +645,10 @@
                     return;
                 }
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
+                scenicInfo = {...currentScenic};
                 sessionStorage.setItem('currentScenic',JSON.stringify(currentScenic));
-                scenicInfo = {
-                    ...currentScenic
-                }
                 this.SETFROMROUTENAME('root');
+                this.SETCURRENTSCENIC(currentScenic);
             } else {
                 //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
@@ -908,7 +908,6 @@
                     const currentAudioContainer = document.querySelector('.toolbars');
                     currentAudioContainer.removeChild(au);
                     sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
-                    this.playEnd(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                     this.isPlayed = false;
 
                     // 如果开启了自动连播
@@ -927,7 +926,6 @@
                             });
                         } else { // 表明播放列表已播完，则更改播放状态
                             sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
-                            this.playEnd(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                         }
                     }
                 }
@@ -1177,11 +1175,10 @@
             ...mapMutations([
                 'SAVERESOURCELIST',
                 'SETROUTENAME', // 更改路由name
-                'startCurrentPlay', // 开始播放
                 'autoPlay', // 自动连播
-                'playEnd', // 播放结束
                 'SETTOROUTENAMEOFMENU',
-                'SETFROMROUTENAME'
+                'SETFROMROUTENAME',
+                'SETCURRENTSCENIC'
             ]),
             /**
              * 初始化音频播放
@@ -1202,7 +1199,6 @@
                         console.log('++++++++++++++ _type:1 继续播放 ++++++++++++++');
                         mainAudio.play();
                         sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: false})); // 修改暂停状态标志量--isPauseStatus
-                        this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                         this.isPlayed = true;
                         this.changeMapIcon(true); // 同步地图上标记点更改状态
                         return;
@@ -1260,7 +1256,6 @@
                                 this.isPlayed = false;
                             } else {
                                 _audioDom.play();
-                                this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试  从地图播放 监听不到？？
                                 this.isPlayed = true;
                             } 
                             if (this.isPlayed) {
@@ -1281,7 +1276,6 @@
                                 this.isPlayed = false;
                             } else {
                                 _audioDom.play();
-                                this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试  从地图播放 监听不到？？
                                 this.isPlayed = true;
                             } 
                             if (this.isPlayed) {
@@ -1299,7 +1293,6 @@
                         this.totalTime = _audioDom.duration;
                         sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus : false}));
                         _audioDom.play();
-                        this.startCurrentPlay('play'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                         this.isPlayed = true;
                         if (this.isPlayed) {
                             this.changeMapIcon(true);
@@ -1320,7 +1313,6 @@
                     isPauseStatus : true
                 } 
                 sessionStorage.setItem('playStatus', JSON.stringify(status));
-                this.startCurrentPlay('pause'); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                 this.isPlayed = false;
 
                 //地图图标交互效果 
@@ -1374,12 +1366,12 @@
                 },1000);
             },
             // 跳转其他页
-            gotoPage(...args) {
-                if (args[0].needGetSrc) {
+            gotoPage(name) {
+                if (name === 'full-view') {
                     const fullViewSrc = JSON.parse(sessionStorage.getItem('currentScenic')).panorama_url;
                     if (fullViewSrc) {
                         this.$router.push({
-                            name: args[0].name,
+                            name,
                             params: {
                                 src: fullViewSrc
                             }
@@ -1388,19 +1380,15 @@
                         this.tipsText = '还没有全景图 ~'
                         this.isTips = true;
                         return;
-                    }  
-                } else {
-                    if (args[0].params) {
-                        console.log(args[0].params)
-                        this.$router.push({
-                            name: args[0].name,
-                            params: {
-                                ...args[0].params
-                            }
-                        });
-                    } else {
-                        this.$router.push({name: args[0].name});
                     }
+                }
+                if (name === 'recognize') {
+                    this.$router.push({name});
+                }
+                if (name === 'feedback') {
+                    this.$router.push({
+                        name
+                    });
                 }
             },
             // 打开/关闭景区详情弹窗
@@ -1438,12 +1426,12 @@
                     // 判断是否是初始化页面 还是回退进入本页面
                     const fromRouteName = this.$store.state.app.fromRouteName;
 
-                    // 存储更新完整景点列表
-                    sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
-
                     // 初始化默认显示
                     if(arg.resourceType == 1) { 
-                        if (fromRouteName === 'root' || fromRouteName === 'feedback') { // 如果是刷新后初始化页面或从反馈页回退的情况
+                        // 存储更新完整景点列表
+                        sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
+                        
+                        if (fromRouteName === 'root' || fromRouteName === 'feedback' || fromRouteName === 'recognize') { // 如果是刷新后初始化页面或从反馈页回退的情况
                             console.log('init');
 
                             // 移除部分本地存储

@@ -225,7 +225,7 @@ export default {
         gotoMsgDetail(params) {
             // 存储文章
             this.SAVECONTENT(params.content);
-            this.$router.push({
+            this.$router.replace({
                 name: 'msg-detail',
                 params
             });

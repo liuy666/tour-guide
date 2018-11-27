@@ -91,8 +91,15 @@ export const appRoutes = [{
     {
         path: '/msg-detail/:msgId',
         name: 'msg-detail',
-        component: () =>
-            import ('@/views/msg-detail.vue')
+        component: () => import ('@/views/msg-detail.vue')
+    },
+    {
+        path: '*',
+        name: 'not-found',
+        meta: {
+            title: '404-页面找不到'
+        },
+        component: () => import ('@/views/404.vue')
     }
 ]
 

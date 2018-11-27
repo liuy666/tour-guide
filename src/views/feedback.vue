@@ -20,6 +20,18 @@
                 font-size:24px;
                 font-weight:400;
             }
+            textarea::-webkit-textarea-placeholder{ /* 改变默认placeholder颜色的方式 */
+                color: #ccc;
+            }
+            textarea::-moz-placeholder{   /* Mozilla Firefox 19+ */
+                color: #ccc;
+            }
+            textarea:-moz-placeholder{    /* Mozilla Firefox 4 to 18 */
+                color: #ccc;
+            }
+            textarea:-ms-textarea-placeholder{  /* Internet Explorer 10-11 */ 
+                color: #ccc;
+            }
             .textarea-200 {
                 font-size: 30px;   
                 width: 630px;
@@ -171,7 +183,7 @@
 
 <script>
 import { Toast } from 'vux';
-import {mapMutations} from 'vuex';
+import {mapMutations, mapState} from 'vuex';
 export default {
     components: {
         Toast
@@ -185,20 +197,20 @@ export default {
             yourTel: '',
             isTips: false,
             tipsText: '',
-            sceneryId: '',
+            uploadImageList: []
         }
     },
     beforeRouteLeave (to, from , next) {
         this.SETFROMROUTENAME('feedback');
         next();
     },
-    created() {
-        this.sceneryId = this.$route.params.sid;
-    },
     computed: {
         entered() {
             return this.words;
-        }
+        },
+        ...mapState({
+            sId: state => state.app.sId
+        })
     },
     methods: {
         ...mapMutations([
@@ -254,14 +266,14 @@ export default {
                             this.isTips = true;
                             return;
                         }
-                        let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
-                        const delIndex = imgUrlList.forEach((element, idx) => {
+                        // let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
+                        const delIndex = this.uploadImageList.forEach((element, idx) => {
                             if (element.id === _ID) {
                                 return idx;
                             }
                         });
-                        imgUrlList.splice(delIndex, 1);
-                        sessionStorage.setItem('imgUrlList', JSON.stringify(imgUrlList));
+                        this.uploadImageList.splice(delIndex, 1);
+                        // sessionStorage.setItem('imgUrlList', JSON.stringify(imgUrlList));
                         grandparentNode.removeChild(parentNode);
                         if (containerDom.children.length <= 3) {
                             this.isCanAddImage = true;
@@ -277,12 +289,12 @@ export default {
                 fileReader.onload = (loadEvent) => {
                     imgDom.src = loadEvent.target.result;
                     imgDom.file = file;
-                    let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList')) || [];
-                    imgUrlList.push({
+                    // let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList')) || [];
+                    this.uploadImageList.push({
                         id: res.ossEntity.id,
                         url: loadEvent.target.result
                     });
-                    sessionStorage.setItem('imgUrlList', JSON.stringify(imgUrlList)); // 存储上传图片的id和本地览的base64-src
+                    // sessionStorage.setItem('imgUrlList', JSON.stringify(imgUrlList)); // 存储上传图片的id和本地览的base64-src
                     sectionDom.appendChild(imgDom);
                     sectionDom.appendChild(closeDom);
                     containerDom.insertBefore(sectionDom, uploadDom);
@@ -303,7 +315,8 @@ export default {
             this.words = this.textareaValue.length;
         },
         // 验证电话号码格式是否正确
-        validateTel() {
+        validateTel(e) {
+            // console(e.keyCode)
             if (this.yourTel.length >= 11) {
                 if (!this.$tool.validateReg.phoneNumber(Number(this.yourTel))) {
                     this.tipsText = '手机号码无效啦 ~';
@@ -332,9 +345,9 @@ export default {
                 this.isTips = true;
                 return;
             } else {
-                const imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
+                // const imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
                 let imgList = {};
-                imgUrlList.forEach((element, idx) => {
+                this.uploadImageList.forEach((element, idx) => {
                     imgList = Object.assign({}, imgList, {
                         [`img${idx + 1}`] : element.id,
                     });
@@ -343,7 +356,7 @@ export default {
                     content: this.textareaValue,
                     contacts: this.yourName,
                     mobile: this.yourTel,
-                    sceneryId: this.sceneryId,
+                    sceneryId: this.sId,
                     ...imgList
                 }
                 const submitFeedback = await this.$http.post(this.$base + '/hqyatu-navigator/app/sys/saveSuggestion', bodyParams);

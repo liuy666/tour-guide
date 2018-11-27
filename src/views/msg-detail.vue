@@ -1,8 +1,17 @@
-<style lang="less" scoped>
+<style lang="less">
     #msg-detail {
         height: 100%;
         width: 100%;
         overflow-y: auto;
+        padding: 30px;
+        box-sizing: border-box;
+        img {
+            width: 100%;
+            margin: 20px 0;
+        }
+        p {
+            font-size: 28px;
+        }
     }
 </style>
 
