@@ -132,7 +132,7 @@
                         div {
                             width: 42px;
                             height: 42px;
-                            margin: 0 27px 5px;
+                            margin: 0 37px 5px;
                             img {
                                 width:100%;
                                 height:100%;
@@ -140,8 +140,8 @@
                         }
                         span {
                             font-size: 24px;
-                            line-height: 32px;
-                            width: 96px;
+                            line-height: 34px;
+                            width: 116px;
                         }
                     }
                 }
@@ -758,7 +758,7 @@
                 center: centerPoint,
                 zoom: zoom,
                 minZoom: zoom,
-                maxZoom: 19,
+                maxZoom: 18,
                 attributionControl: false,
                 zoomControl: false,
                 // closePopupOnClick:false,
@@ -1430,7 +1430,7 @@
                     if(arg.resourceType == 1) { 
                         // 存储更新完整景点列表
                         sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
-                        
+
                         if (fromRouteName === 'root' || fromRouteName === 'feedback' || fromRouteName === 'recognize') { // 如果是刷新后初始化页面或从反馈页回退的情况
                             console.log('init');
 
