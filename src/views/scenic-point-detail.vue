@@ -410,7 +410,7 @@ export default {
             this.isShowLoading = true;
             let _self = this;
             this.imageList = [];
-            const imgList = await this.$http.get(this.$base + 'hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
+            const imgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
             if(!imgList){
                 this.isShowLoading = false;
                 return;
@@ -462,12 +462,7 @@ export default {
         this.getCurrentImgList();
     },
     mounted() {
-        // this.pointList.forEach((v,i) => {
-        //     if(v.resource_id === this.currentPointId){
-        //         this.currentIndex = i;
-        //         return;
-        //     }
-        // });
+        let self = this;
         this.currentIndex = this.pointList.findIndex(item => item.resource_id === this.currentPointId);
         document.querySelector(".point-list").scrollLeft = 120 * this.currentIndex;
         const fromRouteName = this.$store.state.app.fromRouteName_detail;
@@ -475,8 +470,46 @@ export default {
             sessionStorage.removeItem('playStatus');
         }
         this.setAudio();
+
+
+        this.$nextTick(function(){
+            let circle = document.querySelector(".circle");
+            let flag = 0;
+            circle.addEventListener("touchstart",function(e){   
+                if(self.isPlayed){
+                    self.isPlayed = false;
+                    flag = 1;
+                }
+            })
+            circle.addEventListener("touchmove",function(e){
+                let x = e.changedTouches[0].clientX - this.parentElement.offsetLeft;
+                let xx = x < 0 ? 0 : x;
+                let total = this.parentElement.offsetWidth;
+                let move = xx > total ? total : xx;
+                document.querySelector(".circle").style.left = (move - 8) + 'px';
+                
+                self.currentTime = self.totalTime * (move / total).toFixed(2);
+                document.querySelector('.detail-audio').currentTime = self.currentTime;
+                let cf = Math.floor(self.currentTime/60);
+                let cm = (self.currentTime%60).toFixed(0) < 10 ? '0'+(self.currentTime%60).toFixed(0) : (self.currentTime%60).toFixed(0);
+                if(cm == 60) {
+                    cf = cf + 1;
+                    cm = "00";
+                }
+                self.currentTimeStr = cf + ":" + cm;
+
+                self.audioProgress = self.currentTime / self.totalTime * 100;
+                
+            })
+            circle.addEventListener("touchend",function(e){   
+                if(flag == 1){
+                    self.isPlayed = true;
+                    flag = 0;
+                }
+            })
+        })
     },
-    beforeRouteLeave (to, from , next) {debugger
+    beforeRouteLeave (to, from , next) {
         const status = document.querySelector('.detail-audio').paused;
         this.pauseAudio();
         let playStatus = {
