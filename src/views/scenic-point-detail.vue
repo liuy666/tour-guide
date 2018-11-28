@@ -209,6 +209,7 @@
 <template>
     <div id="scenic-point-detail">
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
+        <toast class="short" v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
         <section class="audio-area">
             <div class="audio-area-img">
                 <img :src="pointImg" style="width:100%;height:100%;border-radius:100%;" />
@@ -264,12 +265,13 @@
 </template>
 
 <script>
-import { Swiper, XProgress, Loading } from 'vux'
+import { Swiper, XProgress, Loading, Toast } from 'vux'
 export default {
     components : {
         Swiper,
         XProgress,
-        Loading
+        Loading,
+        Toast
     },
     data() {
         const cPoint = JSON.parse(sessionStorage.getItem("pointList")).filter(item => item.resource_id == sessionStorage.getItem("mapClickPointId"))[0];
@@ -292,7 +294,9 @@ export default {
             timer: '',
             playIndex : 0,
             isShowLoading : false,
-            loadText:''
+            loadText:'',
+            isTips:false,
+            tipsText: '请求失败'
         }
     },
     watch : {
@@ -439,6 +443,7 @@ export default {
             const imgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
             if(!imgList){
                 this.isShowLoading = false;
+                this.isTips = true;
                 return;
             }
             if(imgList.sowingPictures && imgList.sowingPictures.length>0){

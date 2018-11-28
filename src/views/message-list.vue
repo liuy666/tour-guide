@@ -255,7 +255,6 @@ export default {
                 interval,
                 content: item.content
             }
-            this.isShowLoading = false;
         });
         let contentList = getMsgList.page.list.map(item => {
             return {
@@ -263,6 +262,7 @@ export default {
                 id: item.articleId,
             }
         });
+        this.isShowLoading = false;
     },
     methods: {
         ...mapMutations([
