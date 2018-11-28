@@ -946,6 +946,7 @@
                     this.scenicPointId = currentPoint.resource_id;
 
                     this.mapClickPointId = to.params.pid;
+                    sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
     
                     this.getMarkerIndex(to.params.pid);
                     this.markers[this.indexOfMarkers].openPopup();

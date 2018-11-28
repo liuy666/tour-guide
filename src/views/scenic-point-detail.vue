@@ -302,6 +302,7 @@ export default {
             const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
 
             const audio = document.querySelector(".detail-audio");
+            const audio_old = document.querySelector(".detail-audio-old");
             if(audio){
                 document.querySelector(".audio-area").removeChild(audio);
             }
