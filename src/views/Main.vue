@@ -13,38 +13,56 @@
         width: 100%;
         position: relative;
 
-        // 消息提示弹窗样式
-        .vux-toast .weui-toast { // 提示框
+        // 带图标信息提示
+        .short.vux-toast .weui-toast { // 提示框
             top: @toast-top;
-            width: 228px;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
         }
-        .vux-toast .weui-icon_toast { // 提示框icon图片容器
-            margin-top: 30px;
+        .short.vux-toast .weui-icon_toast { // 提示框icon图片容器
+            margin-top: 28px;
         }
-        .vux-toast .weui-icon_toast:before { // 提示框icon图片
-            font-size: 100px;
-            content: '\EA0D';
+        .short.vux-toast .weui-icon_toast:before { // 提示框icon图片
+            font-size: 60px;
         }
-        .vux-toast .weui-toast__content { // 提示框文本信息
-            margin-top: 20px;
-            font-size: 26px;
+        .short.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 22px 0 0 0;
+            font-size: 28px;
+        }
+
+        // 纯文字信息提示
+        .long.vux-toast .weui-toast{ // 提示框
+            top: @toast-top;
+            width: auto!important;
+        }
+        .long.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 0;
+            font-size: 28px;
+            padding: 25px 20px 15px;
         }
 
         // loading层弹窗样式
         .weui-loading_toast .weui-toast {
             top: @toast-top;
-            height: 170px;
-            width: 228px;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
             i {
                 width: 60px;
                 height: 60px;
                 margin-top: 55px;
             }
         }
+
+        // 地图容器
         #wrapper {
             width: 100%;
             height: 100%;
         }
+
         //菜单弹窗
         .main_view {
             width: 732px;
@@ -147,7 +165,8 @@
                 }
             }
         }
-        //底部景点播放
+
+        //底部景点播放栏
         .toolbars {
             display: flex;
             position: absolute;
@@ -160,7 +179,6 @@
             z-index: 1001;
             box-sizing: border-box;
             background: url("../assets/images/bg_player@3x.png") no-repeat center / 100% 100%;
-
             .vux-circle-content{
                 height: 100%;
                 box-sizing: border-box;
@@ -232,6 +250,7 @@
                 background: url('../assets/images/icon_list@3x.png') no-repeat center center / 32px 26px;
             }
         }
+
         //地图页功能键区域
         .function-area-left,.function-area-right{
             position: absolute;
@@ -279,12 +298,16 @@
                 }
             }
         }
+
+        // 定位动态图
         .my-position{
             width: 66px;
             height: 73px;
             margin-left: -33px;
             margin-top: -70px;
         }
+
+        // 地图标记图标
         .marker-content-new{
             width: auto !important;
             height: auto !important;
@@ -345,6 +368,8 @@
                 border: 1px solid #642F15;
             }
         }
+
+        // 地图路线序号
         .point-serial{
             width: 30px !important;
             height: 30px !important;
@@ -356,6 +381,7 @@
             text-align: center;
             border-radius: 15px;
         }
+
         /*信息弹窗相关*/
         .leaflet-popup-content-wrapper{
             padding: 0;
@@ -376,6 +402,7 @@
             height: 28px;
             font-size: 24px;
         }
+
         // 景区简介弹窗样式
         .introDetail{
             position: absolute;
@@ -482,6 +509,14 @@
         <section id="map_test"></section>
         <!-- 网络请求loading层 -->
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
+        <!-- 提示弹窗 -->
+        <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
+        <toast class="short" v-model="isTips2" type="success" :text="tipsText2" :is-show-mask="true"></toast>
+        <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
+
+        
+        <!-- <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast> -->
+
         <!-- 地图容器 -->
         <section id="wrapper"></section>
         <!-- 图标菜单弹窗 -->
@@ -585,17 +620,13 @@
             </div>
            
         </section>
-        <!-- 记录当前经纬度临时框（开发测试用） -->
-        <!-- <section style="position:absolute; left:0; bottom:0; z-index:1001;">
-            <input v-model="longlati" class="currentPosition"  />
-        </section> -->
-        <!-- 提示弹窗 -->
-        <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
+        
+        <!-- 自定义弹窗 -->
+        <!-- <div id="tips">{{ tipsContent }}</div> -->
     </div>
 </template>
 
 <script>
-    // import LC from 'leaflet.chinatmsproviders';
     import { XButton, Icon, XCircle, Toast, Loading } from 'vux';
     import { mapActions, mapMutations, mapState } from 'vuex';
     export default {
@@ -640,8 +671,8 @@
                     domainUrl: 'www.qxgz.com'
                 });
                 if (!scenicList) {
-                    this.tipsText = "请求失败";
-                    this.isTips = true;
+                    this.tipsText3 = "数据请求失败，请刷新后重试";
+                    this.isTips3 = true;
                     return;
                 }
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
@@ -654,6 +685,8 @@
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
             }
             if (!scenicInfo) {
+                this.tipsText3 = "数据请求失败，请刷新后重试";
+                this.isTips3 = true;
                 return;
             }
             
@@ -729,7 +762,6 @@
                 var geolocation = new AMap.Geolocation(options);
                 _self.geolocation = geolocation;
                 map_test.addControl(geolocation);
-                //geolocation.getCurrentPosition()
                 geolocation.on('complete',function(GeolocationResult) {
                     _self.isPositioning = false;
                     let cp = GeolocationResult.position;
@@ -741,13 +773,13 @@
                         });
                         L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
                     }else{
-                        _self.isTips = true;
-                        _self.tipsText = "您当前不在景区范围内";
+                        _self.tipsText3 = "您当前不在景区范围内";
+                        _self.isTips3 = true;
                     }
                 })
                 geolocation.on('error',function(){
-                    _self.isTips = true;
-                    _self.tipsText = "定位失败,请检查应用是否允许使用定位功能";
+                    _self.tipsText3 = "定位失败，请检查应用是否允许使用定位功能";
+                    _self.isTips3 = true;
                     _self.isPositioning = false;
                 })
             });
@@ -761,7 +793,6 @@
                 maxZoom: 18,
                 attributionControl: false,
                 zoomControl: false,
-                // closePopupOnClick:false,
                 maxBounds : [imgLeftBottom1, imgRightTop1],
                 maxBoundsViscosity : 0.8
             });
@@ -782,10 +813,10 @@
                 _self.$router.replace({
                     name: 'main'
                 });
-                //_self.oMap_main.closePopup();
                 _self.isShowMenu = false;
                 _self.isOpenDetail = false;
-            })
+            });
+
             // 获取默认景点列表
             this.getScenicPointList({
                 resourceType: 1,
@@ -816,8 +847,12 @@
                 oMap_main: {}, // 地图实例化对象
                 line: {}, // 路线
                 resourceType: 1, // 景区资源类型 默认 1 -- 景点
-                isTips: false,
-                tipsText: '请求失败',
+                isTips1: false,
+                isTips2: false,
+                isTips3: false,
+                tipsText1: '',
+                tipsText2: '',
+                tipsText3: '',
                 isShowMenu: false,
                 isOpenDetail: false,
                 isAuto: false, // 是否自动播放
@@ -887,7 +922,10 @@
                     '/bg_else@3x.png'
                 ],
                 region: '', // 景点所属地区
-                indexOfMarkers : 0
+                indexOfMarkers : 0,
+                isHasWeather: false,
+                isHasPointList: false,
+                isHastMapImage: false
             }
         },
         computed: mapState({
@@ -1009,7 +1047,6 @@
             },
             // 初始化图标菜单
             async initMenu() {
-                this.isShowLoading = true;
 
                 // 获取当前景区经纬度
                 const getCoordinate = JSON.parse(sessionStorage.getItem('currentScenic'));
@@ -1035,7 +1072,6 @@
 
                 // console.log(getListAndWheather);
                 if (!getListAndWheather) {
-                    this.isShowLoading = false;
                     return;
                 }
 
@@ -1075,7 +1111,6 @@
                     }
                 });
                 this.SETROUTENAME('scenic-spot');
-                this.isShowLoading = false;
             },
             // 打开图标菜单
             openMenu() {

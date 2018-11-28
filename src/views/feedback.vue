@@ -134,20 +134,35 @@
                 background: #FE5100;
             }
         }
-        .vux-toast .weui-toast { // 提示框
+
+        // 带图标信息提示
+        .short.vux-toast .weui-toast { // 提示框
             top: @toast-top;
-            width: 228px;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
         }
-        .vux-toast .weui-icon_toast { // 提示框icon图片容器
-            margin-top: 30px;
+        .short.vux-toast .weui-icon_toast { // 提示框icon图片容器
+            margin-top: 28px;
         }
-        .vux-toast .weui-icon_toast:before { // 提示框icon图片
-            font-size: 100px;
-            content: '\EA0D';
+        .short.vux-toast .weui-icon_toast:before { // 提示框icon图片
+            font-size: 60px;
         }
-        .vux-toast .weui-toast__content { // 提示框文本信息
-            margin-top: 20px;
-            font-size: 26px;
+        .short.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 22px 0 0 0;
+            font-size: 28px;
+        }
+
+        // 纯文字信息提示
+        .long.vux-toast .weui-toast{ // 提示框
+            top: @toast-top;
+            width: auto!important;
+        }
+        .long.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 0;
+            font-size: 28px;
+            padding: 25px 20px 15px;
         }
     }
 </style>
@@ -177,7 +192,9 @@
             </div>
             <v-touch tag="button" type="button" class="submit-upload" @tap="handleSubmit">提交反馈</v-touch>
         </form>
-        <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
+        <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
+        <toast class="short" v-model="isTips2" type="success" :text="tipsText2" :is-show-mask="true"></toast>
+        <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
     </div>
 </template>
 
@@ -195,8 +212,12 @@ export default {
             words: 0,
             yourName: '',
             yourTel: '',
-            isTips: false,
-            tipsText: '',
+            isTips1: false,
+            isTips2: false,
+            isTips3: false,
+            tipsText1: '',
+            tipsText2: '',
+            tipsText3: '',
             uploadImageList: []
         }
     },
@@ -230,8 +251,8 @@ export default {
                 console.log(res);
 
                 if (!res) {
-                    this.tipsText = res.msg;
-                    this.isTips = true;
+                    this.tipsText1 = res.msg;
+                    this.isTips1 = true;
                     return;
                 }
 
@@ -262,8 +283,8 @@ export default {
                         const del = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/delete', [_ID]);
                         console.log(del);
                         if (!del) {
-                            this.tipsText = res.msg;
-                            this.isTips = true;
+                            this.tipsText1 = res.msg;
+                            this.isTips1 = true;
                             return;
                         }
                         // let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
@@ -311,6 +332,8 @@ export default {
         inputWord() {
             if (this.textareaValue.length > 200) {
                 this.textareaValue = this.textareaValue.slice(0, 200);
+                this.tipsText3 = '文字达到上限了~'
+                this.isTips3 = true;
             }
             this.words = this.textareaValue.length;
         },
@@ -319,8 +342,8 @@ export default {
             // console(e.keyCode)
             if (this.yourTel.length >= 11) {
                 if (!this.$tool.validateReg.phoneNumber(Number(this.yourTel))) {
-                    this.tipsText = '手机号码无效啦 ~';
-                    this.isTips = true;
+                    this.tipsText3 = '电话号码错了~';
+                    this.isTips3 = true;
                     this.yourTel = this.yourTel.slice(0, 11);
                     this.isCorrent = false;
                 } else {
@@ -331,8 +354,8 @@ export default {
         // 验证电话号码长度是否正确
         validateLength() {
             if (this.yourTel.length < 11) {
-                this.tipsText = '手机号码太短啦 ~';
-                this.isTips = true;
+                this.tipsText3 = '电话号码错了~';
+                this.isTips3 = true;
                 this.isCorrent = false;
             } else {
                 this.isCorrent = true;
@@ -341,11 +364,10 @@ export default {
         // 提交反馈
         async handleSubmit(e) {
             if (!this.textareaValue || !this.yourName || !this.isCorrent) {
-                this.tipsText = '请填写完整反馈信息';
-                this.isTips = true;
+                this.tipsText3 = '请填写完整反馈信息~';
+                this.isTips3 = true;
                 return;
             } else {
-                // const imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
                 let imgList = {};
                 this.uploadImageList.forEach((element, idx) => {
                     imgList = Object.assign({}, imgList, {
@@ -361,13 +383,17 @@ export default {
                 }
                 const submitFeedback = await this.$http.post(this.$base + '/hqyatu-navigator/app/sys/saveSuggestion', bodyParams);
                 if (!submitFeedback) {
-                    this.tipsText = '???';
-                    this.isTips = true;
+                    this.tipsText1 = '提交失败';
+                    this.isTips1 = true;
                     return;
                 }
-                this.$router.replace({
-                    name: 'main'
-                });
+                this.tipsText2 = '提交成功';
+                this.isTips2 = true;
+                setTimeout(() => {
+                    this.$router.replace({
+                        name: 'main'
+                    });
+                }, 2000);
             }
         }
     }

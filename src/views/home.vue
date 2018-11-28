@@ -92,7 +92,6 @@
 </template>
 
 <script>
-    // import LC from 'leaflet.chinatmsproviders'
     import { Toast, Badge } from 'vux'
     import { mapMutations } from 'vuex'
     export default {
