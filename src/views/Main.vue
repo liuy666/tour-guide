@@ -770,7 +770,11 @@
             //     minZoom: 17
             // }).addTo(oMap);
             
-            L.imageOverlay(scenicBgImg, [imgLeftBottom1,imgRightTop1]).addTo(oMap);
+            let mapImg = L.imageOverlay(scenicBgImg, [imgLeftBottom1,imgRightTop1]).addTo(oMap);
+            mapImg.on('load',function(){
+                
+            })
+
             this.oMap_main = oMap;
 
             oMap.on('click',function(e) {
@@ -1671,7 +1675,8 @@
                     let playStatus = {
                         currentTime: document.querySelector('.main-audio').currentTime,
                         totalTime: this.totalTime,
-                        isPauseStatus : status
+                        isPauseStatus : status,
+                        resourceId: document.querySelector('.main-audio').dataset.id
                     }
                     sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
                 }
