@@ -2,31 +2,51 @@
     #recognize {
         height: 100%;
         overflow: hidden;
+        // loading层弹窗样式
         .weui-loading_toast .weui-toast {
             top: @toast-top;
-            height: 170px;
-            width: 228px;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
             i {
                 width: 60px;
                 height: 60px;
                 margin-top: 55px;
             }
         }
-        .vux-toast .weui-toast { // 提示框
+
+        // 带图标信息提示
+        .short.vux-toast .weui-toast { // 提示框
             top: @toast-top;
-            width: 228px;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
         }
-        .vux-toast .weui-icon_toast { // 提示框icon图片容器
-            margin-top: 30px;
+        .short.vux-toast .weui-icon_toast { // 提示框icon图片容器
+            margin-top: 28px;
         }
-        .vux-toast .weui-icon_toast:before { // 提示框icon图片
-            font-size: 100px;
-            content: '\EA0D';
+        .short.vux-toast .weui-icon_toast:before { // 提示框icon图片
+            font-size: 60px;
         }
-        .vux-toast .weui-toast__content { // 提示框文本信息
-            margin-top: 20px;
-            font-size: 26px;
+        .short.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 22px 0 0 0;
+            font-size: 28px;
         }
+
+        // 纯文字信息提示
+        .long.vux-toast .weui-toast{ // 提示框
+            top: @toast-top;
+            width: auto!important;
+        }
+        .long.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 0;
+            font-size: 28px;
+            padding: 25px 20px 15px;
+        }
+
+
         .img-690-866 {
             background: url("../assets/images/recognize.png") no-repeat center center / 690px 866px;
             border-radius: 20px;
@@ -78,7 +98,9 @@
 <template>
     <div id="recognize">
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
-        <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
+        <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
+        <toast class="short" v-model="isTips2" type="success" :text="tipsText2" :is-show-mask="true"></toast>
+        <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
         <section class="img-690-866"></section>
         <section class="camera-wraper">
             <section class="left s-130-177">
@@ -96,7 +118,7 @@
 </template>
 
 <script>
-import {Loading, Toast} from 'vux';
+import { Loading, Toast } from 'vux';
 import { mapMutations } from 'vuex';
 export default {
     components: {
@@ -107,8 +129,12 @@ export default {
         return {
             isShowLoading: false,
             loadText: '',
-            isTips: false,
-            tipsText: '无法识别该图像 ~'
+            isTips1: false,
+            isTips2: false,
+            isTips3: false,
+            tipsText1: '',
+            tipsText2: '',
+            tipsText3: ''
         }
     },
     beforeRouteLeave (to, from , next) {
@@ -120,7 +146,6 @@ export default {
             'SETFROMROUTENAME'
         ]),
         async addImg(changeEvent) {
-            // console.log(changeEvent);
             this.isShowLoading = true;
             const file = changeEvent.target.files[0], // 返回一个FileList对象,类数组类型
                   imgType = file.type;
@@ -130,29 +155,32 @@ export default {
                 const formData = new FormData();
                 formData.append('image_file', file);
                 const res = await this.$http.post(this.$base + '/hqyatu-navigator/app/img/recognition', formData, 'multipart/form-data');
-                console.log(res);
 
                 if (!res) {
                     this.isShowLoading = false;
                     changeEvent.target.value = '';
-                    this.tipsText = res.msg;
-                    this.isTips = true;
+                    this.tipsText1 = '请求失败';
+                    this.isTips1 = true;
                     return;
                 }
 
                 this.isShowLoading = false;
                 let descOrder = res.response.identify_results.sort((a, b) => b.probability - a.probability);
                 if (descOrder[0].probability.toFixed(2) >= 0.7) {
-                    this.$router.push({
-                        name: 'recognize-detail',
-                        params: {
-                            src: descOrder[0].detail_url
-                        }
-                    });
+                    this.tipsText2 = '识别成功';
+                    this.isTips2 = true;
+                    setTimeout(() => {
+                        this.$router.push({
+                            name: 'recognize-detail',
+                            params: {
+                                src: descOrder[0].detail_url
+                            }
+                        });
+                    }, 2000);
                 } else {
                     changeEvent.target.value = '';
-                    this.tipsText = '无法识别该图像 ~';
-                    this.isTips = true;
+                    this.tipsText3 = '无法识别，请重试';
+                    this.isTips3 = true;
                 }
             }
         }

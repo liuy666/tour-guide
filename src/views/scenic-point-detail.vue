@@ -1,15 +1,40 @@
 <style lang="less">
     #scenic-point-detail{
         padding: 30px;
-        .weui-toast {
-            height: 170px;
-            width: 228px;
+        
+        // loading层弹窗样式
+        .weui-loading_toast .weui-toast {
+            top: @toast-top;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
             i {
                 width: 60px;
                 height: 60px;
                 margin-top: 55px;
             }
         }
+
+        // 带图标信息提示
+        .short.vux-toast .weui-toast { // 提示框
+            top: @toast-top;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
+        }
+        .short.vux-toast .weui-icon_toast { // 提示框icon图片容器
+            margin-top: 28px;
+        }
+        .short.vux-toast .weui-icon_toast:before { // 提示框icon图片
+            font-size: 60px;
+        }
+        .short.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 22px 0 0 0;
+            font-size: 28px;
+        }
+
         .weui-progress__bar{
             background:rgba(254,235,226,1);
             height: 6px;

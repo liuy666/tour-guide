@@ -164,6 +164,20 @@
             font-size: 28px;
             padding: 25px 20px 15px;
         }
+
+        // loading层弹窗样式
+        .weui-loading_toast .weui-toast {
+            top: @toast-top;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
+            i {
+                width: 60px;
+                height: 60px;
+                margin-top: 55px;
+            }
+        }
     }
 </style>
     
@@ -195,15 +209,17 @@
         <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
         <toast class="short" v-model="isTips2" type="success" :text="tipsText2" :is-show-mask="true"></toast>
         <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
+        <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
     </div>
 </template>
 
 <script>
-import { Toast } from 'vux';
+import { Toast, Loading } from 'vux';
 import {mapMutations, mapState} from 'vuex';
 export default {
     components: {
-        Toast
+        Toast,
+        Loading
     },
     data() {
         return {
@@ -218,7 +234,9 @@ export default {
             tipsText1: '',
             tipsText2: '',
             tipsText3: '',
-            uploadImageList: []
+            uploadImageList: [],
+            loadText: '',
+            isShowLoading: false
         }
     },
     beforeRouteLeave (to, from , next) {
@@ -368,6 +386,7 @@ export default {
                 this.isTips3 = true;
                 return;
             } else {
+                this.isShowLoading = true;
                 let imgList = {};
                 this.uploadImageList.forEach((element, idx) => {
                     imgList = Object.assign({}, imgList, {
@@ -383,10 +402,12 @@ export default {
                 }
                 const submitFeedback = await this.$http.post(this.$base + '/hqyatu-navigator/app/sys/saveSuggestion', bodyParams);
                 if (!submitFeedback) {
+                    this.isShowLoading = false;
                     this.tipsText1 = '提交失败';
                     this.isTips1 = true;
                     return;
                 }
+                this.isShowLoading = false;
                 this.tipsText2 = '提交成功';
                 this.isTips2 = true;
                 setTimeout(() => {

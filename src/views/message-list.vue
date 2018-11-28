@@ -104,6 +104,39 @@
                 text-align: center;
             }
         }
+
+        // loading层弹窗样式
+        .weui-loading_toast .weui-toast {
+            top: @toast-top;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
+            i {
+                width: 60px;
+                height: 60px;
+                margin-top: 55px;
+            }
+        }
+
+        // 带图标信息提示
+        .short.vux-toast .weui-toast { // 提示框
+            top: @toast-top;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
+        }
+        .short.vux-toast .weui-icon_toast { // 提示框icon图片容器
+            margin-top: 28px;
+        }
+        .short.vux-toast .weui-icon_toast:before { // 提示框icon图片
+            font-size: 60px;
+        }
+        .short.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 22px 0 0 0;
+            font-size: 28px;
+        }
     }
 </style>
 
@@ -157,31 +190,43 @@
             <p>这里空空如也</p>
             <p>愿你的每一段坚守都不负岁月</p>
         </div>
+        <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
+        <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
     </div>
 </template>
 
 <script>
 import { mapMutations } from 'vuex';
+import { Loading, Toast } from 'vux';
 
 export default {
     data() {
         return {
             messageList: [],
-            isNoMessage: false
+            isNoMessage: false,
+            isShowLoading: false,
+            loadText: '',
+            isTips1: false,
+            tipsText1: ''
         }
     },
+    components: {
+        Loading,
+        Toast
+    },
     async created() {
+        this.isShowLoading = true;
         const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
             domainUrl: 'www.qxgz.com', // 上线改成获取域名
-            limit: 20
+            limit: 500
         });
-
-        console.log(getMsgList)
         if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
             this.isNoMessage = true;
+            this.isShowLoading = false;
+            this.tipsText1 = '请求失败';
+            this.isTips1 = true;
             return;
         }
-
         this.messageList = getMsgList.page.list.map(item => {
             // 处理创建日期为两种显示格式
             const createDate = new Date(item.createTime),
@@ -210,6 +255,7 @@ export default {
                 interval,
                 content: item.content
             }
+            this.isShowLoading = false;
         });
         let contentList = getMsgList.page.list.map(item => {
             return {

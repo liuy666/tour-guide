@@ -264,6 +264,27 @@
             height: 250px;
             top: 26px;
             right: 30px;
+            // 自定义弹窗
+            #tips {
+                width: 278px;
+                height: 63px;
+                background: url("../assets/images/dbx.png") no-repeat center center / 100% 100%;
+                position: absolute;
+                z-index: 1001;
+                bottom: -78px; 
+                right: -4px;
+                p {
+                    position: absolute;
+                    left: 0;
+                    bottom: 0;
+                    font-size: 26px;
+                    color: #fff;
+                    height: 40px;
+                    width: 100%;
+                    text-align: center;
+                    line-height: 40px;
+                }
+            }
         }
         .function-area-left{
             height: 160px;
@@ -420,7 +441,12 @@
                     width: 220px;
                     height: 220px;
                     margin-top: -100px;
+                    .ignore {
+                        box-sizing: border-box;
+                        border: 2px solid #fff;
+                    }
                 }
+                
                 .scenic-name-level{
                     width: 360px;
                     margin-left: 22px;
@@ -511,12 +537,7 @@
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <!-- 提示弹窗 -->
         <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
-        <toast class="short" v-model="isTips2" type="success" :text="tipsText2" :is-show-mask="true"></toast>
         <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
-
-        
-        <!-- <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast> -->
-
         <!-- 地图容器 -->
         <section id="wrapper"></section>
         <!-- 图标菜单弹窗 -->
@@ -593,11 +614,15 @@
             <section class="function-btn JJ" @click="seeIntroduce"></section>
             <section class="function-btn QJ" @click="gotoPage('full-view')"></section>
             <section class="function-btn ZD" @click="changeAuto" :class="isAuto ? '' : 'NO'"></section>
+            <!-- 自定义弹窗 -->
+            <div id="tips" v-show="isTips4">
+                <p>点这里可以自动导游</p>
+            </div>
         </section>
         <!-- 底部景区简介弹窗 -->
         <section v-show="isOpenDetail" class="introDetail">
             <div class="scenic-detail-header">
-                <div class="scenic-img"><img style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/></div>
+                <div class="scenic-img"><img class="ignore" style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/></div>
                 <div class="scenic-name-level">
                     <div class="scenic-name">{{scenicName}}</div>
                     <span class="scenic-level">{{scenicLevel+"级风景区"}}</span>
@@ -620,9 +645,6 @@
             </div>
            
         </section>
-        
-        <!-- 自定义弹窗 -->
-        <!-- <div id="tips">{{ tipsContent }}</div> -->
     </div>
 </template>
 
@@ -650,7 +672,8 @@
             next();
         },
         created() {
-            console.log('created')
+            this.isShowLoading = true;
+            console.log('created');
 
             if(this.timer){
                 clearInterval(this.timer);
@@ -671,8 +694,7 @@
                     domainUrl: 'www.qxgz.com'
                 });
                 if (!scenicList) {
-                    this.tipsText3 = "数据请求失败，请刷新后重试";
-                    this.isTips3 = true;
+                    // 请求失败，跳转404 并传递返回的url
                     return;
                 }
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
@@ -685,8 +707,7 @@
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
             }
             if (!scenicInfo) {
-                this.tipsText3 = "数据请求失败，请刷新后重试";
-                this.isTips3 = true;
+                // 获取当前信息失败，跳转404 并传递返回的url
                 return;
             }
             
@@ -773,12 +794,12 @@
                         });
                         L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
                     }else{
-                        _self.tipsText3 = "您当前不在景区范围内";
+                        _self.tipsText3 = "您当前不在景区内";
                         _self.isTips3 = true;
                     }
                 })
                 geolocation.on('error',function(){
-                    _self.tipsText3 = "定位失败，请检查应用是否允许使用定位功能";
+                    _self.tipsText3 = "定位失败，请确保手机已开启定位";
                     _self.isTips3 = true;
                     _self.isPositioning = false;
                 })
@@ -803,8 +824,12 @@
             
             let mapImg = L.imageOverlay(scenicBgImg, [imgLeftBottom1,imgRightTop1]).addTo(oMap);
             mapImg.on('load',function(){
-                
-            })
+                _self.isHasMapImage = true;
+                if (_self.isHasPointList && _self.isHasWeather) {
+                    _self.isShowLoading = false;
+                    _self.autoGetPositon();
+                }
+            });
 
             this.oMap_main = oMap;
 
@@ -825,12 +850,6 @@
 
             // 初始化图标菜单
             this.initMenu();
-
-            //自动定位一次
-            if(!sessionStorage.getItem("hasPosition")){
-                this.geolocation.getCurrentPosition();
-                sessionStorage.setItem("hasPosition",true);
-            }
         },
         data () {
             return {
@@ -848,10 +867,9 @@
                 line: {}, // 路线
                 resourceType: 1, // 景区资源类型 默认 1 -- 景点
                 isTips1: false,
-                isTips2: false,
                 isTips3: false,
+                isTips4: false,
                 tipsText1: '',
-                tipsText2: '',
                 tipsText3: '',
                 isShowMenu: false,
                 isOpenDetail: false,
@@ -925,7 +943,8 @@
                 indexOfMarkers : 0,
                 isHasWeather: false,
                 isHasPointList: false,
-                isHastMapImage: false
+                isHasMapImage: false,
+                isFirst: true
             }
         },
         computed: mapState({
@@ -1028,6 +1047,17 @@
                 //     console.log('定位出错=====>', e);
                 // });
             },
+            // 自动定位一次及提示自动提示
+            autoGetPositon() {
+                if(!sessionStorage.getItem("hasPosition")){
+                    this.isTips4 = true;
+                    setTimeout(() => {
+                        this.isTips4 = false;
+                    }, 2000);
+                    this.geolocation.getCurrentPosition();
+                    sessionStorage.setItem("hasPosition", true);
+                }
+            },
             // 获取下一个播放链接
             getNext(currentId) {
                 const playList = JSON.parse(sessionStorage.getItem('playList'));
@@ -1068,9 +1098,14 @@
                         }
                     }
                 ]);
-
-                // console.log(getListAndWheather);
                 if (!getListAndWheather) {
+                    this.isHasWeather = true;
+                    if (this.isHasMapImage && this.isHasPointList) {
+                        this.isShowLoading = false;
+                        this.autoGetPositon();
+                    }
+                    this.tipsText1 = '请求失败'
+                    this.isTips1 = true;
                     return;
                 }
 
@@ -1110,6 +1145,11 @@
                     }
                 });
                 this.SETROUTENAME('scenic-spot');
+                this.isHasWeather = true;
+                if (this.isHasMapImage && this.isHasPointList) {
+                    this.isShowLoading = false;
+                    this.autoGetPositon();
+                }
             },
             // 打开图标菜单
             openMenu() {
@@ -1159,7 +1199,6 @@
                     }
                 }
                 this.removeMarker(1);
-
                 switch (paramKey) {
                     case 'resource_point':
                         if(this.markers_line.length>0){
@@ -1419,8 +1458,8 @@
                             }
                         });
                     } else {
-                        this.tipsText = '还没有全景图 ~'
-                        this.isTips = true;
+                        this.tipsText3 = '还没有全景图 ~'
+                        this.isTips3 = true;
                         return;
                     }
                 }
@@ -1441,6 +1480,13 @@
             },
             // 自动连播切换
             changeAuto() {
+                if (this.isAuto) {
+                    this.tipsText3 = '您已关闭自动导游';
+                    this.isTips3 = true;
+                } else {
+                    this.tipsText3 = '您已开启自动导游';
+                    this.isTips3 = true;
+                }
                 this.isAuto = !this.isAuto;
                 sessionStorage.setItem('isAuto',this.isAuto);
             },
@@ -1458,8 +1504,16 @@
                 // 根据资源类型获取资源列表
                 const res = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${arg.resourceType}&limit=500`);
                 if(!res){
-                    this.tipsText = "请求失败";
-                    this.isTips = true;
+                    if (this.isFirst) {
+                        this.isFirst = false;
+                        this.isHasPointList = true;
+                        if (this.isHasMapImage && this.isHasWeather) {
+                            this.isShowLoading = false;
+                            this.autoGetPositon();
+                        }
+                    }
+                    this.tipsText1 = "请求失败";
+                    this.isTips1 = true;
                     return;
                 }
 
@@ -1579,6 +1633,14 @@
                             _id: resource_id,
                             _type: 2 
                         });
+                    }
+                }
+                if (this.isFirst) {
+                    this.isFirst = false;
+                    this.isHasPointList = true;
+                    if (this.isHasMapImage && this.isHasWeather) {
+                        this.isShowLoading = false;
+                        this.autoGetPositon();
                     }
                 }
             },

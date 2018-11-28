@@ -37,7 +37,7 @@
 export default {
     methods: {
         gotoHome() {
-            this.$router.replace({
+            this.$router.replace({ // 需更改  不能直接跳跟路由 应改为指定路由
                 path: '/'
             })
         }
