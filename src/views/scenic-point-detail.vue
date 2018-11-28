@@ -323,7 +323,7 @@ export default {
                 let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
                 if (this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
-                    if(!isChange && playStatus){
+                    if(!isChange && playStatus && playStatus.resourceId == this.point.resource_id){
                         audioDom.currentTime = playStatus.currentTime;
                         this.currentTime = playStatus.currentTime;
                         let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
@@ -339,7 +339,7 @@ export default {
             if(!isChange){//进页面的初始化
                 const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
                 
-                if(playStatus){
+                if(playStatus && playStatus.resourceId == this.point.resource_id){
                     let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0),
                         tm = (playStatus.totalTime%60).toFixed(0) < 10 ? '0'+(playStatus.totalTime%60).toFixed(0) : (playStatus.totalTime%60).toFixed(0);
                     this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
