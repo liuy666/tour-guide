@@ -48,7 +48,9 @@ module.exports = {
              * 内距和外距，可以使用vw   
              */
         },
-        "postcss-viewport-units": {}, // 给CSS的属性添加content的属性，配合viewport-units-buggyfill库给vw、vh、vmin和vmax做适配的操作
+        "postcss-viewport-units": {
+            filterRule: rule => !rule.selector.includes(':before')
+        }, // 给CSS的属性添加content的属性，配合viewport-units-buggyfill库给vw、vh、vmin和vmax做适配的操作
         "postcss-aspect-ratio-mini": {}, // 处理元素容器宽高比,使用方法 => https://www.w3cplus.com/mobile/vw-layout-in-vue.html
         "postcss-write-svg": { // 用来处理移动端1px的解决方案,使用方法 => https://www.w3cplus.com/mobile/vw-layout-in-vue.html
             "utf8": false
