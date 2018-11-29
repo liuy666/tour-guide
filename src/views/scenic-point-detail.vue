@@ -275,9 +275,11 @@ export default {
     },
     data() {
         const cPoint = JSON.parse(sessionStorage.getItem("pointList")).filter(item => item.resource_id == sessionStorage.getItem("mapClickPointId"))[0];
+        const cPoint_play = JSON.parse(sessionStorage.getItem("currentPoint"));
         return {
             currentIndex: 0,
-            point: cPoint,
+            showPoint: cPoint,
+            playingPoint : cPoint_play,
             currentPointId: cPoint.resource_id,
             pointImg: cPoint.url,
             pointName: cPoint.name,
@@ -331,21 +333,37 @@ export default {
             const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
 
             const audio = document.querySelector(".detail-audio");
-            const audio_old = document.querySelector(".detail-audio-old");
+            const audio_play = document.querySelector(".detail-audio-play");
             if(audio){
                 document.querySelector(".audio-area").removeChild(audio);
+                document.querySelector(".audio-area").removeChild(audio_play);
             }
             const audioContainer = document.querySelector(".audio-area");
             let audioDom = document.createElement("audio"),
                 sourceDom = document.createElement("source");
             sourceDom.type = 'audio/mpeg';
-            sourceDom.src = this.point.guideUrl;
-            audioDom.dataset.id = this.point.resource_id;
+            sourceDom.src = this.showPoint.guideUrl;
+            audioDom.dataset.id = this.showPoint.resource_id;
             audioDom.appendChild(sourceDom);
             audioDom.classList.add('detail-audio');
             audioDom.style.display = 'none';
             audioContainer.appendChild(audioDom);
             audioDom.load();
+
+            let audioDom_play = document.createElement("audio"),
+                sourceDom_play = document.createElement("source");
+            sourceDom_play.type = 'audio/mpeg';
+            sourceDom_play.src = this.playingPoint.guideUrl;
+            audioDom_play.dataset.id = this.playingPoint.resource_id;
+            audioDom_play.appendChild(sourceDom_play);
+            audioDom_play.classList.add('detail-audio-play');
+            audioDom_play.style.display = 'none';
+            audioContainer.appendChild(audioDom_play);
+            audioDom_play.load();
+
+
+            //audioDom 用于放当前展示的景点的音频
+            //audioDom_play 用于放之前正在播放的景点的音频
 
             audioDom.oncanplay = (e) => { 
                 let _audioDom = e.target;
@@ -353,7 +371,7 @@ export default {
                 let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
                 if (this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
-                    if(!isChange && playStatus && playStatus.resourceId == this.point.resource_id){
+                    if(!isChange && playStatus && playStatus.resourceId == this.showPoint.resource_id){
                         audioDom.currentTime = playStatus.currentTime;
                         this.currentTime = playStatus.currentTime;
                         let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
@@ -369,7 +387,7 @@ export default {
             if(!isChange){//进页面的初始化
                 const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
                 
-                if(playStatus && playStatus.resourceId == this.point.resource_id){
+                if(playStatus && playStatus.resourceId == this.showPoint.resource_id){
                     let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0),
                         tm = (playStatus.totalTime%60).toFixed(0) < 10 ? '0'+(playStatus.totalTime%60).toFixed(0) : (playStatus.totalTime%60).toFixed(0);
                     this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
@@ -390,6 +408,10 @@ export default {
                     this.currentTimeStr = '0:00';
                     this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + tm1;
                     this.isPlayed = false;
+
+                    if(playStatus && !playStatus.isPauseStatus){
+                        audioDom_play.play();
+                    }
                 }
             }else{//切换景点的初始化
                 let tm2 = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
@@ -408,8 +430,8 @@ export default {
             if(detailAudio && detailAudio.paused){
                 this.isPlayed = true;
                 detailAudio.play();
-                sessionStorage.setItem("currentPoint",JSON.stringify(this.point));
-                sessionStorage.setItem("mapClickPointId",this.point.resource_id);
+                sessionStorage.setItem("currentPoint",JSON.stringify(this.showPoint));
+                sessionStorage.setItem("mapClickPointId",this.showPoint.resource_id);
             }else{
                 console.log("****");
             }
@@ -479,7 +501,7 @@ export default {
                 document.querySelector(".point-list").scrollLeft = 120 * (parseInt(newPointInfo.serial)-1);
             }
             //sessionStorage.setItem("currentPoint",JSON.stringify(newPointInfo));
-            this.point = newPointInfo;
+            this.showPoint = newPointInfo;
             this.currentPointId = newPointInfo.resource_id;
             this.pointImg = newPointInfo.url;
             this.pointName = newPointInfo.name;

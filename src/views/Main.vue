@@ -643,8 +643,9 @@
                 <!-- 最大限制字数340 -->
                 <div class="dec-content font-color-888">{{scenicDec}}</div>
             </div>
-           
         </section>
+
+        <input class="testInput" style="position:absolute;z-index:2000;top:20px;width:300px;" type="text" />
     </div>
 </template>
 
@@ -1601,6 +1602,7 @@
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                       .bindPopup(infoContent,{className:"info-content-new"})
                                       .on('click',() => { 
+                                        document.querySelector(".testInput").value = this.scenicPointId + ',' + v.resource_id;
                                         this.isShowMenu = false;
                                         this.isOpenDetail = false;
                                         this.mapClickPointId = v.resource_id;
