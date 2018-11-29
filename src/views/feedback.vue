@@ -166,7 +166,7 @@
         }
 
         // loading层弹窗样式
-        .weui-loading_toast .weui-toast {
+        .no-words.weui-loading_toast .weui-toast {
             top: @toast-top;
             width: 228px!important;
             height: 170px!important;
@@ -176,6 +176,23 @@
                 width: 60px;
                 height: 60px;
                 margin-top: 55px;
+            }
+        }
+
+        .has-words.weui-loading_toast .weui-toast {
+            top: @toast-top;
+            width: 228px!important;
+            height: 170px!important;
+            min-height: 170px!important;
+            max-height: 170px!important;
+            i {
+                width: 60px;
+                height: 60px;
+                margin-top: 28px;
+            }
+            p {
+                margin-top: 10px;
+                font-size: 28px;
             }
         }
     }
@@ -202,14 +219,15 @@
             </div>
             <div>
                 <span>电话号码</span>
-                <input v-model.trim="yourTel" type="number" placeholder="请留下你您的电话号码" @input="validateTel" @blur="validateLength" class="border-bottom-1"/>
+                <input v-model.trim="yourTel" type="number" placeholder="请留下您的电话号码" @input="validateTel" @blur="validateLength" class="border-bottom-1"/>
             </div>
             <v-touch tag="button" type="button" class="submit-upload" @tap="handleSubmit">提交反馈</v-touch>
         </form>
         <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
         <toast class="short" v-model="isTips2" type="success" :text="tipsText2" :is-show-mask="true"></toast>
         <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
-        <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
+        <loading class="no-words" :show="isShowLoading" :text="loadText" position="absolute"></loading>
+        <loading class="has-words" :show="isShowLoading2" :text="loadText2" position="absolute"></loading>
     </div>
 </template>
 
@@ -236,7 +254,9 @@ export default {
             tipsText3: '',
             uploadImageList: [],
             loadText: '',
-            isShowLoading: false
+            isShowLoading: false,
+            isShowLoading2: false,
+            loadText2: '上传中...'
         }
     },
     beforeRouteLeave (to, from , next) {
@@ -257,19 +277,18 @@ export default {
         ]),
         // 点击添加图片
         async addImg(changeEvent) {
-            // console.dir(changeEvent);
             const file = changeEvent.target.files[0], // 返回一个FileList对象,类数组类型
                   imgType = file.type;
 
             // 上传图片至服务器
             if (imgType === 'image/png' || imgType === 'image/jpeg') {
+                this.isShowLoading2 = true;
                 const formData = new FormData();
                 formData.append('file', file);
                 const res = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/upload', formData, 'multipart/form-data');
-                console.log(res);
-
                 if (!res) {
-                    this.tipsText1 = res.msg;
+                    this.isShowLoading2 = false;
+                    this.tipsText1 = '上传失败';
                     this.isTips1 = true;
                     return;
                 }
@@ -289,34 +308,34 @@ export default {
                 sectionDom.dataset.imgId = res.ossEntity.id;
                 sectionDom.classList.add('upload-120-120-base', 'upload-hasImage');
 
-                // 给关闭按钮添加点击关闭事件，开发调试用click，真机测试改用tap
-                closeDom.addEventListener('click', async (e) => {
+                // 给关闭按钮添加点击关闭事件
+                closeDom.addEventListener('touchstart', async (e) => {
                     const eventSrc = e.target,
                         parentNode = eventSrc.parentNode,
                         grandparentNode = parentNode.parentNode;
  
                     if (eventSrc.className === 'close-btn') {
+                        this.isShowLoading = true;
                         // 获取当前事件源的图片id
                         const _ID = parentNode.dataset.imgId;
                         const del = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/delete', [_ID]);
-                        console.log(del);
                         if (!del) {
-                            this.tipsText1 = res.msg;
+                            this.isShowLoading = false;
+                            this.tipsText1 = '删除失败';
                             this.isTips1 = true;
                             return;
                         }
-                        // let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList'));
                         const delIndex = this.uploadImageList.forEach((element, idx) => {
                             if (element.id === _ID) {
                                 return idx;
                             }
                         });
                         this.uploadImageList.splice(delIndex, 1);
-                        // sessionStorage.setItem('imgUrlList', JSON.stringify(imgUrlList));
                         grandparentNode.removeChild(parentNode);
                         if (containerDom.children.length <= 3) {
                             this.isCanAddImage = true;
                         }
+                        this.isShowLoading = false;
                     } else {
                         return;
                     }
@@ -328,12 +347,10 @@ export default {
                 fileReader.onload = (loadEvent) => {
                     imgDom.src = loadEvent.target.result;
                     imgDom.file = file;
-                    // let imgUrlList = JSON.parse(sessionStorage.getItem('imgUrlList')) || [];
                     this.uploadImageList.push({
                         id: res.ossEntity.id,
                         url: loadEvent.target.result
                     });
-                    // sessionStorage.setItem('imgUrlList', JSON.stringify(imgUrlList)); // 存储上传图片的id和本地览的base64-src
                     sectionDom.appendChild(imgDom);
                     sectionDom.appendChild(closeDom);
                     containerDom.insertBefore(sectionDom, uploadDom);
@@ -341,8 +358,11 @@ export default {
                     if(containerDom.children.length > 3) {
                         this.isCanAddImage = false;
                     }
+                    this.isShowLoading2 = false;
                 }
             } else {
+                this.tipsText3 = '图片格式不正确，请重新上传'
+                this.isTips3 = true;
                 return;
             }
         },

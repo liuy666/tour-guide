@@ -5,6 +5,7 @@
         .line-list {
             height: 468px;
             overflow-y: auto;
+            -webkit-overflow-scrolling : touch;
             ul {
                 overflow: hidden;
                 li {
