@@ -8,6 +8,14 @@
             transform: translateY(-160px);
         }
     }
+    @keyframes rotateimg {
+        0% {
+            transform: rotateZ(0deg);
+        }
+        100% {
+            transform: rotateZ(360deg);
+        }
+    }
     #main {
         height:100%;
         width: 100%;
@@ -195,6 +203,14 @@
                     margin-top: 6px;
                     margin-left: 6px;
                     position: relative;
+                    .pointImg {
+                        animation-name: rotateimg;
+                        animation-duration: 30s;
+                        animation-timing-function: linear;
+                        animation-iteration-count: infinite;
+                        animation-play-state: paused;
+                        // animation: rotateimg 30s linear infinite;
+                    }
                     .wrap {
                         width: 112px;
                         height: 112px;
@@ -583,7 +599,7 @@
                     :stroke-color="'#FE5100'"
                     trail-color="#ffffff">
                     <div class="player-img-area">
-                        <img style="width:100%; height:100%; border-radius: 50%;" :src="scenicPointImg" />
+                        <img class="pointImg" style="width:100%; height:100%; border-radius: 50%;" :src="scenicPointImg" />
                         <!-- 播放图标-暂停中状态 -->
                         <v-touch class="wrap" v-show="!isPlayed" v-on:tap="playAudio({_type: 1})">
                             <div class="control img-16-26">
@@ -858,6 +874,8 @@
 
             // 初始化图标菜单
             this.initMenu();
+
+            this.isOpenDetail = true;
         },
         data () {
             return {
@@ -1351,6 +1369,7 @@
                                 this.isPlayed = false;
                             } else {
                                 _audioDom.play();
+                                // document.querySelector('.pointImg').style.animate
                                 this.isPlayed = true;
                             } 
                             if (this.isPlayed) {
@@ -1595,6 +1614,7 @@
                                     }
                                 });
                                 sessionStorage.setItem('playList',JSON.stringify(playList));
+                                console.dir(document.querySelector('.pointImg'))
                             }
                         }
                     } else {
@@ -1616,7 +1636,6 @@
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                       .bindPopup(infoContent,{className:"info-content-new"})
                                       .on('click',(e) => { 
-                                        
                                         $this.isShowMenu = false;
                                         $this.isOpenDetail = false;
 

@@ -166,7 +166,7 @@ export default {
 
                 this.isShowLoading = false;
                 let descOrder = res.response.identify_results.sort((a, b) => b.probability - a.probability);
-                if (descOrder[0].probability.toFixed(2) >= 0.7) {
+                if (descOrder[0].probability.toFixed(2) > 0.7) {
                     this.tipsText2 = '识别成功';
                     this.isTips2 = true;
                     setTimeout(() => {
@@ -177,9 +177,17 @@ export default {
                             }
                         });
                     }, 2000);
+                } else if (descOrder[0].probability.toFixed(2) > 0.3 && descOrder[0].probability.toFixed(2) <= 0.7) {
+                    changeEvent.target.value = '';
+                    this.tipsText3 = '难住我了，换个角度试试~';
+                    this.isTips3 = true;
+                } else if (descOrder[0].probability.toFixed(2) > 0.1 && descOrder[0].probability.toFixed(2) <= 0.3) {
+                    changeEvent.target.value = '';
+                    this.tipsText3 = '好像不是植物哦~';
+                    this.isTips3 = true;
                 } else {
                     changeEvent.target.value = '';
-                    this.tipsText3 = '无法识别，请重试';
+                    this.tipsText3 = '偶~超出了我的认知';
                     this.isTips3 = true;
                 }
             }
