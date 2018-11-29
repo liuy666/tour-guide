@@ -51,6 +51,7 @@
         .spot-list {
             height: 389px;
             overflow-y: auto;
+            -webkit-overflow-scrolling : touch;
             ul {
                 overflow: hidden;
                 li {
