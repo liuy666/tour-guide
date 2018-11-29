@@ -645,7 +645,7 @@
             </div>
         </section>
 
-        <input class="testInput" style="position:absolute;z-index:2000;top:20px;width:300px;" type="text" />
+        <input class="testInput"  :value="ids" style="position:absolute;z-index:2000;top:20px;width:300px;" type="text" />
     </div>
 </template>
 
@@ -821,7 +821,8 @@
                 attributionControl: false,
                 zoomControl: false,
                 maxBounds : [imgLeftBottom1, imgRightTop1],
-                maxBoundsViscosity : 0.8
+                maxBoundsViscosity : 0.8,
+                closePopupOnClick :false
             });
             // L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
             //     maxZoom: 19,
@@ -838,12 +839,14 @@
             });
 
             this.oMap_main = oMap;
+            this.popup_main = popup;
 
             oMap.on('click',function(e) {
                 console.log(e);
                 _self.$router.replace({
                     name: 'main'
                 });
+                _self.oMap_main.closePopup();
                 _self.isShowMenu = false;
                 _self.isOpenDetail = false;
             });
@@ -953,9 +956,14 @@
                 isFirst: true
             }
         },
-        computed: mapState({
-            watchLine: state => state.app.lineStatus // 监听取消路线选择
-        }),
+        computed: {
+            ...mapState({
+                watchLine: state => state.app.lineStatus // 监听取消路线选择
+            }),
+            ids() {
+                return this.scenicPointId+ ' , ' + this.mapClickPointId;
+            }
+        },
         watch: {
             watchLine(val) {
                 // 清除当前路线
@@ -1505,6 +1513,8 @@
              * @param {Object} query 扫码访问时的 query 参数对象
              */
             async getScenicPointList(arg) {
+                let $this = this;
+
                 this.resourceType = arg.resourceType;
                 this.markers = [];
 
@@ -1606,18 +1616,19 @@
                         });
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                       .bindPopup(infoContent,{className:"info-content-new"})
-                                      .on('click',() => { 
-                                        document.querySelector(".testInput").value = this.scenicPointId + ',' + v.resource_id;
-                                        this.isShowMenu = false;
-                                        this.isOpenDetail = false;
-                                        this.mapClickPointId = v.resource_id;
-                                        sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
-                                        if(document.querySelector(".info-scenic-btns")){
-                                            if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId === v.resource_id){
-                                                document.querySelector(".info-scenic-btns").children[0].classList.add("playing")
-                                            }else{
-                                                document.querySelector(".info-scenic-btns").children[0].classList.remove("playing")
-                                            }
+                                      .on('click',(e) => { 
+                                        
+                                        $this.isShowMenu = false;
+                                        $this.isOpenDetail = false;
+
+                                        $this.mapClickPointId = v.resource_id;
+                                        sessionStorage.setItem("mapClickPointId",$this.mapClickPointId);
+
+                                        let currentPlayBtn = e.target._popup._contentNode.children[0].children[1].children[0];
+                                        if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId == v.resource_id){
+                                            currentPlayBtn.classList.add("playing")
+                                        }else{
+                                            currentPlayBtn.classList.remove("playing")
                                         }
                                     });
                         this.markers.push(marker);
@@ -1663,6 +1674,7 @@
             createInfoWindow_scenicPoint(pointInfo) {
                 let info = document.createElement("div");
                 info.className = "info-contanir";
+                info.dataset.id = pointInfo.resource_id;
 
                 let middle = document.createElement("div");
                 middle.className = "info-content";

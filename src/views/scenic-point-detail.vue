@@ -298,7 +298,8 @@ export default {
             isShowLoading : false,
             loadText:'',
             isTips:false,
-            tipsText: '请求失败'
+            tipsText: '请求失败',
+            bl:0
         }
     },
     watch : {
@@ -333,10 +334,10 @@ export default {
             const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
 
             const audio = document.querySelector(".detail-audio");
-            const audio_play = document.querySelector(".detail-audio-play");
+            //const audio_play = document.querySelector(".detail-audio-play");
             if(audio){
                 document.querySelector(".audio-area").removeChild(audio);
-                document.querySelector(".audio-area").removeChild(audio_play);
+                //document.querySelector(".audio-area").removeChild(audio_play);
             }
             const audioContainer = document.querySelector(".audio-area");
             let audioDom = document.createElement("audio"),
@@ -350,7 +351,7 @@ export default {
             audioContainer.appendChild(audioDom);
             audioDom.load();
 
-            let audioDom_play = document.createElement("audio"),
+            /*let audioDom_play = document.createElement("audio"),
                 sourceDom_play = document.createElement("source");
             sourceDom_play.type = 'audio/mpeg';
             sourceDom_play.src = this.playingPoint.guideUrl;
@@ -359,7 +360,7 @@ export default {
             audioDom_play.classList.add('detail-audio-play');
             audioDom_play.style.display = 'none';
             audioContainer.appendChild(audioDom_play);
-            audioDom_play.load();
+            audioDom_play.load();*/
 
 
             //audioDom 用于放当前展示的景点的音频
@@ -383,6 +384,7 @@ export default {
             audioDom.onplay = (e) => {
                 this.changeProgress();
             }
+
 
             if(!isChange){//进页面的初始化
                 const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
@@ -493,14 +495,19 @@ export default {
         },
         //切换景点
         changePointInfo (index,isClick,ev) {
+            clearInterval(this.timer);
+            this.timer = '';
+            document.querySelector(".circle").style.left = "- 8px";
+            this.audioProgress = 0;
+
             let newPointInfo = {};
             if(isClick){
                 newPointInfo = this.pointList[index];
             }else{
                 newPointInfo = this.pointList.filter(item => item.resource_id === this.playList[index].aId)[0];
-                document.querySelector(".point-list").scrollLeft = 120 * (parseInt(newPointInfo.serial)-1);
+                document.querySelector(".point-list").scrollLeft = 15 + this.bl * 96 * (parseInt(newPointInfo.serial)-1);
             }
-            //sessionStorage.setItem("currentPoint",JSON.stringify(newPointInfo));
+            sessionStorage.setItem("showPoint",JSON.stringify(newPointInfo));
             this.showPoint = newPointInfo;
             this.currentPointId = newPointInfo.resource_id;
             this.pointImg = newPointInfo.url;
@@ -517,14 +524,22 @@ export default {
     mounted() {
         //获取屏幕大小 动态设置不同手机的地图zoom
         const containerWidth = document.querySelector('#scenic-point-detail').clientWidth;
-        let bl = parseFloat((containerWidth/375).toFixed(2));
+        this.bl = parseFloat((containerWidth/375).toFixed(2));
 
         let self = this;
         this.currentIndex = this.pointList.findIndex(item => item.resource_id === this.currentPointId);
-        document.querySelector(".point-list").scrollLeft =  15 + bl * 96 * this.currentIndex;
+        document.querySelector(".point-list").scrollLeft =  15 + this.bl * 96 * this.currentIndex;
         const fromRouteName = this.$store.state.app.fromRouteName_detail;
         if(fromRouteName != 'scenic-point-detail'){
             sessionStorage.removeItem('playStatus');
+            clearInterval(this.timer);
+            this.timer = "";
+
+            this.showPoint = JSON.parse(sessionStorage.getItem("showPoint"));
+            this.currentPointId = this.showPoint.resource_id;
+            this.pointImg = this.showPoint.url;
+            this.pointName = this.showPoint.name;
+            this.pointCaption = this.showPoint.commentary;
         }
         this.setAudio();
 
@@ -538,7 +553,7 @@ export default {
                     flag = 1;
                 }
             })
-            circle.addEventListener("touchmove",function(e){
+            circle.addEventListener("touchmove",function(e){ 
                 let x = e.changedTouches[0].clientX - this.parentElement.offsetLeft;
                 let xx = x < 0 ? 0 : x;
                 let total = this.parentElement.offsetWidth;
@@ -566,7 +581,7 @@ export default {
             })
         })
     },
-    beforeRouteLeave (to, from , next) {
+    beforeRouteLeave (to, from , next) { 
         const status = document.querySelector('.detail-audio').paused;
         this.pauseAudio();
         let playStatus = {
