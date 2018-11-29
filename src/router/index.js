@@ -6,7 +6,7 @@ import vuex from '@/store/store.js';
 Vue.use(VueRouter);
 
 const router = new VueRouter({
-	mode: 'hash',
+    mode: 'hash',
     routes
 });
 
@@ -31,7 +31,7 @@ router.beforeEach((to, from, next) => {
     }
 
     // 在main页的子路由上刷新
-    if (!from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) { 
+    if (!from.name && (to.name === 'scenic-spot' || to.name === 'scenic-line' || to.name === 'scenic-resource')) {
         console.log('在main页的子路由上刷新,跳转回main页');
         next({
             path: '/main',
@@ -71,6 +71,6 @@ router.beforeEach((to, from, next) => {
 });
 
 // 路由后置守卫
-router.afterEach((to,from) => {
+router.afterEach((to, from) => {
 
 });
