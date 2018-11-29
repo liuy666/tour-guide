@@ -681,6 +681,11 @@
             if (!sessionStorage.getItem('currentScenic')) {
                 sessionStorage.setItem('currentScenic', JSON.stringify(this.$store.state.app.currentScenic));
             }
+            if (sessionStorage.getItem('isAuto')) {
+                this.isAuto = sessionStorage.getItem('isAuto');
+            } else {
+                this.isAuto = false;
+            }
         },
         async mounted() {
             console.log('mounted')
@@ -1533,7 +1538,7 @@
 
                             // 移除部分本地存储
                             sessionStorage.removeItem('playStatus');
-                            sessionStorage.removeItem('isAuto');
+                            // sessionStorage.removeItem('isAuto');
                             sessionStorage.removeItem('currentResource');
                             sessionStorage.removeItem('lineList');
                             sessionStorage.removeItem('lineId');
