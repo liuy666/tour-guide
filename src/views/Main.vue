@@ -839,7 +839,6 @@
             });
 
             this.oMap_main = oMap;
-            this.popup_main = popup;
 
             oMap.on('click',function(e) {
                 console.log(e);
