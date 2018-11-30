@@ -374,64 +374,6 @@ export default {
                     }
                 } 
             }
-            /*if(this.$tool.validateReg.isiOS(window.navigator.userAgent)){
-                audioDom.oncanplay = (e) => {
-                    let _audioDom = e.target;
-                    this.totalTime = _audioDom.duration;
-                    let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
-                    this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
-
-                    if(!isChange && playStatus && playStatus.resourceId == this.showPoint.resource_id){
-                        audioDom.currentTime = playStatus.currentTime;
-                        this.currentTime = playStatus.currentTime;
-                        let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
-                        this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
-
-                        if(!playStatus.isPauseStatus){//播放状态
-                            this.isPlayed = true;
-                            _audioDom.play();
-                        }else{
-                            this.isPlayed = false;
-                        }   
-                        //初始化进度条
-                        this.audioProgress = playStatus.currentTime / playStatus.totalTime * 100;
-                        document.querySelector(".circle").style.left = "calc("+this.audioProgress+"% - 8px)";
-                    }else{
-                        this.currentTimeStr = '0:00';
-                        this.isPlayed = false;
-                        this.audioProgress = 0;
-                        document.querySelector(".circle").style.left = "-8px";
-                    }
-                }
-            }
-            if (this.$tool.validateReg.isAndroid(window.navigator.userAgent)) {
-                audioDom.oncanplay = (e) => { 
-                    let _audioDom = e.target;
-                    this.totalTime = _audioDom.duration;
-                    let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
-                    this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
-                }
-                if(!isChange && playStatus && playStatus.resourceId == this.showPoint.resource_id){
-                    audioDom.currentTime = playStatus.currentTime;
-                    let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
-                    this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
-                    
-                    if(!playStatus.isPauseStatus){//播放状态
-                        this.isPlayed = true;
-                        audioDom.play();
-                    }else{
-                        this.isPlayed = false;
-                    }   
-                    //初始化进度条
-                    this.audioProgress = playStatus.currentTime / playStatus.totalTime * 100;
-                    document.querySelector(".circle").style.left = "calc("+this.audioProgress+"% - 8px)";
-                }else{
-                    this.currentTimeStr = '0:00';
-                    this.isPlayed = false;
-                    this.audioProgress = 0;
-                    document.querySelector(".circle").style.left = "-8px";
-                }
-            }*/
             audioDom.onplay = (e) => {
                 this.totalTime = e.target.duration;
                 this.changeProgress();
