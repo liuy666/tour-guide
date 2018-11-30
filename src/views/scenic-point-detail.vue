@@ -314,12 +314,6 @@ export default {
                 if(sessionStorage.getItem("isAuto")){
                     //如果是自动  找到当前点在播放列表中的位置  然后讲列表序列中的下一个点设置成当前 
                     //同时找到当前点在所有景点列表中的位置，执行changePointInfo
-                    // this.playList.forEach((v,i) => { 
-                    //     if(v.aId === this.currentPointId) {
-                    //         this.playIndex = i;
-                    //         return;
-                    //     }
-                    // })
                     this.playIndex = this.playList.findIndex(item => item.aId === this.currentPointId);
                     if(this.playIndex < this.playList.length-1){
                         this.changePointInfo(this.playIndex+1,false);
@@ -378,17 +372,72 @@ export default {
                         let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
                         this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
                     }
-                }
-                
+                } 
             }
+            /*if(this.$tool.validateReg.isiOS(window.navigator.userAgent)){
+                audioDom.oncanplay = (e) => {
+                    let _audioDom = e.target;
+                    this.totalTime = _audioDom.duration;
+                    let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
+                    this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
+
+                    if(!isChange && playStatus && playStatus.resourceId == this.showPoint.resource_id){
+                        audioDom.currentTime = playStatus.currentTime;
+                        this.currentTime = playStatus.currentTime;
+                        let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
+                        this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
+
+                        if(!playStatus.isPauseStatus){//播放状态
+                            this.isPlayed = true;
+                            _audioDom.play();
+                        }else{
+                            this.isPlayed = false;
+                        }   
+                        //初始化进度条
+                        this.audioProgress = playStatus.currentTime / playStatus.totalTime * 100;
+                        document.querySelector(".circle").style.left = "calc("+this.audioProgress+"% - 8px)";
+                    }else{
+                        this.currentTimeStr = '0:00';
+                        this.isPlayed = false;
+                        this.audioProgress = 0;
+                        document.querySelector(".circle").style.left = "-8px";
+                    }
+                }
+            }
+            if (this.$tool.validateReg.isAndroid(window.navigator.userAgent)) {
+                audioDom.oncanplay = (e) => { 
+                    let _audioDom = e.target;
+                    this.totalTime = _audioDom.duration;
+                    let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
+                    this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
+                }
+                if(!isChange && playStatus && playStatus.resourceId == this.showPoint.resource_id){
+                    audioDom.currentTime = playStatus.currentTime;
+                    let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
+                    this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
+                    
+                    if(!playStatus.isPauseStatus){//播放状态
+                        this.isPlayed = true;
+                        audioDom.play();
+                    }else{
+                        this.isPlayed = false;
+                    }   
+                    //初始化进度条
+                    this.audioProgress = playStatus.currentTime / playStatus.totalTime * 100;
+                    document.querySelector(".circle").style.left = "calc("+this.audioProgress+"% - 8px)";
+                }else{
+                    this.currentTimeStr = '0:00';
+                    this.isPlayed = false;
+                    this.audioProgress = 0;
+                    document.querySelector(".circle").style.left = "-8px";
+                }
+            }*/
             audioDom.onplay = (e) => {
+                this.totalTime = e.target.duration;
                 this.changeProgress();
             }
-
-
             if(!isChange){//进页面的初始化
                 const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
-                
                 if(playStatus && playStatus.resourceId == this.showPoint.resource_id){
                     let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0),
                         tm = (playStatus.totalTime%60).toFixed(0) < 10 ? '0'+(playStatus.totalTime%60).toFixed(0) : (playStatus.totalTime%60).toFixed(0);
@@ -411,9 +460,9 @@ export default {
                     this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + tm1;
                     this.isPlayed = false;
 
-                    if(playStatus && !playStatus.isPauseStatus){
-                        audioDom_play.play();
-                    }
+                    //if(playStatus && !playStatus.isPauseStatus){
+                        //audioDom_play.play();
+                    //}
                 }
             }else{//切换景点的初始化
                 let tm2 = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
@@ -424,7 +473,6 @@ export default {
                     this.playAudio();
                 }
             }
-            
         },
         //播放
         playAudio() {
@@ -582,10 +630,17 @@ export default {
         })
     },
     beforeRouteLeave (to, from , next) { 
-        const status = document.querySelector('.detail-audio').paused;
+        const da = document.querySelector(".detail-audio");
+        const status = da.paused;
+        let ct = da.currentTime;
+
+        let playStatus_main = JSON.parse(sessionStorage.getItem("playStatus"))
+        if(playStatus_main && playStatus_main.resourceId == da.dataset.id && ct == 0){
+            ct = playStatus_main.currentTime;
+        }
         this.pauseAudio();
         let playStatus = {
-            currentTime: document.querySelector('.detail-audio').currentTime,
+            currentTime: ct,
             isPauseStatus : status
         }
         sessionStorage.setItem('playStatus', JSON.stringify(playStatus));

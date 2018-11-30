@@ -660,8 +660,6 @@
                 <div class="dec-content font-color-888">{{scenicDec}}</div>
             </div>
         </section>
-
-        <input class="testInput"  :value="ids" style="position:absolute;z-index:2000;top:20px;width:300px;" type="text" />
     </div>
 </template>
 
@@ -745,7 +743,7 @@
             this.sceneryId = scenicInfo.scenery_id;
 
             // 获取地图初始化信息
-            const scenicBgImg = './'+scenicInfo.file_name, // 图片图层
+            const scenicBgImg = scenicInfo.accessMapUrl,//'./'+scenicInfo.file_name, // 图片图层
                   imgRightTop = [scenicInfo.northeast_lng,scenicInfo.northeast_lat], // 地图右上角
                   imgLeftBottom = [scenicInfo.southwest_lng,scenicInfo.southwest_lat], // 地图左下角
                   imgRightTop1 = [scenicInfo.northeast_lat,scenicInfo.northeast_lng], // 地图右上角
@@ -837,7 +835,7 @@
                 attributionControl: false,
                 zoomControl: false,
                 maxBounds : [imgLeftBottom1, imgRightTop1],
-                maxBoundsViscosity : 0.8,
+                maxBoundsViscosity : 0.7,
                 closePopupOnClick :false
             });
             // L.tileLayer.chinaProvider('GaoDe.Normal.Map', {
@@ -875,7 +873,7 @@
             // 初始化图标菜单
             this.initMenu();
 
-            this.isOpenDetail = true;
+            
         },
         data () {
             return {
@@ -976,10 +974,7 @@
         computed: {
             ...mapState({
                 watchLine: state => state.app.lineStatus // 监听取消路线选择
-            }),
-            ids() {
-                return this.scenicPointId+ ' , ' + this.mapClickPointId;
-            }
+            })
         },
         watch: {
             watchLine(val) {
@@ -1082,6 +1077,7 @@
             // 自动定位一次及提示自动提示
             autoGetPositon() {
                 if(!sessionStorage.getItem("hasPosition")){
+                    this.isOpenDetail = true;
                     this.isTips4 = true;
                     setTimeout(() => {
                         this.isTips4 = false;

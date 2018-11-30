@@ -406,6 +406,11 @@ export default {
                 this.isTips3 = true;
                 return;
             } else {
+                if(this.textareaValue.length < 10){
+                    this.tipsText3 = '不能少于10个字';
+                    this.isTips3 = true;
+                    return;
+                }
                 this.isShowLoading = true;
                 let imgList = {};
                 this.uploadImageList.forEach((element, idx) => {
