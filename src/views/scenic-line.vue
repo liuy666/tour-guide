@@ -93,7 +93,7 @@ export default {
         }
     },
     created() {
-        this.SETROUTENAME('scenic-line');
+        this.SET_ROUTE_NAME('scenic-line');
     },
     mounted() {
         const lineId = sessionStorage.getItem('lineId');
@@ -109,8 +109,8 @@ export default {
     }),
     methods: {
         ...mapMutations([
-            'SETROUTENAME',
-            'REMOVECURRENTLINE'
+            'SET_ROUTE_NAME',
+            'REMOVE_CURRENT_LINE'
         ]),
         gotoMapLine(lineId) {
             const imgs = document.querySelectorAll('.img-right img');
@@ -129,7 +129,7 @@ export default {
                             }
                         });
                         sessionStorage.setItem('playList', JSON.stringify(updatePlayList));
-                        this.REMOVECURRENTLINE();
+                        this.REMOVE_CURRENT_LINE();
                     } else {
                         sessionStorage.setItem('lineId', lineId);
                         img.style.display = 'block';

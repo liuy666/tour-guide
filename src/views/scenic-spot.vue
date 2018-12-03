@@ -135,7 +135,7 @@ export default {
         let pointList = JSON.parse(sessionStorage.getItem('pointList'));
         this.getList(pointList);
         this.sceneryId = this.$route.params.sceneryId;
-        this.SETROUTENAME('scenic-spot');
+        this.SET_ROUTE_NAME('scenic-spot');
     },
     mounted() {
         const lis = document.querySelectorAll('.spot-list li');
@@ -169,7 +169,7 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'SETROUTENAME'
+            'SET_ROUTE_NAME'
         ]),
         selectOne(e) {
             const lis = document.querySelectorAll('.spot-list li');

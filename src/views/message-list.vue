@@ -266,11 +266,11 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'SAVECONTENT'
+            'SAVE_CONTENT'
         ]),
         gotoMsgDetail(params) {
             // 存储文章
-            this.SAVECONTENT(params.content);
+            this.SAVE_CONTENT(params.content);
             this.$router.replace({
                 name: 'msg-detail',
                 params

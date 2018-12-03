@@ -138,12 +138,12 @@ export default {
         }
     },
     beforeRouteLeave (to, from , next) {
-        this.SETFROMROUTENAME('recognize');
+        this.SET_FROM_ROUTE_NAME('recognize');
         next();
     },
     methods: {
         ...mapMutations([
-            'SETFROMROUTENAME'
+            'SET_FROM_ROUTE_NAME'
         ]),
         async addImg(changeEvent) {
             this.isShowLoading = true;
