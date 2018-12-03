@@ -198,9 +198,9 @@
                 margin-top: 12px;
                 margin-left: 12px;
                 .player-img-area{
-                    width: 110px;
-                    height: 110px;
-                    margin-top: 8px;
+                    width: 112px;
+                    height: 112px;
+                    margin-top: 6px;
                     margin-left: 6px;
                     position: relative;
                     .pointImg {
@@ -457,118 +457,93 @@
                     width: 220px;
                     height: 220px;
                     margin-top: -100px;
-                    position: relative;
-                    .control-btn{
-                        width: 220px;
-                        height: 220px;
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        .control{
-                            position: absolute;
-                            left: 50%;
-                            top: 50%; 
-                            overflow: hidden;
-                            img {
-                                float: left;
-                                width: 100%;
-                                height: 100%;
-                            }
-                        }
-                        .img-34-40 {
-                            width: 34px;
-                            height: 40px;
-                            transform: translate(-17px, -20px);
-                        }
+                    .ignore {
+                        box-sizing: border-box;
+                        border: 2px solid #fff;
                     }
                 }
-                .ignore {
-                    box-sizing: border-box;
-                    border: 2px solid #fff;
-                }
-            }
                 
-            .scenic-name-level{
-                width: 360px;
-                margin-left: 22px;
-                .scenic-name{
-                    font-size: 36px;
-                    font-weight: bold;
+                .scenic-name-level{
+                    width: 360px;
+                    margin-left: 22px;
+                    .scenic-name{
+                        font-size: 36px;
+                        font-weight: bold;
+                    }
+                    .scenic-level{
+                        display: inline-block;
+                        padding: 12px 10px 8px 10px;
+                        line-height: 22px;
+                        border-radius: 20px;
+                        border: 1px solid #FEA32B;
+                        color: #FEA32B;
+                        font-size: 24px;
+                        margin-top: 16px;
+                    }
                 }
-                .scenic-level{
-                    display: inline-block;
-                    padding: 12px 10px 8px 10px;
-                    line-height: 22px;
-                    border-radius: 20px;
-                    border: 1px solid #FEA32B;
-                    color: #FEA32B;
-                    font-size: 24px;
-                    margin-top: 16px;
-                }
-            }
-            .close-btn{
-                width: 34px;
-                height: 34px;
-                position: absolute;
-                right: 10px;
-                top: 10px;
-                background: url('../assets/images/icon_close_black@2x.png') no-repeat center center / 100% 100%;
-            }
-        }
-        .scenic-address-time{
-            padding: 40px 0 30px;
-            font-size: 30px;
-            line-height: 44px;
-            border-bottom: 1px solid dashed #FE5100; 
-            margin-bottom: 20px;
-            .scenic-address{
-                text-indent: 44px;
-                background: url('../assets/images/icon_black_site@3x.png') no-repeat left top;
-                background-size: 32px 40px;
-                position: relative;
-                .font-color-666{
-                    background: url('../assets/images/icon_map_more@3x.png') no-repeat right center;
-                    background-size: 16px 28px;
-                    padding-right: 20px;
+                .close-btn{
+                    width: 34px;
+                    height: 34px;
                     position: absolute;
-                    right: 0;
-                    top: 2px;
-                    box-sizing: border-box;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    width: calc(~'100% - 160px');
+                    right: 10px;
+                    top: 10px;
+                    background: url('../assets/images/icon_close_black@2x.png') no-repeat center center / 100% 100%;
                 }
             }
-            .scenic-time{
-                text-indent: 44px;
-                background: url('../assets/images/icon_black_time@3x.png') no-repeat left center;
-                background-size: 32px 32px;
-                margin-top: 20px;
+            .scenic-address-time{
+                padding: 40px 0 30px;
+                font-size: 30px;
+                line-height: 44px;
+                border-bottom: 1px solid dashed #FE5100; 
+                margin-bottom: 20px;
+                .scenic-address{
+                    text-indent: 44px;
+                    background: url('../assets/images/icon_black_site@3x.png') no-repeat left top;
+                    background-size: 32px 40px;
+                    position: relative;
+                    .font-color-666{
+                        background: url('../assets/images/icon_map_more@3x.png') no-repeat right center;
+                        background-size: 16px 28px;
+                        padding-right: 20px;
+                        position: absolute;
+                        right: 0;
+                        top: 2px;
+                        box-sizing: border-box;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        width: calc(~'100% - 160px');
+                    }
+                }
+                .scenic-time{
+                    text-indent: 44px;
+                    background: url('../assets/images/icon_black_time@3x.png') no-repeat left center;
+                    background-size: 32px 32px;
+                    margin-top: 20px;
+                }
             }
-        }
-        .dec-title{
-            text-indent: 24px;
-            font-size: 30px;
-            padding: 20px 0;
-            background: url('../assets/images/kuai@3x.png') no-repeat left center;
-            background-size: 10px 30px;
-            line-height: 30px;
-        }
-        .scenic-dec {
-            overflow: hidden;
-            .dec-content{
-                font-size: 28px;
-                line-height: 36px;
-                margin-bottom: 40px;
+            .dec-title{
+                text-indent: 24px;
+                font-size: 30px;
+                padding: 20px 0;
+                background: url('../assets/images/kuai@3x.png') no-repeat left center;
+                background-size: 10px 30px;
+                line-height: 30px;
+            }
+            .scenic-dec {
                 overflow: hidden;
-                word-break: break-all;
-                overflow: hidden;
-                max-height: 540px;
+                .dec-content{
+                    font-size: 28px;
+                    line-height: 36px;
+                    margin-bottom: 40px;
+                    overflow: hidden;
+                    word-break: break-all;
+                    overflow: hidden;
+                    max-height: 540px;
+                }
             }
         }
     }
-    
 </style>
 
 <template>
@@ -619,7 +594,7 @@
             <div class="player-control-btn-area">
                 <x-circle
                     :percent="audioPercent"
-                    :stroke-width="4"
+                    :stroke-width="2"
                     :trail-width="6"
                     :stroke-color="'#FE5100'"
                     trail-color="#ffffff">
@@ -662,24 +637,8 @@
         </section>
         <!-- 底部景区简介弹窗 -->
         <section v-show="isOpenDetail" class="introDetail">
-            <!-- <audio>
-                <source src />
-            </audio> -->
             <div class="scenic-detail-header">
-                <div class="scenic-img">
-                    <img class="ignore" style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/>
-                    <v-touch class="control-btn" v-show="!isPlayed_scenic" v-on:tap="playAudio_scenic">
-                        <div class="control img-34-40">
-                            <img src="../assets/images/icon_small_pause@3x.png" alt="" />
-                        </div>
-                    </v-touch>
-                        <!-- 暂停图标-播放中状态 -->
-                    <v-touch class="control-btn" v-show="isPlayed_scenic" v-on:tap="pauseAudio_scenic">
-                        <div class="control img-34-40">
-                            <img src="../assets/images/icon_suspend@3x.png" alt="" />
-                        </div>
-                    </v-touch>
-                </div>
+                <div class="scenic-img"><img class="ignore" style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/></div>
                 <div class="scenic-name-level">
                     <div class="scenic-name">{{scenicName}}</div>
                     <span class="scenic-level">{{scenicLevel+"级风景区"}}</span>
@@ -948,7 +907,6 @@
                 loadText: '',
                 isShowLoading: false,
                 isPlayed: false,
-                isPlayed_scenic : true,
                 isPositioning : false,
                 timer: '',
                 totalTime: '',
@@ -1023,8 +981,6 @@
                 // 清除当前路线
                 this.removeMarker(2);
                 this.line.remove();
-                this.line = {};
-                this.markers_line = [];
             },
             // 播放进度监听
             audioPercent(val) {
@@ -1477,14 +1433,6 @@
                 if(this.resourceType < 3){
                     this.changeMapIcon(false);
                 }
-            },
-            //景区音频的播放
-            playAudio_scenic() {
-
-            },
-            //景区音频的暂停
-            pauseAudio_scenic() {
-
             },
             // 改变地图图标交互效果 
             changeMapIcon (isPlay) {
