@@ -1,4 +1,5 @@
-export const appRoutes = [{
+export const appRoutes = [
+    {
         path: '/',
         name: 'index',
         component: () =>

@@ -260,7 +260,7 @@ export default {
         }
     },
     beforeRouteLeave (to, from , next) {
-        this.SETFROMROUTENAME('feedback');
+        this.SET_FROM_ROUTE_NAME('feedback');
         next();
     },
     computed: {
@@ -273,7 +273,7 @@ export default {
     },
     methods: {
         ...mapMutations([
-            'SETFROMROUTENAME',
+            'SET_FROM_ROUTE_NAME',
         ]),
         // 点击添加图片
         async addImg(changeEvent) {

@@ -720,8 +720,8 @@
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
                 scenicInfo = {...currentScenic};
                 sessionStorage.setItem('currentScenic',JSON.stringify(currentScenic));
-                this.SET_FROM_ROUTE_NAME('root');
-                this.SET_CURRENT_SCENIC(currentScenic);
+                this.SETFROMROUTENAME('root');
+                this.SETCURRENTSCENIC(currentScenic);
             } else {
                 //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
@@ -974,9 +974,7 @@
         computed: {
             ...mapState({
                 watchLine: state => state.app.lineStatus, // 监听取消路线选择
-                audioPercent: state => state.app.percent, // 监听播放进度
-                isStop: state => state.app.isStop, // 监听是否当前是否播放完毕
-                isAutoPlay: state => state.app.isAutoPlay // 监听是否开始连播下一个音频
+                audioPercent: state => state.app.percent // 监听播放进度
             })
         },
         watch: {
@@ -985,6 +983,44 @@
                 this.removeMarker(2);
                 this.line.remove();
             },
+            // 播放进度监听
+            // audioPercent(val) {
+            //     if (val >= 100) {
+            //         const au = document.querySelector('.main-audio');
+            //         clearInterval(this.timer);
+            //         this.changeMapIcon(false);
+            //         this.oMap_main.closePopup();
+            //         if (!au.paused || !au.ended) {
+            //             au.pause();
+            //         }
+            //         // this.audioPercent = 0;
+            //         this.timer = '';
+            //         let currentId = au.dataset.id;
+            //         const currentAudioContainer = document.querySelector('.toolbars');
+            //         currentAudioContainer.removeChild(au);
+            //         sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
+            //         this.isPlayed = false;
+
+            //         // 如果开启了自动连播
+            //         if (this.isAuto) {
+            //             let next = this.getNext(currentId);
+            //             if (next) {
+            //                 this.scenicPointImg = next.nextPoint.url;
+            //                 this.scenicPointName = next.nextPoint.name;
+            //                 this.scenicPointId = next.nextPoint.resource_id;
+            //                 sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
+            //                 this.autoPlay(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
+            //                 this.playAudio({
+            //                     _src: next.nextPlay.aSrc,
+            //                     _id: next.nextPlay.aId,
+            //                     _type: 3
+            //                 });
+            //             } else { // 表明播放列表已播完，则更改播放状态
+            //                 sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
+            //             }
+            //         }
+            //     }
+            // },
             '$route'(to, from) {
                 // 关闭菜单并展开对应信息窗体
                 if (from.name === 'scenic-spot' && to.name === 'main' && to.params.pid) {
@@ -1002,7 +1038,7 @@
                     this.playAudio({
                         _src: currentPoint.guideUrl,
                         _id: to.params.pid,
-                        type: 2
+                        _type: 3
                     });
                     this.isShowMenu = false;
                 }
@@ -1014,23 +1050,6 @@
                 if(from.name == "scenic-line" && to.name == "main" && to.params.lineId){
                     this.drawLine(to.params.lineId);
                     this.isShowMenu = false;
-                }
-            },
-            isStop(val) {
-                if (val) {
-                    this.oMap_main.closePopup();
-                    this.isPlayed = false;
-                    this.changeMapIcon(false);
-                }
-            },
-            isAutoPlay(val) {
-                if (val) {
-                    this.scenicPointImg = this.$store.state.app.nextMessage.nextPoint.url;
-                    this.scenicPointName = this.$store.state.app.nextMessage.nextPoint.name;
-                    this.scenicPointId = this.$store.state.app.nextMessage.nextPoint.resource_id;
-                    this.START_NEW_INTERVAL();
-                    this.isPlayed = true;
-                    this.changeMapIcon(true);
                 }
             }
         },    
@@ -1059,7 +1078,7 @@
             // 自动定位一次及提示自动提示
             autoGetPositon() {
                 if(!sessionStorage.getItem("hasPosition")){
-                    // this.isOpenDetail = true;
+                    this.isOpenDetail = true;
                     this.isTips4 = true;
                     setTimeout(() => {
                         this.isTips4 = false;
@@ -1068,6 +1087,22 @@
                     sessionStorage.setItem("hasPosition", true);
                 }
             },
+            // 获取下一个播放链接
+            // getNext(currentId) {
+            //     const playList = JSON.parse(sessionStorage.getItem('playList'));
+            //     const index = playList.findIndex(item => item.aId === currentId);
+
+            //     if (index + 1 === playList.length) { // 如果上一个播放的已经是最后一个
+            //         return false;
+            //     } else {
+            //         const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+            //         let nextPoint = pointList.filter(item => item.resource_id === playList[index + 1].aId)[0];
+            //         return {
+            //             nextPlay: playList[index + 1],
+            //             nextPoint: nextPoint
+            //         }
+            //     }
+            // },
             // 初始化图标菜单
             async initMenu() {
 
@@ -1138,7 +1173,7 @@
                         }
                     }
                 });
-                this.SET_ROUTE_NAME('scenic-spot');
+                this.SETROUTENAME('scenic-spot');
                 this.isHasWeather = true;
                 if (this.isHasMapImage && this.isHasPointList) {
                     this.isShowLoading = false;
@@ -1245,36 +1280,38 @@
                 }
             },
             ...mapActions([
-                'getLineList' // 请求获取路线列表
+                'getLineList'
             ]),
             ...mapMutations([
-                'SAVE_RESOURCE_LIST', // 保存资源列表
-                'SET_ROUTE_NAME', // 设置to路由name
+                'SAVERESOURCELIST',
+                'SETROUTENAME', // 更改路由name
                 'AUTO_PALY', // 自动连播
-                'SET_FROM_ROUTE_NAME', // 设置from路由name
-                'SET_CURRENT_SCENIC', // 设置当前景区信息
-                'START_PLAY', // 开始播放,
+                'SETTOROUTENAMEOFMENU',
+                'SETFROMROUTENAME',
+                'SETCURRENTSCENIC',
+                'STARTPLAY', // 开始播放,
                 'CLEAR_CURRENT_INTERVAL', // 清除当前定时器
-                'START_NEW_INTERVAL', // 开始新的定时器
-                'NOTICE_STOP', // 通知是否结束播放
-                'NOTICE_AUTO_PLAY' // 通知是否开始连播
+                'START_NEW_INTERVAL' // 开始新的定时器
             ]),
             /**
              * 初始化音频播放
-             * _type 标志播放来源 1-工具栏播放 2-景点列表点播/地图解说播放/扫码播放 
+             * _type 标志播放来源 1-工具栏播放 3-景点列表点播/地图解说播放/连播/扫码播放  ****2-景点详情页回退续播
              */
             playAudio(options) {
+                // const audioContainer = document.querySelector('.toolbars');
+                // let isContinuePlay = false; // 是否需要续播，针对播放来源2
+
                 const mainAudio = document.querySelector('.main-audio');
                 let src = ''; // 待播放景点 -- src
                 let id = ''; // 待播放景点 -- id
                 
-                // 工具栏播放
-                if (options.type === 1) { 
-                    this.oMap_main.closePopup(); // 关闭信息弹窗
+                if (options.type === 1) { // 工具栏播放
+                    this.oMap_main.closePopup(); // 关闭弹窗
                     if (mainAudio && mainAudio.paused) { // 如果当前 Audio 是暂停状态则直接继续播放
                         console.log('++++++++++++++ type:1 继续播放 ++++++++++++++');
                         mainAudio.play();
-                        this.START_NEW_INTERVAL(); // 重新启动计时器
+                        this.START_NEW_INTERVAL();
+                        // sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: false})); // 修改暂停状态标志量--isPauseStatus
                         this.isPlayed = true; // 播放图标更改
                         this.changeMapIcon(true); // 同步地图上标记点更改状态
                         return;
@@ -1285,24 +1322,130 @@
                         id = currentPoint.resource_id;
                     }
                 }
-
-                // 景点列表点播/地图解说播放/扫码播放
-                if (options.type === 2) { 
-                    console.log('++++++++++++++ type:2 景点列表点播/地图解说播放/扫码播放 ++++++++++++++');
+                if (options.type === 2) { // 景点列表点播/地图解说播放/连播/扫码播放
                     src = options._src;
                     id = options._id;
                 }
 
-                this.START_PLAY({src, id}); // 开始播放
-                this.START_NEW_INTERVAL(); // 开始定时器
+                // 根据播放来源处理不同逻辑
+                // if (options._type === 1) { // 工具栏播放
+                //     this.oMap_main.closePopup();
+                //     if (mainAudio && mainAudio.paused) { // 如果当前 Audio 是暂停状态则直接继续播放
+                //         console.log('++++++++++++++ _type:1 继续播放 ++++++++++++++');
+                //         mainAudio.play();
+                //         sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: false})); // 修改暂停状态标志量--isPauseStatus
+                //         this.isPlayed = true;
+                //         this.changeMapIcon(true); // 同步地图上标记点更改状态
+                //         return;
+                //     } else { // 如果当前 Audio 还不存在则创建元素,并播放当前景点
+                //         console.log('++++++++++++++ _type:1 工具栏播放 ++++++++++++++');
+                //         const currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+                //         src = currentPoint.guideUrl;
+                //         id = currentPoint.resource_id;
+                //     }                        
+                // } else if (options._type === 2) { // 景点详情页回退续播
+                //     console.log('++++++++++++++ _type:2 景点详情页回退续播 ++++++++++++++');
+                //     src = options._src;
+                //     id = options._id;
+                //     isContinuePlay = true;
+                // } else if (options._type === 3) { // 景点列表点播/地图解说播放/连播/扫码播放
+                //     console.log('++++++++++++++ _type:3 点播/连播/扫码播 ++++++++++++++');
+                //     src = options._src;
+                //     id = options._id;
+                // }
+
+                this.STARTPLAY({
+                    src,
+                    id
+                });
+                this.START_NEW_INTERVAL();
                 this.isPlayed = true;
                 this.changeMapIcon(true);
+
+
+
+                // 开始播放
+                // if (isContinuePlay) {
+                //     const playStatus = JSON.parse(sessionStorage.getItem('playStatus'));
+
+                //     // 如果是iOS手机 不能使用电脑模拟器来测试
+                //     if (this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
+                //         audioDom.oncanplay = (e) => {
+                //             audioDom.currentTime = playStatus.currentTime;
+                //             let _audioDom = e.target;
+                //             this.totalTime = _audioDom.duration;
+                //             this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
+
+                //             if (playStatus.isPauseStatus) { // 暂停中
+                //                 this.isPlayed = false;
+                //             } else {
+                //                 _audioDom.play();
+                //                 // document.querySelector('.pointImg').style.animate
+                //                 this.isPlayed = true;
+                //             } 
+                //             if (this.isPlayed) {
+                //                 this.changeMapIcon(true);
+                //             }
+                //         }
+                //     }
+
+                //     // 如果是Android手机
+                //     if (this.$tool.validateReg.isAndroid(window.navigator.userAgent)) {
+                //         audioDom.currentTime = playStatus.currentTime;
+                //         audioDom.oncanplay = (e) => {
+                //             let _audioDom = e.target;
+                //             this.totalTime = _audioDom.duration;
+                //             this.audioPercent = playStatus.currentTime / _audioDom.duration * 100;
+
+                //             if (playStatus.isPauseStatus) { // 暂停中
+                //                 this.isPlayed = false;
+                //             } else {
+                //                 _audioDom.play();
+                //                 this.isPlayed = true;
+                //             } 
+                //             if (this.isPlayed) {
+                //                 this.changeMapIcon(true);
+                //             }
+                //         }
+                //     }
+                    
+                //     audioDom.onplay = (e) => {
+                //         this.changeProgress();
+                //     }
+                // } else {
+                //     audioDom.oncanplay = (e) => {
+                //         let _audioDom = e.target;
+                //         this.totalTime = _audioDom.duration;
+                //         sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus : false}));
+                //         _audioDom.play();
+                //         this.isPlayed = true;
+                //         if (this.isPlayed) {
+                //             this.changeMapIcon(true);
+                //         }
+                //     }
+                //     audioDom.onplay = (e) => {
+                //         this.changeProgress();
+                //     }
+                // }
             },
             // 暂停播放
             pauseAudio() {
-                this.CLEAR_CURRENT_INTERVAL(); // 通知App页清除定时器
-                document.querySelector('.main-audio').pause(); // 直接暂停音频
+                // clearInterval(this.timer);
+                // this.timer = '';
+                // let status = {
+                //     currentTime: document.querySelector('.main-audio').currentTime,
+                //     isPauseStatus : true
+                // } 
+                // sessionStorage.setItem('playStatus', JSON.stringify(status));
+
+                // 通知App页清除定时器
+                this.CLEAR_CURRENT_INTERVAL();
+
+                // 直接暂停音频
+                document.querySelector('.main-audio').pause();
                 this.isPlayed = false;
+
+                //地图图标交互效果 
                 this.changeMapIcon(false);
             },
             // 改变地图图标交互效果 
@@ -1345,6 +1488,13 @@
                     }
                 });
             },
+            // 播放进度圆环
+            // changeProgress() {
+            //     this.timer = setInterval(() => {
+            //         let currentTime = document.querySelector('.main-audio').currentTime;
+            //         this.audioPercent = currentTime / this.totalTime * 100;
+            //     },1000);
+            // },
             // 跳转其他页
             gotoPage(name) {
                 if (name === 'full-view') {
@@ -1432,6 +1582,8 @@
                             console.log('init');
 
                             // 移除部分本地存储
+                            sessionStorage.removeItem('playStatus');
+                            // sessionStorage.removeItem('isAuto');
                             sessionStorage.removeItem('currentResource');
                             sessionStorage.removeItem('lineList');
                             sessionStorage.removeItem('lineId');
@@ -1460,7 +1612,7 @@
                                 this.playAudio({
                                     _src: qrcode_current_point.guideUrl,
                                     _id: qrcode_current_point.resource_id,
-                                    type: 2
+                                    _type: 3
                                 });
                             } else {
 
@@ -1482,7 +1634,7 @@
                             }
                         }
                     } else {
-                        this.SAVE_RESOURCE_LIST(res.page.list); // commit mutation 保存其他资源列表
+                        this.SAVERESOURCELIST(res.page.list); // commit mutation 保存其他资源列表
                     }
 
                     //地图画点
@@ -1523,9 +1675,17 @@
                     // 如果是从景点详情页回退的情况
                     if (fromRouteName === 'scenic-point-detail') {
                         const { guideUrl, resource_id, url, name } = JSON.parse(sessionStorage.getItem('currentPoint'));
+
                         this.scenicPointImg = url;
                         this.scenicPointName = name;
                         this.scenicPointId = resource_id;
+                        
+                        // 设置播放栏
+                        this.playAudio({
+                            _src: guideUrl,
+                            _id: resource_id,
+                            _type: 2 
+                        });
                     }
                 }
                 if (this.isFirst) {
@@ -1606,7 +1766,7 @@
                     sessionStorage.setItem('currentPoint',JSON.stringify(currentPointInfo));
                     let cau = document.querySelector(".main-audio");
                     if(cau && cau.paused && resource_id == cau.dataset.id){ // 继续播放
-                        this.playAudio({type: 1});
+                        this.playAudio({_type: 1});
                     }else{ // 开始新的播放
                         const currLineId = sessionStorage.getItem('lineId');
                         const pointList = JSON.parse(sessionStorage.getItem('pointList'));
@@ -1652,7 +1812,7 @@
                         this.playAudio({
                             _src: guideUrl,
                             _id: resource_id,
-                            type: 2
+                            _type: 3
                         });
                     }
                 }else{ // 之前是播放状态则暂停

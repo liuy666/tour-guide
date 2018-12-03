@@ -27,13 +27,13 @@ router.beforeEach((to, from, next) => {
 
     // 从home页进入main页或在main页刷新
     if ((!from.name || from.name === 'index') && to.name === 'main') {
-        console.log('SETFROMROUTENAME => root')
-        vuex.commit('SETFROMROUTENAME', 'root');
+        console.log('SET_FROM_ROUTE_NAME => root')
+        vuex.commit('SET_FROM_ROUTE_NAME', 'root');
     }
 
     // 在反馈页刷新
     if (to.name === 'feedback') {
-        vuex.commit('SETSCENICID', JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id);
+        vuex.commit('SET_SCENIC_ID', JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id);
     }
 
     // 在main页的子路由上刷新
@@ -63,7 +63,7 @@ router.beforeEach((to, from, next) => {
             });
         } else {
             console.log(2)
-            vuex.commit('SETFROMROUTENAME', from.name);
+            vuex.commit('SET_FROM_ROUTE_NAME', from.name);
         }
     }
 

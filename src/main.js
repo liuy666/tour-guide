@@ -35,7 +35,7 @@ const vm = new Vue({
     store,
     render: h => h(App),
     mounted() {
-        this.$store.commit('INITCONTENT');
+        this.$store.commit('INIT_CONTENT'); // 初始化设置消息详情内容
         console.log(11)
     }
 }).$mount('#app');

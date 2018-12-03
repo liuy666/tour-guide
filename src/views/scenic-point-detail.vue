@@ -586,7 +586,7 @@ export default {
             isPauseStatus : status
         }
         sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
-        this.$store.commit('SETFROMROUTENAME', 'scenic-point-detail');
+        this.$store.commit('SET_FROM_ROUTE_NAME', 'scenic-point-detail');
         if(this.timer){
             clearInterval(this.timer);
         }

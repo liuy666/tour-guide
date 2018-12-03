@@ -56,9 +56,15 @@
                     audioDom.oncanplay = (e) => {
                         let _audioDom = e.target;
                         this.totalTime = _audioDom.duration;
+                        // sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus : false}));
                         _audioDom.play();
-                        this.NOTICE_STOP(false);
-                        this.NOTICE_AUTO_PLAY(false);
+                        // this.SETMAPSTATUS({
+                        //     isPlayed: true,
+                        // });
+                        // this.isPlayed = true;
+                        // if (this.isPlayed) {
+                        //     this.changeMapIcon(true);
+                        // }
                     }
                     audioDom.onplay = (e) => {
                         this.changeProgress();
@@ -77,14 +83,16 @@
                 if (percent >= 100) {
                     const currentAudio = document.querySelector('.main-audio');
 
-                    // 通知地图页 停止icon 关闭弹窗 更改播放按钮状态
-                    this.NOTICE_STOP(true);
+                    // 改用vuex更改地图icon 关闭弹窗 更改播放按钮状态
+                    // this.changeMapIcon(false);
+                    // this.oMap_main.closePopup();
+                    // this.isPlayed = false;
 
                     if (!currentAudio.paused || !currentAudio.ended) {
                         currentAudio.pause();
                     }
                     this.audioPercent = 0;
-                    this.SET_PERCENT(0);
+                    this.SETPERCENT(0);
                     this.CLEAR_CURRENT_INTERVAL();
                     let currentId = currentAudio.dataset.id;
                     const app = document.querySelector('#app');
@@ -97,18 +105,27 @@
                         let next = this.getNext(currentId);
                         if (next) {
 
-                            // 通知地图页更改当前景点显示信息
-                            this.NOTICE_AUTO_PLAY({
-                                isAutoPlay: true,
-                                nextMessage: next
-                            });
-                            
+                            // 改用vuex更改当前显示信息
+                            // this.scenicPointImg = next.nextPoint.url;
+                            // this.scenicPointName = next.nextPoint.name;
+                            // this.scenicPointId = next.nextPoint.resource_id;
+                            // this.START_NEW_INTERVAL();
+                            // this.isPlayed = true;
+                            // this.changeMapIcon(true);
+
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
-                            this.AUTO_PALY(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
-                            this.START_PLAY({
+                            // this.autoPlay(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
+                            // this.playAudio({
+                            //     _src: next.nextPlay.aSrc,
+                            //     _id: next.nextPlay.aId,
+                            //     _type: 3
+                            // });
+                            this.STARTPLAY({
                                 src: next.nextPlay.aSrc,
                                 id: next.nextPlay.aId
                             });
+                        } else { // 表明播放列表已播完，则更改播放状态
+                            sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
                         }
                     }
                 }
@@ -116,20 +133,18 @@
         },
         methods: {
             ...mapMutations([
-                'SET_PERCENT', // 实时更新播放进度
-                'START_PLAY',
-                'CLEAR_CURRENT_INTERVAL',
-                'NOTICE_STOP',
-                'NOTICE_AUTO_PLAY',
-                'AUTO_PALY'
+                'SETPERCENT', // 实时更新播放进度
+                'STARTPLAY',
+                'CLEAR_CURRENT_INTERVAL'
+                // 'SETMAPSTATUS' // 更新地图页的播放状态
             ]),
-            // 播放进度
+            // 播放进度圆环
             changeProgress() {
                 this.timer = setInterval(() => {
                     let currentTime = document.querySelector('.main-audio').currentTime;
                     this.audioPercent = currentTime / this.totalTime * 100;
                     console.log('播放进度：' + currentTime / this.totalTime * 100 + '%');
-                    this.SET_PERCENT(this.audioPercent);
+                    this.SETPERCENT(this.audioPercent);
                 },1000);
             },
             // 获取下一个播放链接
