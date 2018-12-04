@@ -1574,10 +1574,14 @@
 
                 // 如果是从景点详情页回退的情况
                 if (fromRouteName === 'scenic-point-detail') {
+
+                    // 重新渲染当前景点信息
                     let currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
                     this.scenicPointImg = currentPoint.url;
                     this.scenicPointName = currentPoint.name;
                     this.scenicPointId = currentPoint.resource_id;
+
+                    // 重新渲染当前播放状态
                     let currAu = document.querySelector('.main-audio');
                     if (currAu) {
                         if (!currAu.paused) {
@@ -1591,6 +1595,17 @@
                                 this.changeMapIcon(false);
                             }
                         }
+                    }
+
+                    // 如果之前选了路线 则重新画线路线
+                    if (sessionStorage.getItem('lineId')) {
+                        this.drawLine(sessionStorage.getItem('lineId'));
+                    }
+
+                    // 如果之前选了其他资源点 则清除对应的缓存信息
+                    if (sessionStorage.getItem('currentResource')) {
+                        sessionStorage.removeItem('currentResource');
+                        sessionStorage.removeItem('otherPointList');
                     }
                 }
 
