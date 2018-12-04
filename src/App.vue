@@ -32,13 +32,14 @@
                 if (params) {
                     const mainAudio = document.querySelector('.main-audio');
                     const audioContainer = document.querySelector('#app');
-                    if (mainAudio) {
+                    if (mainAudio) { // 当前正在播放时 切换了音频
                         clearInterval(this.timer);
                         if (!mainAudio.paused) {
                             mainAudio.pause();
                         }
                         audioContainer.removeChild(mainAudio);
                         this.audioPercent = 0;
+                        this.SET_PERCENT(0);
                         this.timer = '';
                     }
                     let audioDom = document.createElement('audio');
@@ -57,8 +58,8 @@
                         let _audioDom = e.target;
                         this.totalTime = _audioDom.duration;
                         _audioDom.play();
-                        this.NOTICE_STOP(false);
-                        this.NOTICE_AUTO_PLAY(false);
+                        this.NOTICE_STOP(false); // 通知是否结束播放 -- 否
+                        this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
                     }
                     audioDom.onplay = (e) => {
                         this.changeProgress();
@@ -77,10 +78,10 @@
                 if (percent >= 100) {
                     const currentAudio = document.querySelector('.main-audio');
 
-                    // 通知地图页 停止icon 关闭弹窗 更改播放按钮状态
+                    // 通知地图页 更换icon图标/关闭弹窗/更改播放按钮状态
                     this.NOTICE_STOP(true);
 
-                    if (!currentAudio.paused || !currentAudio.ended) {
+                    if (!currentAudio.paused || !currentAudio.ended) { // 如果当前音频还有最后一点点没播完则直接停止 针对获取的总时长比实际时长短一点点的问题
                         currentAudio.pause();
                     }
                     this.audioPercent = 0;
@@ -89,10 +90,9 @@
                     let currentId = currentAudio.dataset.id;
                     const app = document.querySelector('#app');
                     app.removeChild(currentAudio);
-                    // sessionStorage.setItem('playStatus', JSON.stringify({isPauseStatus: true}));
                     
-                    const isAuto = sessionStorage.getItem('isAuto');
                     // 如果开启了自动连播
+                    const isAuto = sessionStorage.getItem('isAuto');
                     if (isAuto) {
                         let next = this.getNext(currentId);
                         if (next) {

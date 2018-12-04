@@ -11,7 +11,7 @@ const app = {
         fromRouteName_detail: '',
         lineStatus: '',
         sId: '',
-        currentScenic: null,
+        // currentScenic: null,
         playParams: null, // 播放所需参数，包括景点id和音频src
         percent: 0, // 播放进度百分比
         playStatus: '', // 当前播放状态 -- pause/play
@@ -61,9 +61,10 @@ const app = {
         SET_SCENIC_ID(state, val) {
             state.sId = val;
         },
-        SET_CURRENT_SCENIC(state, val) {
-            state.currentScenic = val;
-        },
+        // 保存当前景区信息
+        // SET_CURRENT_SCENIC(state, val) {
+        //     state.currentScenic = val;
+        // },
 
 
 

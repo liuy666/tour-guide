@@ -677,9 +677,6 @@
         // 导航离开该组件的对应路由时调用 可以访问组件实例 `this`
         beforeRouteLeave(to, from, next){
             this.$store.commit('setFromRouteName_detail', to.name);
-            if (this.timer) {
-                clearInterval(this.timer);
-            }
             next();
         },
         // 在当前路由改变，但是该组件被复用时调用 可以访问组件实例 `this`
@@ -687,15 +684,12 @@
             next();
         },
         created() {
-            this.isShowLoading = true;
             console.log('created');
 
-            if(this.timer){
-                clearInterval(this.timer);
-            }
-            if (!sessionStorage.getItem('currentScenic')) {
-                sessionStorage.setItem('currentScenic', JSON.stringify(this.$store.state.app.currentScenic));
-            }
+            this.isShowLoading = true;
+            // if (!sessionStorage.getItem('currentScenic') && this.$store.state.app.currentScenic) {
+            //     sessionStorage.setItem('currentScenic', JSON.stringify(this.$store.state.app.currentScenic));
+            // }
             if (sessionStorage.getItem('isAuto')) {
                 this.isAuto = sessionStorage.getItem('isAuto');
             } else {
@@ -703,35 +697,44 @@
             }
         },
         async mounted() {
-            console.log('mounted')
+            console.log('mounted');
 
-            const query = this.$route.query;
             let scenicInfo = null;
 
             // 扫码进入页面,先获取该域名下的景区列表,并根据获取的景区id获取景区详情
+            const query = this.$route.query;
             if (query.sid) {
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
                     domainUrl: 'www.qxgz.com'  // 域名改成获取
                 });
-                if (!scenicList) {
-                    // 请求失败，跳转404 并传递返回的url
+
+                // 请求失败，跳转404 并传递返回的url
+                if (!scenicList || !scenicList.data || !scenicList.data.length) {
+                    this.$router.repalce({
+                        name: 'not-found',
+                        params: {
+                            returnUrl: window.location.href
+                        }
+                    });
                     return;
                 }
+
+                // 请求成功，开始初始化
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
                 scenicInfo = {...currentScenic};
                 sessionStorage.setItem('currentScenic',JSON.stringify(currentScenic));
                 this.SET_FROM_ROUTE_NAME('root');
-                this.SET_CURRENT_SCENIC(currentScenic);
+                // this.SET_CURRENT_SCENIC(currentScenic);
             } else {
                 //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
             }
-            if (!scenicInfo) {
-                // 获取当前信息失败，跳转404 并传递返回的url
-                return;
-            }
+            // if (!scenicInfo) {
+            //     // 获取当前信息失败，跳转404 并传递返回的url
+            //     return;
+            // }
             
-            // 初始化底部景区简介弹窗
+            // 初始化底部景区简介弹窗并存储景区id
             this.scenicImg = scenicInfo.accessCoverUrl;
             this.scenicName = scenicInfo.name;
             this.scenicLevel = scenicInfo.level;
@@ -739,7 +742,6 @@
             this.region = Number(String(scenicInfo.region).slice(1));
             this.scenicOpenTime = scenicInfo.opening_time;
             this.scenicDec = scenicInfo.introduce;
-            // 存储景区id
             this.sceneryId = scenicInfo.scenery_id;
 
             // 获取地图初始化信息
@@ -872,8 +874,6 @@
 
             // 初始化图标菜单
             this.initMenu();
-
-            
         },
         data () {
             return {
@@ -898,7 +898,6 @@
                 isShowMenu: false,
                 isOpenDetail: false,
                 isAuto: false, // 是否自动播放
-                // audioPercent: 0,
                 scenicPointImg: '', // 播放栏--景点图片
                 scenicPointName: '', // 播放栏--景点名称
                 scenicPointId:'', // 播放栏--景点Id
@@ -908,8 +907,6 @@
                 isShowLoading: false,
                 isPlayed: false,
                 isPositioning : false,
-                timer: '',
-                totalTime: '',
                 currentScenicId: '',
                 markers: [],
                 markers_line:[],
@@ -1021,6 +1018,7 @@
                     this.oMap_main.closePopup();
                     this.isPlayed = false;
                     this.changeMapIcon(false);
+                    document.querySelector('.pointImg').style.animationPlayState = 'paused';
                 }
             },
             isAutoPlay(val) {
@@ -1031,6 +1029,7 @@
                     this.START_NEW_INTERVAL();
                     this.isPlayed = true;
                     this.changeMapIcon(true);
+                    document.querySelector('.pointImg').style.animationPlayState = 'paused';
                 }
             }
         },    
@@ -1059,7 +1058,7 @@
             // 自动定位一次及提示自动提示
             autoGetPositon() {
                 if(!sessionStorage.getItem("hasPosition")){
-                    // this.isOpenDetail = true;
+                    this.isOpenDetail = true;
                     this.isTips4 = true;
                     setTimeout(() => {
                         this.isTips4 = false;
@@ -1138,7 +1137,10 @@
                         }
                     }
                 });
+
+                // 初始化默认第一个子页面是景点列表页
                 this.SET_ROUTE_NAME('scenic-spot');
+
                 this.isHasWeather = true;
                 if (this.isHasMapImage && this.isHasPointList) {
                     this.isShowLoading = false;
@@ -1252,7 +1254,7 @@
                 'SET_ROUTE_NAME', // 设置to路由name
                 'AUTO_PALY', // 自动连播
                 'SET_FROM_ROUTE_NAME', // 设置from路由name
-                'SET_CURRENT_SCENIC', // 设置当前景区信息
+                // 'SET_CURRENT_SCENIC', // 设置当前景区信息
                 'START_PLAY', // 开始播放,
                 'CLEAR_CURRENT_INTERVAL', // 清除当前定时器
                 'START_NEW_INTERVAL', // 开始新的定时器
@@ -1277,6 +1279,7 @@
                         this.START_NEW_INTERVAL(); // 重新启动计时器
                         this.isPlayed = true; // 播放图标更改
                         this.changeMapIcon(true); // 同步地图上标记点更改状态
+                        document.querySelector('.pointImg').style.animationPlayState = 'running';
                         return;
                     } else { // 如果当前 Audio 还不存在则创建元素,并播放当前景点
                         console.log('++++++++++++++ type:1 工具栏播放 ++++++++++++++');
@@ -1297,6 +1300,7 @@
                 this.START_NEW_INTERVAL(); // 开始定时器
                 this.isPlayed = true;
                 this.changeMapIcon(true);
+                document.querySelector('.pointImg').style.animationPlayState = 'running';
             },
             // 暂停播放
             pauseAudio() {
@@ -1304,6 +1308,7 @@
                 document.querySelector('.main-audio').pause(); // 直接暂停音频
                 this.isPlayed = false;
                 this.changeMapIcon(false);
+                document.querySelector('.pointImg').style.animationPlayState = 'paused';
             },
             // 改变地图图标交互效果 
             changeMapIcon (isPlay) {
@@ -1404,8 +1409,8 @@
 
                 // 根据资源类型获取资源列表
                 const res = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${arg.resourceType}&limit=500`);
-                if(!res){
-                    if (this.isFirst) {
+                if(!res || !res.page.list || !res.page.list.length){
+                    if (this.isFirst) { // 仅第一次初始化时执行定位
                         this.isFirst = false;
                         this.isHasPointList = true;
                         if (this.isHasMapImage && this.isHasWeather) {
@@ -1418,117 +1423,110 @@
                     return;
                 }
 
-                if(res.page.list && res.page.list.length){
+                // 判断是否是初始化页面 还是回退进入本页面
+                const fromRouteName = this.$store.state.app.fromRouteName;
 
-                    // 判断是否是初始化页面 还是回退进入本页面
-                    const fromRouteName = this.$store.state.app.fromRouteName;
+                // 初始化默认显示
+                if(arg.resourceType == 1) { 
+                    sessionStorage.setItem('pointList',JSON.stringify(res.page.list)); // 存储更新完整景点列表
+                    if (fromRouteName === 'root' || fromRouteName === 'feedback' || fromRouteName === 'recognize') { // 如果是刷新后初始化页面或从反馈页回退的情况
+                        console.log('init');
 
-                    // 初始化默认显示
-                    if(arg.resourceType == 1) { 
-                        // 存储更新完整景点列表
-                        sessionStorage.setItem('pointList',JSON.stringify(res.page.list));
+                        // 移除部分本地存储
+                        sessionStorage.removeItem('currentResource');
+                        sessionStorage.removeItem('lineList');
+                        sessionStorage.removeItem('lineId');
+                        sessionStorage.removeItem('otherPointList');
 
-                        if (fromRouteName === 'root' || fromRouteName === 'feedback' || fromRouteName === 'recognize') { // 如果是刷新后初始化页面或从反馈页回退的情况
-                            console.log('init');
+                        if (arg.query && arg.query.pid) { // 如果通过二维码扫码进入页面则使用指定景点
+                            const QRCODE_CURRENT_POINT = res.page.list.filter(item => item.resource_id === arg.query.pid)[0];
 
-                            // 移除部分本地存储
-                            sessionStorage.removeItem('currentResource');
-                            sessionStorage.removeItem('lineList');
-                            sessionStorage.removeItem('lineId');
-                            sessionStorage.removeItem('otherPointList');
+                            // 存储当前扫码景点的信息
+                            sessionStorage.setItem("currentPoint",JSON.stringify(QRCODE_CURRENT_POINT));
+                            this.scenicPointImg = QRCODE_CURRENT_POINT.url;
+                            this.scenicPointName = QRCODE_CURRENT_POINT.name;
+                            this.scenicPointId = QRCODE_CURRENT_POINT.resource_id;
+                            
+                            // 过滤出默认播放列表
+                            const index = res.page.list.findIndex(item => item.resource_id === arg.query.pid);
+                            const newPlayList = res.page.list.slice(index).map(item => {
+                                return {
+                                    aSrc: item.guideUrl,
+                                    aId: item.resource_id
+                                }
+                            });
+                            sessionStorage.setItem('playList',JSON.stringify(newPlayList));
 
-                            if (arg.query && arg.query.pid) { // 如果通过二维码扫码进入页面则使用指定景点
-                                const qrcode_current_point = res.page.list.filter(item => item.resource_id === arg.query.pid)[0];
+                            // 播放当前扫码景点的解说音频
+                            this.playAudio({
+                                _src: QRCODE_CURRENT_POINT.guideUrl,
+                                _id: QRCODE_CURRENT_POINT.resource_id,
+                                type: 2
+                            });
+                        } else { // 否则默认取第一个景点
+                            sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
+                            this.scenicPointImg = res.page.list[0].url;
+                            this.scenicPointName = res.page.list[0].name;
+                            this.scenicPointId = res.page.list[0].resource_id;
 
-                                // 存储当前扫码景点的信息
-                                sessionStorage.setItem("currentPoint",JSON.stringify(qrcode_current_point));
-                                this.scenicPointImg = qrcode_current_point.url;
-                                this.scenicPointName = qrcode_current_point.name;
-                                this.scenicPointId = qrcode_current_point.resource_id;
-                                
-                                // 过滤出默认播放列表
-                                const index = res.page.list.findIndex(item => item.resource_id === arg.query.pid);
-                                const newPlayList = res.page.list.slice(index).map(item => {
-                                    return {
-                                        aSrc: item.guideUrl,
-                                        aId: item.resource_id
-                                    }
-                                });
-                                sessionStorage.setItem('playList',JSON.stringify(newPlayList));
-
-                                // 播放当前扫码景点的解说音频
-                                this.playAudio({
-                                    _src: qrcode_current_point.guideUrl,
-                                    _id: qrcode_current_point.resource_id,
-                                    type: 2
-                                });
-                            } else {
-
-                                // 否则默认取取第一个景点
-                                sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
-                                this.scenicPointImg = res.page.list[0].url;
-                                this.scenicPointName = res.page.list[0].name;
-                                this.scenicPointId = res.page.list[0].resource_id;
-
-                                // 过滤出默认播放列表
-                                const playList = res.page.list.map(item => {
-                                    return {
-                                        aSrc: item.guideUrl,
-                                        aId: item.resource_id
-                                    }
-                                });
-                                sessionStorage.setItem('playList',JSON.stringify(playList));
-                                console.dir(document.querySelector('.pointImg'))
-                            }
+                            // 过滤出默认播放列表
+                            const playList = res.page.list.map(item => {
+                                return {
+                                    aSrc: item.guideUrl,
+                                    aId: item.resource_id
+                                }
+                            });
+                            sessionStorage.setItem('playList',JSON.stringify(playList));
                         }
-                    } else {
-                        this.SAVE_RESOURCE_LIST(res.page.list); // commit mutation 保存其他资源列表
                     }
-
-                    //地图画点
-                    let className_resource = this.typeList.filter(item => item.type == this.resourceType)[0].className;
-                    res.page.list.forEach((v,i) => {
-                        let infoContent = this.resourceType == 1 ? this.createInfoWindow_scenicPoint(v) : this.createInfoWindow(v);
-                        let myIcon = L.divIcon({
-                            html: `<div data-id="${v.resource_id}">
-                                        <div class="icon ${className_resource}"></div>
-                                        <div class="name">${v.name}</div>
-                                    </div>`,
-                            className: 'marker-content-new',
-                            popupAnchor: [0, -(42*this.bl)]
-                        });
-                        let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
-                                      .bindPopup(infoContent,{className:"info-content-new"})
-                                      .on('click',(e) => { 
-                                        $this.isShowMenu = false;
-                                        $this.isOpenDetail = false;
-
-                                        $this.mapClickPointId = v.resource_id;
-                                        sessionStorage.setItem("mapClickPointId",$this.mapClickPointId);
-
-                                        let currentPlayBtn = e.target._popup._contentNode.children[0].children[1].children[0];
-                                        if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId == v.resource_id){
-                                            currentPlayBtn.classList.add("playing")
-                                        }else{
-                                            currentPlayBtn.classList.remove("playing")
-                                        }
-                                    });
-                        this.markers.push(marker);
-                    });  
-
-                    if(this.resourceType < 3) {
-                        this.changeMapIcon(this.isPlayed);
-                    }         
-
-                    // 如果是从景点详情页回退的情况
-                    if (fromRouteName === 'scenic-point-detail') {
-                        const { guideUrl, resource_id, url, name } = JSON.parse(sessionStorage.getItem('currentPoint'));
-                        this.scenicPointImg = url;
-                        this.scenicPointName = name;
-                        this.scenicPointId = resource_id;
-                    }
+                } else {
+                    this.SAVE_RESOURCE_LIST(res.page.list); // commit mutation 保存其他资源列表
                 }
-                if (this.isFirst) {
+
+                //地图画点
+                let className_resource = this.typeList.filter(item => item.type == this.resourceType)[0].className;
+                res.page.list.forEach((v,i) => {
+                    let infoContent = this.resourceType == 1 ? this.createInfoWindow_scenicPoint(v) : this.createInfoWindow(v);
+                    let myIcon = L.divIcon({
+                        html: `<div data-id="${v.resource_id}">
+                                    <div class="icon ${className_resource}"></div>
+                                    <div class="name">${v.name}</div>
+                                </div>`,
+                        className: 'marker-content-new',
+                        popupAnchor: [0, -(42*this.bl)]
+                    });
+                    let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
+                                    .bindPopup(infoContent,{className:"info-content-new"})
+                                    .on('click',(e) => { 
+                                    $this.isShowMenu = false;
+                                    $this.isOpenDetail = false;
+
+                                    $this.mapClickPointId = v.resource_id;
+                                    sessionStorage.setItem("mapClickPointId",$this.mapClickPointId);
+
+                                    let currentPlayBtn = e.target._popup._contentNode.children[0].children[1].children[0];
+                                    if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId == v.resource_id){
+                                        currentPlayBtn.classList.add("playing")
+                                    }else{
+                                        currentPlayBtn.classList.remove("playing")
+                                    }
+                                });
+                    this.markers.push(marker);
+                });  
+
+                if(this.resourceType < 3) { // 只有景点或路线才需要更换icon图标
+                    this.changeMapIcon(this.isPlayed);
+                }         
+
+                // 如果是从景点详情页回退的情况
+                if (fromRouteName === 'scenic-point-detail') {
+                    let currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+                    this.scenicPointImg = currentPoint.url;
+                    this.scenicPointName = currentPoint.name;
+                    this.scenicPointId = currentPoint.resource_id;
+                }
+
+                if (this.isFirst) { // 仅第一次初始化时执行定位
                     this.isFirst = false;
                     this.isHasPointList = true;
                     if (this.isHasMapImage && this.isHasWeather) {
@@ -1660,24 +1658,27 @@
                 }
             },
             toDetail(isWindow) {
-                if(document.querySelector(".main-audio")){
-                    const status = document.querySelector('.main-audio').paused;
-                    this.pauseAudio();
-                    let playStatus = {
-                        currentTime: document.querySelector('.main-audio').currentTime,
-                        totalTime: this.totalTime,
-                        isPauseStatus : status,
-                        resourceId: document.querySelector('.main-audio').dataset.id
-                    }
-                    sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
-                }
-                if(!isWindow){
-                    sessionStorage.setItem("mapClickPointId",this.scenicPointId);
-                }
-                this.$router.push({
-                    name :  'scenic-point-detail'
-                });
+
             },
+            // toDetail(isWindow) {
+            //     if(document.querySelector(".main-audio")){
+            //         const status = document.querySelector('.main-audio').paused;
+            //         this.pauseAudio();
+            //         let playStatus = {
+            //             currentTime: document.querySelector('.main-audio').currentTime,
+            //             totalTime: this.totalTime,
+            //             isPauseStatus : status,
+            //             resourceId: document.querySelector('.main-audio').dataset.id
+            //         }
+            //         sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
+            //     }
+            //     if(!isWindow){
+            //         sessionStorage.setItem("mapClickPointId",this.scenicPointId);
+            //     }
+            //     this.$router.push({
+            //         name :  'scenic-point-detail'
+            //     });
+            // },
             //画路线
             drawLine(lineId) { 
                 if(this.markers_line.length>0){

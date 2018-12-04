@@ -167,7 +167,7 @@
         },
         methods: {
             ...mapMutations([
-                'SET_CURRENT_SCENIC' // 保存当前景区信息到vuex
+                // 'SET_CURRENT_SCENIC' // 保存当前景区信息到vuex
             ]),
             async getScenicList () {
                 let _self = this;
@@ -190,7 +190,7 @@
                                      .bindPopup(_self.createInfoWindow(v),{className:"info-content-new"})
                                      .on('click',function(){
                                          sessionStorage.setItem("currentScenic",JSON.stringify(v));
-                                         _self.SET_CURRENT_SCENIC(v);
+                                        //  _self.SET_CURRENT_SCENIC(v);
                                      });
                     })
                 }
