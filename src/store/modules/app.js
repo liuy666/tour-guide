@@ -17,7 +17,8 @@ const app = {
         playStatus: '', // 当前播放状态 -- pause/play
         isStop: false, // 判断当前播放是否结束
         isAutoPlay: false, // 判断是否自动播放下一个
-        nextMessage: null // 下一个播放景点所需信息
+        nextMessage: null, // 下一个播放景点所需信息
+        hasGetTotal: false //是否已经得到总时长
     },
     mutations: {
         // 保存路线列表
@@ -69,7 +70,7 @@ const app = {
 
         // 开始播放
         START_PLAY(state, params) {
-            state.playParams = {...params};
+            state.playParams = {...params };
         },
         // 设置播放进度百分比
         SET_PERCENT(state, percent) {
@@ -89,9 +90,12 @@ const app = {
             state.isStop = isStop;
         },
         // 通知是否开始连播
-        NOTICE_AUTO_PLAY(state, {isAutoPlay, nextMessage}) {
+        NOTICE_AUTO_PLAY(state, { isAutoPlay, nextMessage }) {
             state.isAutoPlay = isAutoPlay;
             state.nextMessage = nextMessage;
+        },
+        SET_HAS_GET_TOTAL(state, hasGetTotal) {
+            state.hasGetTotal = hasGetTotal;
         }
     },
     actions: {

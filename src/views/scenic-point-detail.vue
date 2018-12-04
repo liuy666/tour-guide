@@ -232,7 +232,7 @@
                 <div style="display:flex;margin-top:4px;">
                     <div class="audio-time">{{currentTimeStr}}</div>
                     <div class="audio-progress">
-                        <x-progress :percent="audioProgress" :show-cancel="false"></x-progress>
+                        <x-progress :percent="progress" :show-cancel="false"></x-progress>
                         <div class="circle"></div>
                     </div>
                     <div class="audio-time">{{totalTimeStr}}</div>
@@ -255,7 +255,7 @@
         </section>
         <section class="point-list-area">
             <ul class="point-list">
-                <v-touch tag="li" v-for="(item,index) in pointList" :key="index" @tap="changePointInfo(index,true,$event)">
+                <v-touch tag="li" v-for="(item,index) in pointList" :key="index" @tap="changePointInfo(index,$event)">
                     <div class="point-list-img ignore" :class="item.resource_id == currentPointId ? 'orange' : ''"><img :src="item.url"/></div>
                     <div class="point-list-name" :class="item.resource_id == currentPointId ? 'current' : ''" >{{item.name}}</div>
                 </v-touch>
@@ -265,7 +265,8 @@
 </template>
 
 <script>
-import { Swiper, XProgress, Loading, Toast } from 'vux'
+import { Swiper, XProgress, Loading, Toast } from 'vux';
+import { mapMutations, mapState } from 'vuex';
 export default {
     components : {
         Swiper,
@@ -287,7 +288,7 @@ export default {
             pointList: JSON.parse(sessionStorage.getItem("pointList")),
             playList: JSON.parse(sessionStorage.getItem("playList")),
             isPlayed: false,
-            audioProgress: 0,
+            progress:0,
             currentTimeStr: '0:00',
             totalTimeStr: '0:00',
             currentTime : '',
@@ -303,35 +304,79 @@ export default {
         }
     },
     watch : {
-        audioProgress (v) { 
-            if(v >= 100){
-                const dAudio = document.querySelector('.detail-audio');
-                clearInterval(this.timer);
-                if (!dAudio.paused || !dAudio.ended) {
-                    dAudio.pause();
-                }
-                this.isPlayed = false;
-                if(sessionStorage.getItem("isAuto")){
-                    //如果是自动  找到当前点在播放列表中的位置  然后讲列表序列中的下一个点设置成当前 
-                    //同时找到当前点在所有景点列表中的位置，执行changePointInfo
-                    this.playIndex = this.playList.findIndex(item => item.aId === this.currentPointId);
-                    if(this.playIndex < this.playList.length-1){
-                        this.changePointInfo(this.playIndex+1,false);
+        audioPercent (val) {
+            if(val>0){
+                if(document.querySelector(".main-audio").dataset.id == this.showPoint.resource_id){
+                    document.querySelector(".circle").style.left = "calc("+ val +"% - 8px)";
+
+                    this.currentTime = val/100*this.totalTime;
+                    let cf = Math.floor(this.currentTime/60);
+                    let cm = (this.currentTime%60).toFixed(0) < 10 ? '0'+(this.currentTime%60).toFixed(0) : (this.currentTime%60).toFixed(0);
+                    if(cm == 60) {
+                        cf = cf + 1;
+                        cm = "00";
                     }
+                    this.currentTimeStr = cf + ":" + cm;
+                    this.progress = val;
+                }else{
+                    document.querySelector(".circle").style.left = "-8px";
+                    this.currentTimeStr = "0:00";
+                    this.progress = 0;
                 }
+            }
+        },
+        isStop (val) {
+            if (val) {
+                this.isPlayed = false;
+            }
+        },
+        isAutoPlay (val) {
+            if (val) {
+                this.showPoint = this.$store.state.app.nextMessage.nextPoint;
+                this.currentPointId = this.showPoint.resource_id;
+                this.pointImg = this.showPoint.url;
+                this.pointName = this.showPoint.name;
+                this.pointCaption = this.showPoint.commentary;
+                this.currentTimeStr = "0:00";
+                this.getCurrentImgList();
+                this.START_NEW_INTERVAL();
+                this.isPlayed = true;
+
+                //设置滚动位置
+                let ind = this.pointList.findIndex(item => item.resource_id === this.showPoint.resource_id)
+                document.querySelector(".point-list").scrollLeft = 15 + this.bl * 96 * ind;
+            }
+        },
+        //用于自动播放 切换景点时获取总时长
+        hasGetTotal (val){
+            if(val) {
+                let totalTime = sessionStorage.getItem("totalTime");
+                console.log(totalTime);
+                this.totalTime = totalTime;
+                let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
+                this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
             }
         }
     },
+    computed : {
+        ...mapState({
+            audioPercent: state => state.app.percent,
+            isStop: state => state.app.isStop, // 监听是否当前是否播放完毕
+            isAutoPlay: state => state.app.isAutoPlay, // 监听是否开始连播下一个音频
+            hasGetTotal: state => state.app.hasGetTotal
+        })
+    },
     methods : {
-        //初始化音频
-        setAudio(isChange) {
-            const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
-
+        ...mapMutations([
+            'START_PLAY',
+            'START_NEW_INTERVAL', // 开始新的定时器
+            'CLEAR_CURRENT_INTERVAL' //清除定时器
+        ]),
+        //当没有播放时进入详情 或 播放的音频不是进入详情页的景点  初始化音频 获取对应景点音频的总时长
+        setAudio() {
             const audio = document.querySelector(".detail-audio");
-            //const audio_play = document.querySelector(".detail-audio-play");
             if(audio){
                 document.querySelector(".audio-area").removeChild(audio);
-                //document.querySelector(".audio-area").removeChild(audio_play);
             }
             const audioContainer = document.querySelector(".audio-area");
             let audioDom = document.createElement("audio"),
@@ -345,109 +390,43 @@ export default {
             audioContainer.appendChild(audioDom);
             audioDom.load();
 
-            /*let audioDom_play = document.createElement("audio"),
-                sourceDom_play = document.createElement("source");
-            sourceDom_play.type = 'audio/mpeg';
-            sourceDom_play.src = this.playingPoint.guideUrl;
-            audioDom_play.dataset.id = this.playingPoint.resource_id;
-            audioDom_play.appendChild(sourceDom_play);
-            audioDom_play.classList.add('detail-audio-play');
-            audioDom_play.style.display = 'none';
-            audioContainer.appendChild(audioDom_play);
-            audioDom_play.load();*/
-
-
-            //audioDom 用于放当前展示的景点的音频
-            //audioDom_play 用于放之前正在播放的景点的音频
-
             audioDom.oncanplay = (e) => { 
                 let _audioDom = e.target;
                 this.totalTime = _audioDom.duration;
                 let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
                 this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
-                if (this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
-                    if(!isChange && playStatus && playStatus.resourceId == this.showPoint.resource_id){
-                        audioDom.currentTime = playStatus.currentTime;
-                        this.currentTime = playStatus.currentTime;
-                        let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0);
-                        this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
-                    }
-                } 
             }
             audioDom.onplay = (e) => {
                 this.totalTime = e.target.duration;
-                this.changeProgress();
-            }
-            if(!isChange){//进页面的初始化
-                const playStatus = JSON.parse(sessionStorage.getItem("playStatus"));
-                if(playStatus && playStatus.resourceId == this.showPoint.resource_id){
-                    let cm = (playStatus.currentTime%60).toFixed(0) < 10 ? '0'+(playStatus.currentTime%60).toFixed(0) : (playStatus.currentTime%60).toFixed(0),
-                        tm = (playStatus.totalTime%60).toFixed(0) < 10 ? '0'+(playStatus.totalTime%60).toFixed(0) : (playStatus.totalTime%60).toFixed(0);
-                    this.currentTimeStr = Math.floor(playStatus.currentTime/60) + ":" + cm;
-                    this.totalTimeStr = Math.floor(playStatus.totalTime/60) + ":" + tm;
-                    //this.isPlayed = !playStatus.isPauseStatus;
-                    audioDom.currentTime = playStatus.currentTime;
-                    if(!playStatus.isPauseStatus){//播放状态
-                        this.isPlayed = true;
-                        audioDom.play();
-                    }else{
-                        this.isPlayed = false;
-                    }   
-                    //初始化进度条
-                    this.audioProgress = playStatus.currentTime / playStatus.totalTime * 100;
-                    document.querySelector(".circle").style.left = "calc("+this.audioProgress+"% - 8px)";
-                }else{
-                    let tm1 = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
-                    this.currentTimeStr = '0:00';
-                    this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + tm1;
-                    this.isPlayed = false;
-
-                    //if(playStatus && !playStatus.isPauseStatus){
-                        //audioDom_play.play();
-                    //}
-                }
-            }else{//切换景点的初始化
-                let tm2 = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
-                this.currentTimeStr = '0:00';
-                this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + tm2;
-                this.isPlayed = false;
-                if(sessionStorage.getItem("isAuto")){
-                    this.playAudio();
-                }
             }
         },
         //播放
         playAudio() {
-            const detailAudio = document.querySelector(".detail-audio");
-            if(detailAudio && detailAudio.paused){
+            const mainAudio = document.querySelector('.main-audio');
+            //当前正在播放并且播放景点与展示景点一致
+            if(mainAudio && mainAudio.dataset.id == this.showPoint.resource_id){
+                if(mainAudio.paused){
+                    this.isPlayed = true;
+                    mainAudio.play();
+                    this.START_NEW_INTERVAL();
+                }
+            }
+            //未播放状态或者播放景点与展示景点不一致，重新创建音频
+            else{ 
                 this.isPlayed = true;
-                detailAudio.play();
+                let src = this.showPoint.guideUrl,
+                    id = this.showPoint.resource_id;
+                this.START_PLAY({src, id}); // 开始播放
+                this.START_NEW_INTERVAL(); // 开始定时器
                 sessionStorage.setItem("currentPoint",JSON.stringify(this.showPoint));
                 sessionStorage.setItem("mapClickPointId",this.showPoint.resource_id);
-            }else{
-                console.log("****");
             }
+            
         },
         pauseAudio() {
-            clearInterval(this.timer);
-            this.timer = '';
-            document.querySelector('.detail-audio').pause();
+            this.CLEAR_CURRENT_INTERVAL(); // 通知App页清除定时器
+            document.querySelector('.main-audio').pause(); // 直接暂停音频
             this.isPlayed = false;
-        },
-        changeProgress() {
-            this.timer = setInterval(() => {
-                this.currentTime = document.querySelector('.detail-audio').currentTime;
-                let cf = Math.floor(this.currentTime/60);
-                let cm = (this.currentTime%60).toFixed(0) < 10 ? '0'+(this.currentTime%60).toFixed(0) : (this.currentTime%60).toFixed(0);
-                if(cm == 60) {
-                    cf = cf + 1;
-                    cm = "00";
-                }
-                this.currentTimeStr = cf + ":" + cm;
-
-                this.audioProgress = this.currentTime / this.totalTime * 100;
-                document.querySelector(".circle").style.left = "calc("+this.audioProgress+"% - 8px)";
-            },1000);
         },
         //获取当前景点轮播图
         async getCurrentImgList() {
@@ -484,20 +463,11 @@ export default {
             this.isShowLoading = false;
         },
         //切换景点
-        changePointInfo (index,isClick,ev) {
-            clearInterval(this.timer);
-            this.timer = '';
+        changePointInfo (index,ev) {
             document.querySelector(".circle").style.left = "- 8px";
-            this.audioProgress = 0;
+            this.progress = 0;
 
-            let newPointInfo = {};
-            if(isClick){
-                newPointInfo = this.pointList[index];
-            }else{
-                newPointInfo = this.pointList.filter(item => item.resource_id === this.playList[index].aId)[0];
-                document.querySelector(".point-list").scrollLeft = 15 + this.bl * 96 * (parseInt(newPointInfo.serial)-1);
-            }
-            sessionStorage.setItem("showPoint",JSON.stringify(newPointInfo));
+            let newPointInfo = this.pointList[index];
             this.showPoint = newPointInfo;
             this.currentPointId = newPointInfo.resource_id;
             this.pointImg = newPointInfo.url;
@@ -505,34 +475,59 @@ export default {
             this.pointCaption = newPointInfo.commentary;
             this.currentTimeStr = "0:00";
             this.getCurrentImgList();
-            this.setAudio(true);
+            this.setAudio();
+            sessionStorage.setItem("showPoint",JSON.stringify(newPointInfo));
+
+            if(document.querySelector(".main-audio")){
+                if(document.querySelector(".main-audio").dataset.id != this.showPoint.resource_id){
+                    this.isPlayed = false;
+                }else{
+                    this.isPlayed = true;
+                }
+            }else{
+                this.isPlayed = false;
+            }
         }
     },
     created() {
         this.getCurrentImgList();
     },
     mounted() {
-        //获取屏幕大小 动态设置不同手机的地图zoom
+        //获取屏幕大小 
         const containerWidth = document.querySelector('#scenic-point-detail').clientWidth;
         this.bl = parseFloat((containerWidth/375).toFixed(2));
 
         let self = this;
         this.currentIndex = this.pointList.findIndex(item => item.resource_id === this.currentPointId);
         document.querySelector(".point-list").scrollLeft =  15 + this.bl * 96 * this.currentIndex;
+        
+        //刷新进页面
         const fromRouteName = this.$store.state.app.fromRouteName_detail;
         if(fromRouteName != 'scenic-point-detail'){
-            sessionStorage.removeItem('playStatus');
-            clearInterval(this.timer);
-            this.timer = "";
-
             this.showPoint = JSON.parse(sessionStorage.getItem("showPoint"));
             this.currentPointId = this.showPoint.resource_id;
             this.pointImg = this.showPoint.url;
             this.pointName = this.showPoint.name;
             this.pointCaption = this.showPoint.commentary;
         }
-        this.setAudio();
-
+        
+        let mainAudio = document.querySelector(".main-audio");
+        //进入页面时，判断是否正在播放 且 播放的景点与展示的景点是否一致
+        //如果一致    初始化播放状态、总时长，总时长通过session获取 因为此时正在播放的音频的总时长已经准确的存入了session中
+        //如果不一致  播放状态设置为暂停，总时长用过自己创建一个audio来获取并展示
+        if(mainAudio && mainAudio.dataset.id == this.showPoint.resource_id){
+            if(mainAudio.paused) { 
+                this.isPlayed = false;
+            }else{
+                this.isPlayed = true;
+            }
+            this.totalTime = sessionStorage.getItem("totalTime");
+            let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
+            this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
+        }else{
+            this.isPlayed = false;
+            this.setAudio();
+        }
 
         this.$nextTick(function(){
             let circle = document.querySelector(".circle");
@@ -572,24 +567,7 @@ export default {
         })
     },
     beforeRouteLeave (to, from , next) { 
-        const da = document.querySelector(".detail-audio");
-        const status = da.paused;
-        let ct = da.currentTime;
-
-        let playStatus_main = JSON.parse(sessionStorage.getItem("playStatus"))
-        if(playStatus_main && playStatus_main.resourceId == da.dataset.id && ct == 0){
-            ct = playStatus_main.currentTime;
-        }
-        this.pauseAudio();
-        let playStatus = {
-            currentTime: ct,
-            isPauseStatus : status
-        }
-        sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
         this.$store.commit('SET_FROM_ROUTE_NAME', 'scenic-point-detail');
-        if(this.timer){
-            clearInterval(this.timer);
-        }
         next();
     }
 }

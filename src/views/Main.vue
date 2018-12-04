@@ -668,17 +668,16 @@
             <div class="scenic-detail-header">
                 <div class="scenic-img">
                     <img class="ignore" style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/>
-                    <v-touch class="control-btn" v-show="!isPlayed_scenic" v-on:tap="playAudio_scenic">
+                    <!--<v-touch class="control-btn" v-show="!isPlayed_scenic" v-on:tap="playAudio_scenic">
                         <div class="control img-34-40">
                             <img src="../assets/images/icon_small_pause@3x.png" alt="" />
                         </div>
                     </v-touch>
-                        <!-- 暂停图标-播放中状态 -->
                     <v-touch class="control-btn" v-show="isPlayed_scenic" v-on:tap="pauseAudio_scenic">
                         <div class="control img-34-40">
                             <img src="../assets/images/icon_suspend@3x.png" alt="" />
                         </div>
-                    </v-touch>
+                    </v-touch>-->
                 </div>
                 <div class="scenic-name-level">
                     <div class="scenic-name">{{scenicName}}</div>
@@ -1714,17 +1713,17 @@
                 }
             },
             toDetail(isWindow) {
-                if(document.querySelector(".main-audio")){
-                    const status = document.querySelector('.main-audio').paused;
-                    this.pauseAudio();
-                    let playStatus = {
-                        currentTime: document.querySelector('.main-audio').currentTime,
-                        totalTime: this.totalTime,
-                        isPauseStatus : status,
-                        resourceId: document.querySelector('.main-audio').dataset.id
-                    }
-                    sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
-                }
+                // if(document.querySelector(".main-audio")){
+                //     const status = document.querySelector('.main-audio').paused;
+                //     this.pauseAudio();
+                //     let playStatus = {
+                //         currentTime: document.querySelector('.main-audio').currentTime,
+                //         totalTime: this.totalTime,
+                //         isPauseStatus : status,
+                //         resourceId: document.querySelector('.main-audio').dataset.id
+                //     }
+                //     sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
+                // }
                 if(!isWindow){
                     sessionStorage.setItem("mapClickPointId",this.scenicPointId);
                 }

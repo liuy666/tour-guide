@@ -57,8 +57,10 @@
                         let _audioDom = e.target;
                         this.totalTime = _audioDom.duration;
                         _audioDom.play();
+                        sessionStorage.setItem("totalTime",_audioDom.duration);
                         this.NOTICE_STOP(false);
                         this.NOTICE_AUTO_PLAY(false);
+                        this.SET_HAS_GET_TOTAL(true);
                     }
                     audioDom.onplay = (e) => {
                         this.changeProgress();
@@ -84,6 +86,7 @@
                         currentAudio.pause();
                     }
                     this.audioPercent = 0;
+                    this.SET_HAS_GET_TOTAL(false);
                     this.SET_PERCENT(0);
                     this.CLEAR_CURRENT_INTERVAL();
                     let currentId = currentAudio.dataset.id;
@@ -121,7 +124,8 @@
                 'CLEAR_CURRENT_INTERVAL',
                 'NOTICE_STOP',
                 'NOTICE_AUTO_PLAY',
-                'AUTO_PALY'
+                'AUTO_PALY',
+                'SET_HAS_GET_TOTAL'
             ]),
             // 播放进度
             changeProgress() {
