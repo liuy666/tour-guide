@@ -276,11 +276,9 @@ export default {
     },
     data() {
         const cPoint = JSON.parse(sessionStorage.getItem("pointList")).filter(item => item.resource_id == sessionStorage.getItem("mapClickPointId"))[0];
-        const cPoint_play = JSON.parse(sessionStorage.getItem("currentPoint"));
         return {
             currentIndex: 0,
             showPoint: cPoint,
-            playingPoint : cPoint_play,
             currentPointId: cPoint.resource_id,
             pointImg: cPoint.url,
             pointName: cPoint.name,
@@ -518,6 +516,8 @@ export default {
         const fromRouteName = this.$store.state.app.fromRouteName_detail;
         if(fromRouteName != 'scenic-point-detail'){
             this.showPoint = JSON.parse(sessionStorage.getItem("showPoint"));
+            if(!this.showPoint) 
+            this.showPoint = JSON.parse(sessionStorage.getItem("pointList")).filter(item => item.resource_id == sessionStorage.getItem("mapClickPointId"))[0]
             this.currentPointId = this.showPoint.resource_id;
             this.pointImg = this.showPoint.url;
             this.pointName = this.showPoint.name;
@@ -542,7 +542,7 @@ export default {
             this.setAudio();
         }
 
-        /*this.$nextTick(function(){
+        this.$nextTick(function(){
             let circle = document.querySelector(".circle");
             let flag = 0;
             circle.addEventListener("touchstart",function(e){   
@@ -582,7 +582,7 @@ export default {
                     flag = 0;
                 }
             })
-        })*/
+        })
     },
     beforeRouteLeave (to, from , next) { 
         this.$store.commit('SET_FROM_ROUTE_NAME', 'scenic-point-detail');
