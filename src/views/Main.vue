@@ -905,6 +905,7 @@
 
             oMap.on('click',function(e) {
                 console.log(e);
+                this.pauseAudio_scenic();
                 _self.$router.replace({
                     name: 'main'
                 });
@@ -1449,6 +1450,9 @@
             },
             // 打开/关闭景区详情弹窗
             seeIntroduce() {
+                if (this.isOpenDetail) {
+                    this.pauseAudio_scenic();
+                }
                 this.isOpenDetail = !this.isOpenDetail;
                 this.oMap_main.closePopup();
                 this.isShowMenu = false;
