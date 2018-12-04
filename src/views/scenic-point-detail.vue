@@ -36,7 +36,7 @@
         }
 
         .weui-progress__bar{
-            background:rgba(254,235,226,1);
+            background:rgba(254,226,213,1);
             height: 6px;
             border-radius:4px;
         }
@@ -98,11 +98,11 @@
                         width: 32px;
                         height: 32px;
                         border-radius: 50%;
-                        background: #fff;
                         position: absolute;
                         left: -16px;
-                        top: -2px;
-                        box-shadow:0px 1px 3px 0px rgba(129,28,0,0.15);
+                        top: 0;
+                        background:rgba(254,81,0,1);
+                        box-shadow:0px 1px 3px 0px rgba(254,81,0,0.27);
                     }
                 }
             }
@@ -368,6 +368,7 @@ export default {
     },
     methods : {
         ...mapMutations([
+            'SET_PERCENT',
             'START_PLAY',
             'START_NEW_INTERVAL', // 开始新的定时器
             'CLEAR_CURRENT_INTERVAL' //清除定时器
@@ -529,12 +530,14 @@ export default {
             this.setAudio();
         }
 
-        this.$nextTick(function(){
+        /*this.$nextTick(function(){
             let circle = document.querySelector(".circle");
             let flag = 0;
             circle.addEventListener("touchstart",function(e){   
                 if(self.isPlayed){
                     self.isPlayed = false;
+                    document.querySelector(".main-audio").pause();
+                    self.CLEAR_CURRENT_INTERVAL();
                     flag = 1;
                 }
             })
@@ -546,7 +549,7 @@ export default {
                 document.querySelector(".circle").style.left = (move - 8) + 'px';
                 
                 self.currentTime = self.totalTime * (move / total).toFixed(2);
-                document.querySelector('.detail-audio').currentTime = self.currentTime;
+                document.querySelector('.main-audio').currentTime = self.totalTime * (move / total).toFixed(2);
                 let cf = Math.floor(self.currentTime/60);
                 let cm = (self.currentTime%60).toFixed(0) < 10 ? '0'+(self.currentTime%60).toFixed(0) : (self.currentTime%60).toFixed(0);
                 if(cm == 60) {
@@ -555,16 +558,19 @@ export default {
                 }
                 self.currentTimeStr = cf + ":" + cm;
 
-                self.audioProgress = self.currentTime / self.totalTime * 100;
+                self.progress = self.currentTime / self.totalTime * 100;
+                self.SET_PERCENT(self.progress);
                 
             })
             circle.addEventListener("touchend",function(e){   
                 if(flag == 1){
                     self.isPlayed = true;
+                    document.querySelector(".main-audio").play();
+                    self.START_NEW_INTERVAL();
                     flag = 0;
                 }
             })
-        })
+        })*/
     },
     beforeRouteLeave (to, from , next) { 
         this.$store.commit('SET_FROM_ROUTE_NAME', 'scenic-point-detail');

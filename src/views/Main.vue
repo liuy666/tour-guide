@@ -270,14 +270,14 @@
         //地图页功能键区域
         .function-area-left,.function-area-right{
             position: absolute;
-            width: 70px;
+            width: 86px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             z-index: 1001;
         }
         .function-area-right{
-            height: 250px;
+            height: 260px;
             top: 26px;
             right: 30px;
             // 自定义弹窗
@@ -303,13 +303,13 @@
             }
         }
         .function-area-left{
-            height: 160px;
+            height: 180px;
             left: 30px;
             bottom: 186px;
         }
         .function-btn{
-            width: 70px;
-            height: 70px;
+            width: 86px;
+            height: 86px;
             background-repeat: no-repeat;
             background-position: center center;
             background-size: 100% 100%;
@@ -436,8 +436,9 @@
         }
         .leaflet-popup-close-button{
             width: 36px;
-            height: 28px;
-            font-size: 24px;
+            height: 36px;
+            font-size: 36px;
+            line-height: 36px;
         }
 
         // 景区简介弹窗样式
@@ -1712,18 +1713,7 @@
                     this.pauseAudio();
                 }
             },
-            toDetail(isWindow) {
-                // if(document.querySelector(".main-audio")){
-                //     const status = document.querySelector('.main-audio').paused;
-                //     this.pauseAudio();
-                //     let playStatus = {
-                //         currentTime: document.querySelector('.main-audio').currentTime,
-                //         totalTime: this.totalTime,
-                //         isPauseStatus : status,
-                //         resourceId: document.querySelector('.main-audio').dataset.id
-                //     }
-                //     sessionStorage.setItem('playStatus', JSON.stringify(playStatus));
-                // }
+            toDetail(isWindow) {               
                 if(!isWindow){
                     sessionStorage.setItem("mapClickPointId",this.scenicPointId);
                 }
