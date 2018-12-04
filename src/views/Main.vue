@@ -209,7 +209,6 @@
                         animation-timing-function: linear;
                         animation-iteration-count: infinite;
                         animation-play-state: paused;
-                        // animation: rotateimg 30s linear infinite;
                     }
                     .wrap {
                         width: 112px;
@@ -487,6 +486,13 @@
                     box-sizing: border-box;
                     border: 2px solid #fff;
                 }
+                .detail-img {
+                    animation-name: rotateimg;
+                    animation-duration: 30s;
+                    animation-timing-function: linear;
+                    animation-iteration-count: infinite;
+                    animation-play-state: paused;
+                }
             }
                 
             .scenic-name-level{
@@ -663,13 +669,13 @@
         </section>
         <!-- 底部景区简介弹窗 -->
         <section v-show="isOpenDetail" class="introDetail">
-            <!-- <audio>
-                <source src />
-            </audio> -->
+            <audio preload="auto" style="display: none;" class="detail-audio">
+                <source src="../assets/test.mp3" type="audio/mpeg"></source>
+            </audio>
             <div class="scenic-detail-header">
                 <div class="scenic-img">
-                    <img class="ignore" style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/>
-                    <!--<v-touch class="control-btn" v-show="!isPlayed_scenic" v-on:tap="playAudio_scenic">
+                    <img class="ignore detail-img" style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/>
+                    <v-touch class="control-btn" v-show="!isPlayed_scenic" v-on:tap="playAudio_scenic">
                         <div class="control img-34-40">
                             <img src="../assets/images/icon_small_pause@3x.png" alt="" />
                         </div>
@@ -678,7 +684,7 @@
                         <div class="control img-34-40">
                             <img src="../assets/images/icon_suspend@3x.png" alt="" />
                         </div>
-                    </v-touch>-->
+                    </v-touch>
                 </div>
                 <div class="scenic-name-level">
                     <div class="scenic-name">{{scenicName}}</div>
@@ -947,7 +953,7 @@
                 loadText: '',
                 isShowLoading: false,
                 isPlayed: false,
-                isPlayed_scenic : true,
+                isPlayed_scenic : false,
                 isPositioning : false,
                 currentScenicId: '',
                 markers: [],
@@ -1113,6 +1119,17 @@
                     }, 2000);
                     this.geolocation.getCurrentPosition();
                     sessionStorage.setItem("hasPosition", true);
+                    this.$nextTick(() => {
+                        if (!this.$route.query.sid) {
+                            document.querySelector('.detail-audio').play();
+                            document.querySelector('.detail-img').style.animationPlayState = 'running';
+                            this.isPlayed_scenic = true;
+                            document.querySelector('.detail-audio').addEventListener('ended', (e) => {
+                                document.querySelector('.detail-img').style.animationPlayState = 'paused';
+                                this.isPlayed_scenic = false;
+                            });
+                        }
+                    });
                 }
             },
             // 初始化图标菜单
@@ -1774,6 +1791,16 @@
                     let marker_line = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                     this.markers_line.push(marker_line);
                 });
+            },
+            playAudio_scenic() {
+                document.querySelector('.detail-audio').play();
+                document.querySelector('.detail-img').style.animationPlayState = 'running';
+                this.isPlayed_scenic = true;
+            },
+            pauseAudio_scenic() {
+                document.querySelector('.detail-audio').pause();
+                document.querySelector('.detail-img').style.animationPlayState = 'paused';
+                this.isPlayed_scenic = false;
             }
         }
     }
