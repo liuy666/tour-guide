@@ -97,10 +97,12 @@ export default {
     },
     mounted() {
         const lineId = sessionStorage.getItem('lineId');
-        const imgs = document.querySelectorAll('.img-right img');
-        for (let img of imgs) {
-            if (img.dataset.lineid === lineId) {
-                img.style.display = 'block';
+        if (lineId) {
+            const imgs = document.querySelectorAll('.img-right img');
+            for (let img of imgs) {
+                if (img.dataset.lineid === lineId) {
+                    img.style.display = 'block';
+                }
             }
         }
     },
@@ -130,6 +132,7 @@ export default {
                         });
                         sessionStorage.setItem('playList', JSON.stringify(updatePlayList));
                         this.REMOVE_CURRENT_LINE();
+                        sessionStorage.removeItem('lineId');
                     } else {
                         sessionStorage.setItem('lineId', lineId);
                         img.style.display = 'block';

@@ -93,7 +93,6 @@
 
 <script>
     import { Toast, Badge } from 'vux'
-    import { mapMutations } from 'vuex'
     export default {
         components: {
             Toast,
@@ -163,12 +162,11 @@
                 tipsText : '请求失败',
                 isHasMsg: false,
                 bl: 0,
+                currentInfo: null,
+                scenicList: []
             }
         },
         methods: {
-            ...mapMutations([
-                'SET_CURRENT_SCENIC' // 保存当前景区信息到vuex
-            ]),
             async getScenicList () {
                 let _self = this;
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
@@ -189,8 +187,7 @@
                         let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_home)
                                      .bindPopup(_self.createInfoWindow(v),{className:"info-content-new"})
                                      .on('click',function(){
-                                         sessionStorage.setItem("currentScenic",JSON.stringify(v));
-                                         _self.SET_CURRENT_SCENIC(v);
+                                         _self.currentInfo = {...v};
                                      });
                     })
                 }
@@ -224,6 +221,21 @@
                 return info;
             },
             toScenic() {
+                // 如果景区列表存在 则提前临时保存
+                if (sessionStorage.getItem('scenicList')) {
+                    this.scenicList = JSON.parse(sessionStorage.getItem('scenicList'));
+                }
+
+                // 清空所有缓存
+                sessionStorage.clear();
+
+                // 如果之前临时保存有景区列表 则再存入缓存
+                if (this.scenicList.length) {
+                    sessionStorage.setItem('scenicList',JSON.stringify(this.scenicList));
+                }
+
+                // 更新当前景区信息
+                sessionStorage.setItem('currentScenic',JSON.stringify(this.currentInfo));
                 this.$router.push({
                     name : 'main'
                 })
