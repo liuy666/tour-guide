@@ -465,28 +465,40 @@ export default {
         },
         //切换景点
         changePointInfo (index,ev) {
-            document.querySelector(".circle").style.left = "- 8px";
-            this.progress = 0;
-
             let newPointInfo = this.pointList[index];
             this.showPoint = newPointInfo;
             this.currentPointId = newPointInfo.resource_id;
             this.pointImg = newPointInfo.url;
             this.pointName = newPointInfo.name;
             this.pointCaption = newPointInfo.commentary;
-            this.currentTimeStr = "0:00";
+            
             this.getCurrentImgList();
             this.setAudio();
             sessionStorage.setItem("showPoint",JSON.stringify(newPointInfo));
 
-            if(document.querySelector(".main-audio")){
+            if(document.querySelector(".main-audio") ){
                 if(document.querySelector(".main-audio").dataset.id != this.showPoint.resource_id){
                     this.isPlayed = false;
+                    document.querySelector(".circle").style.left = "-8px";
+                    this.progress = 0;
+                    this.currentTimeStr = "0:00";
                 }else{
-                    this.isPlayed = true;
+                    if(!document.querySelector(".main-audio").paused){
+                        this.isPlayed = true;
+                    }else{
+                        this.isPlayed = false;
+                    }
+                    document.querySelector(".circle").style.left = "calc("+ this.audioPercent +"% - 8px)";
+                    this.progress = this.audioPercent;
+                    let cf = Math.floor(this.currentTime/60);
+                    let cm = (this.currentTime%60).toFixed(0) < 10 ? '0'+(this.currentTime%60).toFixed(0) : (this.currentTime%60).toFixed(0);
+                    this.currentTimeStr = cf + ":" + cm;
                 }
             }else{
                 this.isPlayed = false;
+                document.querySelector(".circle").style.left = "-8px";
+                this.progress = 0;
+                this.currentTimeStr = "0:00";
             }
         }
     },
