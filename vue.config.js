@@ -3,12 +3,11 @@ module.exports = {
     configureWebpack: config => {
         require('vux-loader').merge(config, {
             options: {},
-            plugins: [
-                {
+            plugins: [{
                     name: 'vux-ui'
                 },
                 {
-                    name: 'less-theme', 
+                    name: 'less-theme',
                     path: 'src/styles/theme.less'
                 }
             ]
