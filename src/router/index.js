@@ -19,12 +19,6 @@ router.beforeEach((to, from, next) => {
     console.log(to);
     console.log('***from-to***')
 
-    //从main回退到home
-    if (from.name === 'main' && to.name === 'index') {
-        sessionStorage.removeItem("isAuto");
-        sessionStorage.removeItem("hasPosition");
-    }
-
     // 从home页进入main页或在main页刷新
     if ((!from.name || from.name === 'index') && to.name === 'main') {
         console.log('SET_FROM_ROUTE_NAME => root')

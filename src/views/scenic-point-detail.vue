@@ -321,6 +321,9 @@ export default {
     },
     watch : {
         audioPercent (val) {
+            //设置进度条、圆圈、当前时长的显示状态
+            //当播放音频的景点与展示的景点一致 进度条等状态跟着播放进度走
+            //不一致 进度条等状态初始化为0
             if(val>0){
                 if(document.querySelector(".main-audio").dataset.id == this.showPoint.resource_id){
                     document.querySelector(".circle").style.left = "calc("+ val +"% - 8px)";
