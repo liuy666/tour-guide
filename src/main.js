@@ -18,14 +18,14 @@ import '@/styles/globalStyle.less';
 import QS from 'qs';
 import utils from '@/libs/utils.js';
 import https from '@/libs/http.js';
-const lodash  = require('lodash');
+// const lodash  = require('lodash');
 
 
 Vue.config.productionTip = false;
 Vue.prototype.$QS = QS;
 Vue.prototype.$tool = utils;
 Vue.prototype.$http = https;
-Vue.prototype.$lodash = lodash;
+// Vue.prototype.$lodash = lodash;
 Vue.prototype.$base = process.env.NODE_ENV === "production" ? '' : '/api';
 const VueTouch = require('vue-touch');
 Vue.use(VueTouch, { name: 'v-touch' })
@@ -36,7 +36,7 @@ const vm = new Vue({
     render: h => h(App),
     mounted() {
         this.$store.commit('INIT_CONTENT'); // 初始化设置消息详情内容
-        console.log(11)
+        //console.log(wx);
     }
 }).$mount('#app');
 

@@ -29,7 +29,6 @@
                     background: url("../assets/images/icon_bg@3x.png") no-repeat center center / 100% 100%;
                     font-weight: bold;
                     color: #572b12;
-                    -webkit-transform: translateX(-50%);
                     transform: translateX(-50%);
                     margin-left: 33px;
                     text-align: center;
@@ -86,17 +85,16 @@
 <template>
     <div id="home">
         <section id="wrapper_home"></section>
-        <v-touch tag="section" class="msg-70-70" :class="[isHasMsg ? 'has' : 'no']" v-on:tap="gotoMsgList"></v-touch>
+        <v-touch tag="section" class="msg-70-70" :class="[isHasMsg ? 'has' : 'no']" v-on:tap="gotoMsgList"></v-touch> 
         <toast v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
     </div>
 </template>
 
 <script>
-    import { Toast, Badge } from 'vux'
+    import { Toast } from 'vux';
     export default {
         components: {
-            Toast,
-            Badge
+            Toast
         },
         async created() {
             const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
@@ -163,7 +161,8 @@
                 isHasMsg: false,
                 bl: 0,
                 currentInfo: null,
-                scenicList: []
+                scenicList: [],
+                hh: ''
             }
         },
         methods: {
@@ -238,12 +237,12 @@
                 // 更新当前景区信息
                 sessionStorage.setItem('currentScenic',JSON.stringify(this.currentInfo));
                 this.$router.push({
-                    name : 'main'
+                    path : '/main'
                 })
             },
             gotoMsgList() {
                 this.$router.push({
-                    name: 'message-list'
+                    path: '/message-list'
                 });
             }
         }

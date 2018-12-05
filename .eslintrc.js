@@ -17,6 +17,7 @@ module.exports = {
     },
     globals: {
         L: true,
-        AMap: true
+        AMap: true,
+        wx: true
     }
 }

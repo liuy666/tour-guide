@@ -30,7 +30,7 @@ export default {
                 contaier.removeChild(ifm);
             }
             let iframe = document.createElement('iframe');
-            iframe.src = params.src;
+            iframe.src = 'https' + params.src.slice(4);
             iframe.frameBorder = '0';
             iframe.height = '100%';
             iframe.width = '100%';
