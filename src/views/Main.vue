@@ -758,7 +758,7 @@
                     this.$router.repalce({
                         name: 'not-found',
                         params: {
-                            returnUrl: window.location.href
+                            returnUrl: '/main'
                         }
                     });
                     return;
@@ -768,16 +768,14 @@
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
                 scenicInfo = {...currentScenic};
                 sessionStorage.setItem('currentScenic',JSON.stringify(currentScenic));
-                this.SET_FROM_ROUTE_NAME('root');
+                if (this.$store.state.app.routeName !== 'scenic-point-detail') {
+                    this.SET_FROM_ROUTE_NAME('root');
+                }
                 // this.SET_CURRENT_SCENIC(currentScenic);
             } else {
                 //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
             }
-            // if (!scenicInfo) {
-            //     // 获取当前信息失败，跳转404 并传递返回的url
-            //     return;
-            // }
             
             // 初始化底部景区简介弹窗并存储景区id
             this.scenicImg = scenicInfo.accessCoverUrl;
@@ -1123,8 +1121,10 @@
                     this.$nextTick(() => {
                         if (!this.$route.query.pid) {
                             this.isOpenDetail = true;
-                            document.querySelector('.detail-audio').play();
-                            document.querySelector('.detail-img').style.animationPlayState = 'running';
+                            wx.ready(() => {
+                                document.querySelector('.detail-audio').play(); // 还不能播放
+                                document.querySelector('.detail-img').style.animationPlayState = 'running';
+                            });
                             this.isPlayed_scenic = true;
                         } else {
                             this.isOpenDetail = false;
@@ -1536,11 +1536,24 @@
                             sessionStorage.setItem('playList',JSON.stringify(newPlayList));
 
                             // 播放当前扫码景点的解说音频
-                            this.playAudio({
-                                _src: QRCODE_CURRENT_POINT.guideUrl,
-                                _id: QRCODE_CURRENT_POINT.resource_id,
-                                type: 2
-                            });
+                            if (!document.querySelector('.main-audio')) {
+                                console.log('解说音频' + wx);
+                                wx.ready(() => {
+                                    this.playAudio({
+                                        _src: QRCODE_CURRENT_POINT.guideUrl,
+                                        _id: QRCODE_CURRENT_POINT.resource_id,
+                                        type: 2
+                                    });
+                                });
+                            } else {  // 解决回退后音频可视状态未同步的问题
+                                if (document.querySelector('.main-audio').paused) {
+                                    this.isPlayed = false;
+                                    document.querySelector('.pointImg').style.animationPlayState = 'paused';
+                                } else {
+                                    this.isPlayed = true;
+                                    document.querySelector('.pointImg').style.animationPlayState = 'running';
+                                }
+                            }
                         } else { // 否则默认取第一个景点
                             sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
                             this.scenicPointImg = res.page.list[0].url;

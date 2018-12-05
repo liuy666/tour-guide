@@ -103,7 +103,10 @@
             });
             if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
                 this.$router.replace({
-                    name: 'not-found'
+                    name: 'not-found',
+                    params: {
+                        returnUrl: '/'
+                    }
                 });
                 return;
             }
