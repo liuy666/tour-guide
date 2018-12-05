@@ -670,7 +670,7 @@
         <!-- 底部景区简介弹窗 -->
         <section v-show="isOpenDetail" class="introDetail">
             <audio preload="auto" style="display: none;" class="detail-audio">
-                <source src="../assets/test.mp3" type="audio/mpeg"></source>
+                <source src="../assets/test.mp3" type="audio/mpeg" />
             </audio>
             <div class="scenic-detail-header">
                 <div class="scenic-img">
@@ -734,9 +734,6 @@
             console.log('created');
 
             this.isShowLoading = true;
-            // if (!sessionStorage.getItem('currentScenic') && this.$store.state.app.currentScenic) {
-            //     sessionStorage.setItem('currentScenic', JSON.stringify(this.$store.state.app.currentScenic));
-            // }
             if (sessionStorage.getItem('isAuto')) {
                 this.isAuto = sessionStorage.getItem('isAuto');
             } else {
@@ -905,7 +902,7 @@
 
             oMap.on('click',function(e) {
                 console.log(e);
-                this.pauseAudio_scenic();
+                _self.pauseAudio_scenic();
                 _self.$router.replace({
                     name: 'main'
                 });
@@ -1113,7 +1110,6 @@
             // 自动定位一次及提示自动提示
             autoGetPositon() {
                 if(!sessionStorage.getItem("hasPosition")){
-                    this.isOpenDetail = true;
                     this.isTips4 = true;
                     setTimeout(() => {
                         this.isTips4 = false;
@@ -1121,15 +1117,18 @@
                     this.geolocation.getCurrentPosition();
                     sessionStorage.setItem("hasPosition", true);
                     this.$nextTick(() => {
-                        if (!this.$route.query.sid) {
+                        if (!this.$route.query.pid) {
+                            this.isOpenDetail = true;
                             document.querySelector('.detail-audio').play();
                             document.querySelector('.detail-img').style.animationPlayState = 'running';
                             this.isPlayed_scenic = true;
-                            document.querySelector('.detail-audio').addEventListener('ended', (e) => {
-                                document.querySelector('.detail-img').style.animationPlayState = 'paused';
-                                this.isPlayed_scenic = false;
-                            });
+                        } else {
+                            this.isOpenDetail = false;
                         }
+                        document.querySelector('.detail-audio').addEventListener('ended', (e) => {
+                            document.querySelector('.detail-img').style.animationPlayState = 'paused';
+                            this.isPlayed_scenic = false;
+                        });
                     });
                 }
             },
@@ -1797,6 +1796,9 @@
                 });
             },
             playAudio_scenic() {
+                if (document.querySelector('.main-audio') && !document.querySelector('.main-audio').paused) {
+                    this.pauseAudio();
+                }
                 document.querySelector('.detail-audio').play();
                 document.querySelector('.detail-img').style.animationPlayState = 'running';
                 this.isPlayed_scenic = true;
