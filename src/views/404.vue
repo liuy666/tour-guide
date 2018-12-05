@@ -35,10 +35,18 @@
 
 <script>
 export default {
+    data() {
+        return {
+            returnUrl: ''
+        }
+    },
+    created() {
+        this.returnUrl = this.$router.params.returnUrl;
+    },
     methods: {
         gotoHome() {
             this.$router.replace({ // 需更改  不能直接跳跟路由 应改为指定路由
-                path: '/'
+                path: this.returnUrl || '/'
             })
         }
     }

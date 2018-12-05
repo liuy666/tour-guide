@@ -118,6 +118,13 @@
                     }
                 }
             },
+            // 监听路由 回退到home页 则停止播放
+            '$route'(to, from) {
+                if (to.path === '/' && from.name) {
+                    this.CLEAR_CURRENT_INTERVAL();
+                    document.querySelector('.main-audio').pause();
+                }
+            }
         },
         methods: {
             ...mapMutations([

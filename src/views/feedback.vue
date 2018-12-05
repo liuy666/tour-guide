@@ -201,7 +201,7 @@
 <template>
     <div id="feedback">
         <section class="wrapper-textarea-200">
-            <textarea v-model.trim="textareaValue" placeholder="请描述你遇到的问题！" class="textarea-200" rows="4" @input="inputWord"></textarea>
+            <textarea v-model.trim="textareaValue" placeholder="请描述你遇到的问题！" class="textarea-200" rows="4" @input="inputWord" @keydown="addSix(1, $event)"></textarea>
             <span><i>{{ entered }}</i>/200</span>
         </section>
         <section class="title-263-29">
@@ -215,11 +215,11 @@
         <form>
             <div>
                 <span>姓名</span>
-                <input v-model.trim="yourName" type="text" placeholder="请留下您的姓名" class="border-bottom-1" />
+                <input v-model.trim="yourName" type="text" placeholder="请留下您的姓名" class="border-bottom-1" @keydown="addSix(2, $event)" />
             </div>
             <div>
                 <span>电话号码</span>
-                <input v-model.trim="yourTel" type="number" placeholder="请留下您的电话号码" @input="validateTel" @blur="validateLength" class="border-bottom-1"/>
+                <input v-model.trim="yourTel" type="number" placeholder="请留下您的电话号码" @input="validateTel" @blur="validateLength" class="border-bottom-1" @keydown="addSix(3, $event)"/>
             </div>
             <v-touch tag="button" type="button" class="submit-upload" @tap="handleSubmit">提交反馈</v-touch>
         </form>
@@ -272,6 +272,22 @@ export default {
         })
     },
     methods: {
+        addSix(index, e) {
+            // 针对iOS不能输入6的骚操作
+            if (this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
+                if (e.keyCode === 54) {
+                    if (index === 1) {
+                        this.textareaValue = this.textareaValue + '6';
+                    }
+                    if (index === 2) {
+                        this.yourName = this.yourName + '6';
+                    }
+                    if (index === 3) {
+                        this.yourTel = this.yourTel + '6';
+                    }
+                }
+            }            
+        },
         ...mapMutations([
             'SET_FROM_ROUTE_NAME',
         ]),
@@ -402,6 +418,17 @@ export default {
         },
         // 提交反馈
         async handleSubmit(e) {
+            if (!this.$tool.validateReg.phoneNumber(Number(this.yourTel))) {
+                this.tipsText3 = '电话号码错了~';
+                this.isTips3 = true;
+                this.yourTel = this.yourTel.slice(0, 11);
+                return;
+            }
+            if (this.yourTel.length < 11) {
+                this.tipsText3 = '电话号码错了~';
+                this.isTips3 = true;
+                return;
+            }
             if (!this.textareaValue || !this.yourName || !this.isCorrent) {
                 this.tipsText3 = '请填写完整反馈信息~';
                 this.isTips3 = true;
@@ -427,10 +454,11 @@ export default {
                     ...imgList
                 }
                 const submitFeedback = await this.$http.post(this.$base + '/hqyatu-navigator/app/sys/saveSuggestion', bodyParams);
-                if (!submitFeedback) {
+                console.log(submitFeedback)
+                if (!submitFeedback.status) {
                     this.isShowLoading = false;
-                    this.tipsText1 = '提交失败';
-                    this.isTips1 = true;
+                    this.tipsText3 = submitFeedback.msg;
+                    this.isTips3 = true;
                     return;
                 }
                 this.isShowLoading = false;

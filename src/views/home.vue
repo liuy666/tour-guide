@@ -103,7 +103,10 @@
             });
             if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
                 this.$router.replace({
-                    name: 'not-found'
+                    name: 'not-found',
+                    params: {
+                        returnUrl: '/'
+                    }
                 });
                 return;
             }
@@ -169,7 +172,7 @@
             async getScenicList () {
                 let _self = this;
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
-                    domainUrl: 'www.qxgz.com'
+                    domainUrl: window.location.hostname
                 });
                 if(!scenicList){
                     this.isTips = true;

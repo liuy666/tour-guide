@@ -750,7 +750,7 @@
             const query = this.$route.query;
             if (query.sid) {
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
-                    domainUrl: 'www.qxgz.com'  // 域名改成获取
+                    domainUrl: window.location.hostname // 域名改成获取
                 });
 
                 // 请求失败，跳转404 并传递返回的url
@@ -758,7 +758,7 @@
                     this.$router.repalce({
                         name: 'not-found',
                         params: {
-                            returnUrl: window.location.href
+                            returnUrl: '/main'
                         }
                     });
                     return;
@@ -768,16 +768,14 @@
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
                 scenicInfo = {...currentScenic};
                 sessionStorage.setItem('currentScenic',JSON.stringify(currentScenic));
-                this.SET_FROM_ROUTE_NAME('root');
+                if (this.$store.state.app.routeName !== 'scenic-point-detail') {
+                    this.SET_FROM_ROUTE_NAME('root');
+                }
                 // this.SET_CURRENT_SCENIC(currentScenic);
             } else {
                 //处理获取到的要用到的景区信息  景区手绘图路径、景区手绘图两点坐标、景区zoom、地图中心点
                 scenicInfo = JSON.parse(sessionStorage.getItem("currentScenic"));
             }
-            // if (!scenicInfo) {
-            //     // 获取当前信息失败，跳转404 并传递返回的url
-            //     return;
-            // }
             
             // 初始化底部景区简介弹窗并存储景区id
             this.scenicImg = scenicInfo.accessCoverUrl;
@@ -1089,7 +1087,9 @@
     
                     this.getMarkerIndex(to.params.pid);
                     this.markers[this.indexOfMarkers].openPopup();
-                    
+                    if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                        this.pauseAudio_scenic();
+                    }
                     this.playAudio({
                         _src: currentPoint.guideUrl,
                         _id: to.params.pid,
@@ -1157,8 +1157,13 @@
                     this.$nextTick(() => {
                         if (!this.$route.query.pid) {
                             this.isOpenDetail = true;
-                            document.querySelector('.detail-audio').play();
-                            document.querySelector('.detail-img').style.animationPlayState = 'running';
+                            wx.ready(() => {
+                                if (document.querySelector('main-audio') && !document.querySelector('main-audio').paused) {
+                                    this.pauseAudio();
+                                }
+                                document.querySelector('.detail-audio').play(); // 还不能播放
+                                document.querySelector('.detail-img').style.animationPlayState = 'running';
+                            });
                             this.isPlayed_scenic = true;
                         } else {
                             this.isOpenDetail = false;
@@ -1378,6 +1383,9 @@
                     this.oMap_main.closePopup(); // 关闭信息弹窗
                     if (mainAudio && mainAudio.paused) { // 如果当前 Audio 是暂停状态则直接继续播放
                         console.log('++++++++++++++ type:1 继续播放 ++++++++++++++');
+                        if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                            this.pauseAudio_scenic();
+                        }
                         mainAudio.play();
                         this.START_NEW_INTERVAL(); // 重新启动计时器
                         this.isPlayed = true; // 播放图标更改
@@ -1401,6 +1409,9 @@
                     id = options._id;
                 }
 
+                if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                    this.pauseAudio_scenic();
+                }
                 this.START_PLAY({src, id}); // 开始播放
                 this.START_NEW_INTERVAL(); // 开始定时器
                 this.isPlayed = true;
@@ -1570,11 +1581,24 @@
                             sessionStorage.setItem('playList',JSON.stringify(newPlayList));
 
                             // 播放当前扫码景点的解说音频
-                            this.playAudio({
-                                _src: QRCODE_CURRENT_POINT.guideUrl,
-                                _id: QRCODE_CURRENT_POINT.resource_id,
-                                type: 2
-                            });
+                            if (!document.querySelector('.main-audio')) {
+                                console.log('解说音频' + wx);
+                                wx.ready(() => {
+                                    this.playAudio({
+                                        _src: QRCODE_CURRENT_POINT.guideUrl,
+                                        _id: QRCODE_CURRENT_POINT.resource_id,
+                                        type: 2
+                                    });
+                                });
+                            } else {  // 解决回退后音频可视状态未同步的问题
+                                if (document.querySelector('.main-audio').paused) {
+                                    this.isPlayed = false;
+                                    document.querySelector('.pointImg').style.animationPlayState = 'paused';
+                                } else {
+                                    this.isPlayed = true;
+                                    document.querySelector('.pointImg').style.animationPlayState = 'running';
+                                }
+                            }
                         } else { // 否则默认取第一个景点
                             sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
                             this.scenicPointImg = res.page.list[0].url;
@@ -1757,6 +1781,9 @@
                     sessionStorage.setItem('currentPoint',JSON.stringify(currentPointInfo));
                     let cau = document.querySelector(".main-audio");
                     if(cau && cau.paused && resource_id == cau.dataset.id){ // 继续播放
+                        if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                            this.pauseAudio_scenic();
+                        }
                         this.playAudio({type: 1});
                     }else{ // 开始新的播放
                         const currLineId = sessionStorage.getItem('lineId');
@@ -1800,6 +1827,9 @@
 
                         // 更新播放列表并播放
                         sessionStorage.setItem('playList', JSON.stringify(newPlayList));
+                        if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                            this.pauseAudio_scenic();
+                        }
                         this.playAudio({
                             _src: guideUrl,
                             _id: resource_id,

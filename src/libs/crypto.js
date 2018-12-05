@@ -145,8 +145,17 @@ function getDecryptedObject(data) {
     return JSON.parse(decryptedResult);
 }
 
+/**
+ * sha1 加密
+ */
+
+function getSHA1String(data) {
+    return CryptoJS.SHA1(data).toString();
+}
+
 export default {
     getEncryptedString,
     getDecryptedString,
     getDecryptedObject,
+    getSHA1String
 };
