@@ -750,7 +750,7 @@
             const query = this.$route.query;
             if (query.sid) {
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
-                    domainUrl: 'www.qxgz.com'  // 域名改成获取
+                    domainUrl: window.location.hostname // 域名改成获取
                 });
 
                 // 请求失败，跳转404 并传递返回的url
@@ -1045,7 +1045,9 @@
     
                     this.getMarkerIndex(to.params.pid);
                     this.markers[this.indexOfMarkers].openPopup();
-                    
+                    if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                        this.pauseAudio_scenic();
+                    }
                     this.playAudio({
                         _src: currentPoint.guideUrl,
                         _id: to.params.pid,
@@ -1122,6 +1124,9 @@
                         if (!this.$route.query.pid) {
                             this.isOpenDetail = true;
                             wx.ready(() => {
+                                if (document.querySelector('main-audio') && !document.querySelector('main-audio').paused) {
+                                    this.pauseAudio();
+                                }
                                 document.querySelector('.detail-audio').play(); // 还不能播放
                                 document.querySelector('.detail-img').style.animationPlayState = 'running';
                             });
@@ -1344,6 +1349,9 @@
                     this.oMap_main.closePopup(); // 关闭信息弹窗
                     if (mainAudio && mainAudio.paused) { // 如果当前 Audio 是暂停状态则直接继续播放
                         console.log('++++++++++++++ type:1 继续播放 ++++++++++++++');
+                        if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                            this.pauseAudio_scenic();
+                        }
                         mainAudio.play();
                         this.START_NEW_INTERVAL(); // 重新启动计时器
                         this.isPlayed = true; // 播放图标更改
@@ -1367,6 +1375,9 @@
                     id = options._id;
                 }
 
+                if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                    this.pauseAudio_scenic();
+                }
                 this.START_PLAY({src, id}); // 开始播放
                 this.START_NEW_INTERVAL(); // 开始定时器
                 this.isPlayed = true;
@@ -1726,6 +1737,9 @@
                     sessionStorage.setItem('currentPoint',JSON.stringify(currentPointInfo));
                     let cau = document.querySelector(".main-audio");
                     if(cau && cau.paused && resource_id == cau.dataset.id){ // 继续播放
+                        if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                            this.pauseAudio_scenic();
+                        }
                         this.playAudio({type: 1});
                     }else{ // 开始新的播放
                         const currLineId = sessionStorage.getItem('lineId');
@@ -1769,6 +1783,9 @@
 
                         // 更新播放列表并播放
                         sessionStorage.setItem('playList', JSON.stringify(newPlayList));
+                        if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
+                            this.pauseAudio_scenic();
+                        }
                         this.playAudio({
                             _src: guideUrl,
                             _id: resource_id,
