@@ -378,6 +378,7 @@ export default {
         // 验证电话号码格式是否正确
         validateTel(e) {
             // console(e.keyCode)
+            this.yourTel = this.yourTel.replace(/[^0-9-]+/,'');
             if (this.yourTel.length >= 11) {
                 if (!this.$tool.validateReg.phoneNumber(Number(this.yourTel))) {
                     this.tipsText3 = '电话号码错了~';

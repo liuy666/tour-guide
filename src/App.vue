@@ -96,10 +96,10 @@
                     
                     // 如果开启了自动连播
                     const isAuto = sessionStorage.getItem('isAuto');
-                    if (isAuto) {
+                    if (isAuto && isAuto == "true") {
                         let next = this.getNext(currentId);
                         if (next) {
-
+                            this.SET_IS_LAST(false);
                             // 通知地图页更改当前景点显示信息
                             this.NOTICE_AUTO_PLAY({
                                 isAutoPlay: true,
@@ -112,6 +112,8 @@
                                 src: next.nextPlay.aSrc,
                                 id: next.nextPlay.aId
                             });
+                        }else{
+                            this.SET_IS_LAST(true);
                         }
                     }
                 }
@@ -125,7 +127,8 @@
                 'NOTICE_STOP',
                 'NOTICE_AUTO_PLAY',
                 'AUTO_PALY',
-                'SET_HAS_GET_TOTAL'
+                'SET_HAS_GET_TOTAL',
+                'SET_IS_LAST'
             ]),
             // 播放进度
             changeProgress() {

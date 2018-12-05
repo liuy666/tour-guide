@@ -670,7 +670,7 @@
         <!-- 底部景区简介弹窗 -->
         <section v-show="isOpenDetail" class="introDetail">
             <audio preload="auto" style="display: none;" class="detail-audio">
-                <source src="../assets/test.mp3" type="audio/mpeg"></source>
+                <source src="../assets/test.mp3" type="audio/mpeg" />
             </audio>
             <div class="scenic-detail-header">
                 <div class="scenic-img">
@@ -737,8 +737,8 @@
             // if (!sessionStorage.getItem('currentScenic') && this.$store.state.app.currentScenic) {
             //     sessionStorage.setItem('currentScenic', JSON.stringify(this.$store.state.app.currentScenic));
             // }
-            if (sessionStorage.getItem('isAuto')) {
-                this.isAuto = sessionStorage.getItem('isAuto');
+            if (sessionStorage.getItem('isAuto') && sessionStorage.getItem('isAuto') == "true") {
+                this.isAuto = true;
             } else {
                 this.isAuto = false;
             }
@@ -878,8 +878,8 @@
             // 实例化地图
             let oMap = L.map("wrapper", {
                 center: centerPoint,
-                zoom: zoom,
-                minZoom: zoom,
+                zoom: zoom-1,
+                minZoom: zoom-1,
                 maxZoom: 18,
                 attributionControl: false,
                 zoomControl: false,
@@ -899,6 +899,9 @@
                     _self.isShowLoading = false;
                     _self.autoGetPositon();
                 }
+                 _self.oMap_main.setZoom(zoom);
+                 _self.oMap_main.setMinZoom(zoom);
+                // _self.oMap_main.setZoom(zoom)
             });
 
             this.oMap_main = oMap;
@@ -1607,11 +1610,13 @@
                     if (currAu) {
                         if (!currAu.paused) {
                             this.isPlayed = true;
+                            document.querySelector('.pointImg').style.animationPlayState = 'running';
                             if(this.resourceType < 3){
                                 this.changeMapIcon(true);
                             }
                         } else {
                             this.isPlayed = false;
+                            document.querySelector('.pointImg').style.animationPlayState = 'paused';
                             if(this.resourceType < 3){
                                 this.changeMapIcon(false);
                             }

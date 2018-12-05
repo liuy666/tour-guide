@@ -204,6 +204,7 @@
                                 <div class='info-scenic-info'>
                                     <div class='info-scenic-name'>${scenicInfo.name}</div>
                                     <div class='info-scenic-dec'>${scenicInfo.introduce}</div>
+
                                 </div>`
                 middle.innerHTML = htmlStr;
 

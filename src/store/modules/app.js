@@ -18,7 +18,8 @@ const app = {
         isStop: false, // 判断当前播放是否结束
         isAutoPlay: false, // 判断是否自动播放下一个
         nextMessage: null, // 下一个播放景点所需信息
-        hasGetTotal: false //是否已经得到总时长
+        hasGetTotal: false, //是否已经得到总时长
+        isLastOne: false,
     },
     mutations: {
         // 保存路线列表
@@ -97,6 +98,9 @@ const app = {
         },
         SET_HAS_GET_TOTAL(state, hasGetTotal) {
             state.hasGetTotal = hasGetTotal;
+        },
+        SET_IS_LAST(state, isLastOne) {
+            state.isLastOne = isLastOne;
         }
     },
     actions: {

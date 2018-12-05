@@ -1,4 +1,12 @@
 <style lang="less">
+    @keyframes rotateimg {
+        0% {
+            transform: rotateZ(0deg);
+        }
+        100% {
+            transform: rotateZ(360deg);
+        }
+    }
     #scenic-point-detail{
         padding: 30px;
         
@@ -50,6 +58,13 @@
                 width: 112px;
                 height: 112px;
                 position: relative;
+                .animateImg{
+                    animation-name: rotateimg;
+                    animation-duration: 30s;
+                    animation-timing-function: linear;
+                    animation-iteration-count: infinite;
+                    //animation-play-state: paused;
+                }
                 .iwrap {
                     width: 112px;
                     height: 112px;
@@ -210,9 +225,10 @@
     <div id="scenic-point-detail">
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>
         <toast class="short" v-model="isTips" type="cancel" :text="tipsText" :is-show-mask="true"></toast>
+        <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
         <section class="audio-area">
             <div class="audio-area-img">
-                <img :src="pointImg" style="width:100%;height:100%;border-radius:100%;" />
+                <img :src="pointImg" style="width:100%;height:100%;border-radius:100%;" class="scenicImg" />
                 <!-- 播放图标-暂停中状态 -->
                 <v-touch class="iwrap" v-show="!isPlayed" v-on:tap="playAudio()">
                     <div class="control img-16-26">
@@ -297,7 +313,9 @@ export default {
             isShowLoading : false,
             loadText:'',
             isTips:false,
+            isTips3:false,
             tipsText: '请求失败',
+            tipsText3:'',
             bl:0
         }
     },
@@ -321,11 +339,23 @@ export default {
                     this.currentTimeStr = "0:00";
                     this.progress = 0;
                 }
+            }else{
+                document.querySelector(".circle").style.left = "-8px";
+                this.currentTimeStr = "0:00";
+                this.progress = 0;
+                if(this.isLastOne){
+                    //document.querySelector('.animateImg').style.animationPlayState = 'paused';
+                    this.animatePause();
+                }
             }
         },
         isStop (val) {
             if (val) {
                 this.isPlayed = false;
+                if(!sessionStorage.getItem('isAuto') || sessionStorage.getItem('isAuto') == "false"){
+                    //document.querySelector('.animateImg').style.animationPlayState = 'paused';
+                    this.animatePause();
+                }
             }
         },
         isAutoPlay (val) {
@@ -339,7 +369,12 @@ export default {
                 this.getCurrentImgList();
                 this.START_NEW_INTERVAL();
                 this.isPlayed = true;
-
+                //document.querySelector('.animateImg').style.animationPlayState = 'running';
+                this.running();
+                //更新session信息
+                sessionStorage.setItem("currentPoint",JSON.stringify(this.showPoint));
+                sessionStorage.setItem("mapClickPointId",this.showPoint.resource_id);
+                sessionStorage.setItem("showPoint",JSON.stringify(this.showPoint));
                 //设置滚动位置
                 let ind = this.pointList.findIndex(item => item.resource_id === this.showPoint.resource_id)
                 document.querySelector(".point-list").scrollLeft = 15 + this.bl * 96 * ind;
@@ -361,7 +396,8 @@ export default {
             audioPercent: state => state.app.percent,
             isStop: state => state.app.isStop, // 监听是否当前是否播放完毕
             isAutoPlay: state => state.app.isAutoPlay, // 监听是否开始连播下一个音频
-            hasGetTotal: state => state.app.hasGetTotal
+            hasGetTotal: state => state.app.hasGetTotal,
+            isLastOne: state => state.app.isLastOne
         })
     },
     methods : {
@@ -412,7 +448,10 @@ export default {
             }
             //未播放状态或者播放景点与展示景点不一致，重新创建音频
             else{ 
+                document.querySelector(".circle").style.left = "-8px";
+                this.progress = 0;
                 this.isPlayed = true;
+                this.currentTimeStr = '0:00';
                 let src = this.showPoint.guideUrl,
                     id = this.showPoint.resource_id;
                 this.START_PLAY({src, id}); // 开始播放
@@ -420,12 +459,15 @@ export default {
                 sessionStorage.setItem("currentPoint",JSON.stringify(this.showPoint));
                 sessionStorage.setItem("mapClickPointId",this.showPoint.resource_id);
             }
-            
+            //document.querySelector('.animateImg').style.animationPlayState = 'running';
+            this.running();
         },
         pauseAudio() {
             this.CLEAR_CURRENT_INTERVAL(); // 通知App页清除定时器
             document.querySelector('.main-audio').pause(); // 直接暂停音频
             this.isPlayed = false;
+            //document.querySelector('.animateImg').style.animationPlayState = 'paused';
+            this.animatePause();
         },
         //获取当前景点轮播图
         async getCurrentImgList() {
@@ -480,9 +522,13 @@ export default {
                     document.querySelector(".circle").style.left = "-8px";
                     this.progress = 0;
                     this.currentTimeStr = "0:00";
+                    //document.querySelector('.animateImg').style.animationPlayState = 'paused';
+                    this.animatePause();
                 }else{
                     if(!document.querySelector(".main-audio").paused){
                         this.isPlayed = true;
+                        //document.querySelector('.animateImg').style.animationPlayState = 'running';
+                        this.running();
                     }else{
                         this.isPlayed = false;
                     }
@@ -497,7 +543,19 @@ export default {
                 document.querySelector(".circle").style.left = "-8px";
                 this.progress = 0;
                 this.currentTimeStr = "0:00";
+                //document.querySelector('.animateImg').style.animationPlayState = 'paused';
+                this.animatePause();
             }
+        },
+        running () {
+            document.querySelector(".scenicImg").classList.add("animateImg");
+        },
+        animatePause () {
+            // let siteImg = document.querySelector(".scenicImg").css('transform')  //获取当前元素的动画改变，transform的值
+            // let siteWp = document.querySelector('.audio-area-img').css('transform')
+            // document.querySelector('.audio-area-img').css('transform',siteWp === 'none' ? siteImg : siteImg.concat('',siteWp))  
+            //由于父元素没有动画，所以每次赋值的时候，需要将上次父元素的状态加上
+            document.querySelector(".scenicImg").classList.remove('animateImg');
         }
     },
     created() {
@@ -533,6 +591,8 @@ export default {
                 this.isPlayed = false;
             }else{
                 this.isPlayed = true;
+                //document.querySelector('.animateImg').style.animationPlayState = 'running';
+                this.running();
             }
             this.totalTime = sessionStorage.getItem("totalTime");
             let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
@@ -545,15 +605,28 @@ export default {
         this.$nextTick(function(){
             let circle = document.querySelector(".circle");
             let flag = 0;
-            circle.addEventListener("touchstart",function(e){   
+            circle.addEventListener("touchstart",function(e){ 
+                if(self.progress == 0){
+                    self.isTips3 = true;
+                    self.tipsText3 = '在当前音频开始播放后才可以拖动哦~';
+                    return;
+                }
                 if(self.isPlayed){
                     self.isPlayed = false;
                     document.querySelector(".main-audio").pause();
                     self.CLEAR_CURRENT_INTERVAL();
                     flag = 1;
+                }else{
+                    self.isPlayed = false;
+                    self.CLEAR_CURRENT_INTERVAL();
                 }
+                //document.querySelector('.animateImg').style.animationPlayState = 'paused';
+                self.animatePause();
             })
             circle.addEventListener("touchmove",function(e){ 
+                if(self.progress == 0){
+                    return;
+                }
                 let x = e.changedTouches[0].clientX - this.parentElement.offsetLeft;
                 let xx = x < 0 ? 0 : x;
                 let total = this.parentElement.offsetWidth;
@@ -574,13 +647,21 @@ export default {
                 self.SET_PERCENT(self.progress);
                 
             })
-            circle.addEventListener("touchend",function(e){   
+            circle.addEventListener("touchend",function(e){  
+                if(self.progress == 0){
+                    return;
+                }
                 if(flag == 1){
                     self.isPlayed = true;
                     document.querySelector(".main-audio").play();
                     self.START_NEW_INTERVAL();
                     flag = 0;
+                }else{
+                    self.isPlayed = true;
+                    self.START_NEW_INTERVAL();
                 }
+                //document.querySelector('.animateImg').style.animationPlayState = 'running';
+                self.running();
             })
         })
     },
