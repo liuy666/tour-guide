@@ -200,8 +200,8 @@
                 .player-img-area{
                     width: 110px;
                     height: 110px;
-                    margin-top: 8px;
-                    margin-left: 6px;
+                    margin-top: 7px;
+                    margin-left: 7px;
                     position: relative;
                     .pointImg {
                         animation-name: rotateimg;
@@ -876,9 +876,9 @@
             // 实例化地图
             let oMap = L.map("wrapper", {
                 center: centerPoint,
-                zoom: zoom-1,
-                minZoom: zoom-1,
-                maxZoom: 18,
+                zoom: zoom,
+                minZoom: zoom,
+                maxZoom: 19,
                 attributionControl: false,
                 zoomControl: false,
                 maxBounds : [imgLeftBottom1, imgRightTop1],
@@ -897,14 +897,13 @@
                     _self.isShowLoading = false;
                     _self.autoGetPositon();
                 }
-                 _self.oMap_main.setZoom(zoom);
-                 _self.oMap_main.setMinZoom(zoom);
-                // _self.oMap_main.setZoom(zoom)
+                //_self.oMap_main.setZoom(zoom);
+                //_self.oMap_main.setMinZoom(zoom);
             });
 
             this.oMap_main = oMap;
 
-            oMap.on('click',function(e) {
+            this.oMap_main.on('click',function(e) {
                 console.log(e);
                 _self.pauseAudio_scenic();
                 _self.$router.replace({
@@ -913,6 +912,48 @@
                 _self.oMap_main.closePopup();
                 _self.isShowMenu = false;
                 _self.isOpenDetail = false;
+            });
+
+            this.oMap_main.on('locationfound', function(e) {
+                _self.isPositioning = false;
+                let radius = e.accuracy / 2,
+                    cp = e.latlng;
+                // L.marker(e.latlng).addTo(_self.oMap_main).bindPopup("你就在这个圈内");
+                // L.circle(e.latlng, radius).addTo(_self.oMap_main);
+                if (_self.oMap_main.maxBounds.contains(cp)) {
+                    _self.oMap_main.setView([cp.lat,cp.lng]);
+                    var myIcon = L.icon({
+                        iconUrl: './location.gif',
+                        className:'my-position'
+                    });
+                    L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
+                    
+                    if(_self.isAuto && _self.resourceType < 3){
+                        _self.markers.forEach((v,i) => {
+                            let latlng = L.latlng(v._latlng.lat,v._latlng.lng);
+                            if(cp.distanceTo(latlng) < 20){
+                                let point_dw = _self.pointList.filter(item => item.resource_id === v._icon.children[0].dataset.id)[0];
+                                if(_self.scenicPointId != point_dw.resource_id){
+                                    _self.playAudio({
+                                        type : 2,
+                                        _src : point_dw.guideUrl,
+                                        _id : point_dw.resource_id
+                                    })
+                                    sessionStorage.setItem("currentPoint",JSON.stringify(point_dw));
+                                    sessionStorage.setItem("mapClickPointId",point_dw.resource_id);
+                                }
+                            }
+                        })
+                    }
+                }else{
+                    _self.tipsText3 = "您当前不在景区内";
+                    _self.isTips3 = true;
+                }
+            });
+            this.oMap_main.on('locationerror', function(e) { 
+                _self.tipsText3 = "定位失败，请确保手机已开启定位";
+                _self.isTips3 = true;
+                _self.isPositioning = false;
             });
 
             // 获取默认景点列表
@@ -1015,7 +1056,8 @@
                 isHasWeather: false,
                 isHasPointList: false,
                 isHasMapImage: false,
-                isFirst: true
+                isFirst: true,
+                locateObj: {}
             }
         },
         computed: {
@@ -1092,24 +1134,15 @@
         methods: {
             getCurrentPosition() { 
                 this.isPositioning = true;
-                this.geolocation.getCurrentPosition()
-                // console.dir(L)
-                // return
-                // this.oMap_main.locate({
-                //     setView: true,
-                //     maxZoom: 19,
-                //     timeout:50000
-                // })
-                // this.oMap_main.on('locationfound', function(e) {
-                //     alert("cg")
-                //     var radius = e.accuracy / 2;
-                //     L.marker(e.latlng).addTo(this.oMap_main).bindPopup("你就在这个圈内");
-                //     L.circle(e.latlng, radius).addTo(this.oMap_main);
-                // });
-                // this.oMap_main.on('locationerror', function(e) { 
-                //     alert('2222')
-                //     console.log('定位出错=====>', e);
-                // });
+                //if(JSON.stringify(this.locateObj) === '{}'){
+                this.locateObj = this.oMap_main.locate({
+                    setView: false,
+                    maxZoom: 19,
+                    enableHighAccuracy: true,
+                    maximumAge: 5000,
+                    watch: true
+                })
+                //}
             },
             // 自动定位一次及提示自动提示
             autoGetPositon() {
@@ -1118,7 +1151,8 @@
                     setTimeout(() => {
                         this.isTips4 = false;
                     }, 2000);
-                    this.geolocation.getCurrentPosition();
+                    //this.geolocation.getCurrentPosition();
+                    this.getCurrentPosition();
                     sessionStorage.setItem("hasPosition", true);
                     this.$nextTick(() => {
                         if (!this.$route.query.pid) {
@@ -1590,7 +1624,17 @@
                                     }
                                 });
                     this.markers.push(marker);
-                });  
+                }); 
+                
+                //扫码播放景点时设置交互效果 打开对应信息弹窗
+                if (arg.query && arg.query.pid) {
+                    //设置id 用于对应信息弹窗的播放跳动  
+                    this.mapClickPointId = arg.query.pid;
+                    sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
+                    //打开扫码景点对应的信息弹窗
+                    this.getMarkerIndex(arg.query.pid);
+                    this.markers[this.indexOfMarkers].openPopup();
+                }
 
                 if(this.resourceType < 3) { // 只有景点或路线才需要更换icon图标
                     this.changeMapIcon(this.isPlayed);
