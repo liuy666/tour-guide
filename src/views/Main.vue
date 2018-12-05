@@ -1048,6 +1048,9 @@
                     if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
                         this.pauseAudio_scenic();
                     }
+                    document.addEventListener('WeixinJSBridgeReady',function(){
+                        alert(565)
+                    },false);
                     this.playAudio({
                         _src: currentPoint.guideUrl,
                         _id: to.params.pid,
