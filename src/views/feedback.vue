@@ -457,7 +457,7 @@ export default {
                 console.log(submitFeedback)
                 if (!submitFeedback.status) {
                     this.isShowLoading = false;
-                    this.tipsText3 = submitFeedback.msg;
+                    this.tipsText3 = submitFeedback.data.msg;
                     this.isTips3 = true;
                     return;
                 }

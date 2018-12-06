@@ -39,8 +39,16 @@ const vm = new Vue({
     async mounted() {
         this.$store.commit('INIT_CONTENT'); // 初始化设置消息详情内容
         console.log(wx);
+        // let a = $crypto.getSHA1String('jsapi_ticket=kgt8ON7yVITDhtdwci0qearGJDdcPw58HL1KLAheDgj9XWSD_SEk0Xa6x8drtytJKa9mXFHDTLQ3aU69EPGU0w&noncestr=liuy666comwhosyourdaddy&timestamp=1544077236&url=http://localhost:8086/dev/')
+        // console.log(a)
+        // 410445c2fed20d96aa619e52de813b9f493fe600
+
+        // 410445c2fed20d96aa619e52de813b9f493fe600
         // 注入wx config
+        Cookies.remove('ticket');
+
         if (!Cookies.get('ticket')) {
+            alert('还没有ticket！')
             const GET_JS_SDK = await this.$http.get(this.$base + '/hqyatu-navigator/app/getWxAccessToken');
             console.log(GET_JS_SDK);
             if (!GET_JS_SDK) {
@@ -52,7 +60,7 @@ const vm = new Vue({
         let jsapi_ticket = Cookies.get('ticket');
         let noncestr = 'liuy666comwhosyourdaddy';
         let timestamp = Date.now();
-        let url = 'www.rtzhisheng.com';
+        let url = 'https://www.rtzhisheng.com/webchat/';
         let newString = `jsapi_ticket=${jsapi_ticket}&noncestr=${noncestr}&timestamp=${timestamp}&url=${url}`
         let signature = $crypto.getSHA1String(newString);
         wx.config({
@@ -66,15 +74,28 @@ const vm = new Vue({
                 'updateTimelineShareData' // 自定义“分享到朋友圈”及“分享到QQ空间”按钮的分享内容
             ] 
         });
-        wx.ready(function () {   //需在用户可能点击分享按钮前就先调用
+        wx.ready(function () { //需在用户可能点击分享按钮前就先调用 
             wx.updateAppMessageShareData({ 
                 title: '青川智能语音导游', // 分享标题
                 desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！', // 分享描述
-                link: '/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: '/50x50.png', // 分享图标
+                link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: './50x50.png', // 分享图标
                 success: function () {
-                  // 设置成功
-                  console.log('设置成功')
+                    alert('分享到QQ设置成功')
+                },
+                fail: function (e) {
+                    alert('分享到QQ设置失败')
+                }
+            });  
+            wx.updateTimelineShareData({ 
+                title: '青川智能语音导游', // 分享标题
+                link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                imgUrl: './50x50.png', // 分享图标
+                success: function () {
+                  alert('分享到QQ空间设置成功')
+                },
+                fail: function (e) {
+                    alert('分享到QQ空间设置失败')
                 }
             });
         });

@@ -98,7 +98,7 @@
         },
         async created() {
             const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
-                domainUrl: 'www.qxgz.com', // 上线改成获取域名
+                domainUrl: window.location.hostname, // 'www.qxgz.com' // 上线改成获取域名
                 limit: 500
             });
             if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
@@ -172,7 +172,7 @@
             async getScenicList () {
                 let _self = this;
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
-                    domainUrl: 'www.qxgz.com' //window.location.hostname
+                    domainUrl: window.location.hostname // 'www.qxgz.com'
                 });
                 if(!scenicList){
                     this.isTips = true;

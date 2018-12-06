@@ -42,16 +42,19 @@ function checkCode(res) {
 
 function checkCodeForPost(res) {
 	// console.log('------ 检查 Code 信息码 ------');
-	// console.log(res);
+	console.log(res);
 	if (res.status === 200) {
 		if (res.data.code === 0) {
 			// console.log('**** 这里是数据 ****');
-			return res.data;
+			return {
+				status: true,
+				data: res.data
+			};
 		} else {
 			// console.log('错误信息:\ncode:' + res.data.code + '\nmsg:' + res.data.msg);
 			return {
 				status: false,
-				msg: res.data.msg
+				data: res.data
 			};
 		}
 	}
