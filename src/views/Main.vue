@@ -1139,49 +1139,47 @@
             autoGetPositon() {
                 if(!sessionStorage.getItem("hasPosition")){
                     this.$nextTick(() => {
-                        wx.ready(() => {
-                            if (document.querySelector('main-audio') && !document.querySelector('main-audio').paused) {
-                                this.pauseAudio();
-                            }
-                            // document.querySelector('.detail-audio').play(); // 还不能播放
+                        if (document.querySelector('main-audio') && !document.querySelector('main-audio').paused) {
+                            this.pauseAudio();
+                        }
+                        // document.querySelector('.detail-audio').play(); // 还不能播放
 
-                            const detailAudio = document.querySelector('.detail-audio');
-                            const audioContainer = document.querySelector('.introDetail');
-                            if (detailAudio) { // 当前正在播放时 切换了音频
-                                if (!detailAudio.paused) {
-                                    detailAudio.pause();
-                                }
-                                audioContainer.removeChild(detailAudio);
+                        const detailAudio = document.querySelector('.detail-audio');
+                        const audioContainer = document.querySelector('.introDetail');
+                        if (detailAudio) { // 当前正在播放时 切换了音频
+                            if (!detailAudio.paused) {
+                                detailAudio.pause();
                             }
-                            
-                            let audioDom = document.createElement('audio');
-                            let sourceDom = document.createElement('source');
-                            sourceDom.type = 'audio/mpeg';
-                            sourceDom.src = JSON.parse(sessionStorage.getItem('currentScenic')).explainOssUrl;
-                            audioDom.preload = 'auto';
-                            audioDom.dataset.sid = JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id;
-                            audioDom.appendChild(sourceDom);
-                            audioDom.className = 'detail-audio';
-                            audioDom.style.display = 'none';
-                            audioContainer.appendChild(audioDom);
-                            audioDom.addEventListener('ended', (e) => {
-                                document.querySelector('.detail-img').style.animationPlayState = 'paused';
-                                this.isPlayed_scenic = false;
-                            });
-                            audioDom.load();
-
-                            if (!this.$route.query.pid) {
-                                audioDom.oncanplay = (e) => {
-                                    let _audioDom = e.target;
-                                    _audioDom.play();
-                                    this.isPlayed_scenic = true;
-                                    document.querySelector('.detail-img').style.animationPlayState = 'running';
-                                    this.isOpenDetail = true;
-                                }
-                            } else {
-                                this.isOpenDetail = false;
-                            }
+                            audioContainer.removeChild(detailAudio);
+                        }
+                        
+                        let audioDom = document.createElement('audio');
+                        let sourceDom = document.createElement('source');
+                        sourceDom.type = 'audio/mpeg';
+                        sourceDom.src = JSON.parse(sessionStorage.getItem('currentScenic')).explainOssUrl;
+                        audioDom.preload = 'auto';
+                        audioDom.dataset.sid = JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id;
+                        audioDom.appendChild(sourceDom);
+                        audioDom.className = 'detail-audio';
+                        audioDom.style.display = 'none';
+                        audioContainer.appendChild(audioDom);
+                        audioDom.addEventListener('ended', (e) => {
+                            document.querySelector('.detail-img').style.animationPlayState = 'paused';
+                            this.isPlayed_scenic = false;
                         });
+                        audioDom.load();
+
+                        if (!this.$route.query.pid) {
+                            audioDom.oncanplay = (e) => {
+                                let _audioDom = e.target;
+                                _audioDom.play();
+                                this.isPlayed_scenic = true;
+                                document.querySelector('.detail-img').style.animationPlayState = 'running';
+                                this.isOpenDetail = true;
+                            }
+                        } else {
+                            this.isOpenDetail = false;
+                        }
                     });
                     this.getCurrentPosition();
                     sessionStorage.setItem("hasPosition", true);
@@ -1556,6 +1554,11 @@
                     this.isTips1 = true;
                     return;
                 }
+                res.page.list.forEach(item => {
+                    item.guideUrl = item.guideUrl ? 'https' + item.guideUrl.slice(4) : item.guideUrl;
+                    item.url = item.url ? 'https' + item.url.slice(4) : item.url;
+                });
+
 
                 // 判断是否是初始化页面 还是回退进入本页面
                 const fromRouteName = this.$store.state.app.fromRouteName;
