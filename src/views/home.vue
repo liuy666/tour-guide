@@ -98,7 +98,8 @@
         },
         async created() {
             const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
-                domainUrl: 'www.qxgz.com' // window.location.hostname, // 'www.qxgz.com' // 上线改成获取域名
+                domainUrl: 'www.qxgz.com', // window.location.hostname
+                limit: 500
             });
             if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
                 this.$router.replace({
@@ -171,7 +172,7 @@
             async getScenicList () {
                 let _self = this;
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
-                    domainUrl: 'www.qxgz.com' // window.location.hostname // 'www.qxgz.com'
+                    domainUrl: 'www.qxgz.com' // window.location.hostname
                 });
                 if(!scenicList){
                     this.isTips = true;
@@ -232,6 +233,12 @@
                 return info;
             },
             toScenic() {
+                // 清理音频
+                if (document.querySelector('.main-audio')) {
+                    document.querySelector('#app').removeChild(document.querySelector('.main-audio'));
+                }
+
+                this.$store.commit('INIT_STATE');
                 // 如果景区列表存在 则提前临时保存
                 if (sessionStorage.getItem('scenicList')) {
                     this.scenicList = JSON.parse(sessionStorage.getItem('scenicList'));

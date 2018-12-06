@@ -107,7 +107,7 @@
                             });
                             
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
-                            this.AUTO_PALY(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
+                            // this.AUTO_PALY(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                             this.START_PLAY({
                                 src: next.nextPlay.aSrc,
                                 id: next.nextPlay.aId
@@ -133,7 +133,7 @@
                 'CLEAR_CURRENT_INTERVAL',
                 'NOTICE_STOP',
                 'NOTICE_AUTO_PLAY',
-                'AUTO_PALY',
+                // 'AUTO_PALY',
                 'SET_HAS_GET_TOTAL',
                 'SET_IS_LAST'
             ]),

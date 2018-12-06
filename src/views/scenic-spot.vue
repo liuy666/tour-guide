@@ -138,31 +138,31 @@ export default {
         this.SET_ROUTE_NAME('scenic-spot');
     },
     mounted() {
-        const lis = document.querySelectorAll('.spot-list li');
-        const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-        for (let li of lis) {
-            if (li.dataset.pid === currPoint.resource_id) {
-                li.style.backgroundColor = '#f0f0f0';
-            } else {
-                li.style.backgroundColor = '#fff';
-            }
-        }        
+        // const lis = document.querySelectorAll('.spot-list li');
+        // const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+        // for (let li of lis) {
+        //     if (li.dataset.pid === currPoint.resource_id) {
+        //         li.style.backgroundColor = '#f0f0f0';
+        //     } else {
+        //         li.style.backgroundColor = '#fff';
+        //     }
+        // }        
     },
     computed: mapState({
-        watchAutoPlay: state => state.app.autoPlay
+        // watchAutoPlay: state => state.app.autoPlay
     }),
     watch: {
-        watchAutoPlay(val) {
-            const lis = document.querySelectorAll('.spot-list li');
-            const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-            for (let li of lis) {
-                if (li.dataset.pid === currPoint.resource_id) {
-                    li.style.backgroundColor = '#f0f0f0';
-                } else {
-                    li.style.backgroundColor = '#fff';
-                }
-            }
-        },
+        // watchAutoPlay(val) {
+        //     const lis = document.querySelectorAll('.spot-list li');
+        //     const currPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+        //     for (let li of lis) {
+        //         if (li.dataset.pid === currPoint.resource_id) {
+        //             li.style.backgroundColor = '#f0f0f0';
+        //         } else {
+        //             li.style.backgroundColor = '#fff';
+        //         }
+        //     }
+        // },
         text(val) {
             this.searchInput();
         }
@@ -176,23 +176,23 @@ export default {
             for (let li of lis) {
                 if (e.target.dataset.pid === li.dataset.pid) {
                     li.style.backgroundColor = '#f0f0f0';
-                    let status = {
-                        status: false
-                    }
-                    sessionStorage.setItem('playStatus', JSON.stringify(status));
+                    // let status = {
+                    //     status: false
+                    // }
+                    // sessionStorage.setItem('playStatus', JSON.stringify(status));
 
-                    const pointList = JSON.parse(sessionStorage.getItem('pointList'));
-                    const currPoint = pointList.filter(item => item.resource_id === li.dataset.pid)[0];
-                    sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
+                    // const pointList = JSON.parse(sessionStorage.getItem('pointList'));
+                    // const currPoint = pointList.filter(item => item.resource_id === li.dataset.pid)[0];
+                    // sessionStorage.setItem('currentPoint', JSON.stringify(currPoint));
 
-                    const index = pointList.findIndex(item => item.resource_id === li.dataset.pid);
-                    const newPlayList = pointList.slice(index).map(item => {
-                        return {
-                            aSrc: item.guideUrl,
-                            aId: item.resource_id
-                        }
-                    });
-                    sessionStorage.setItem('playList', JSON.stringify(newPlayList));
+                    // const index = pointList.findIndex(item => item.resource_id === li.dataset.pid);
+                    // const newPlayList = pointList.slice(index).map(item => {
+                    //     return {
+                    //         aSrc: item.guideUrl,
+                    //         aId: item.resource_id
+                    //     }
+                    // });
+                    // sessionStorage.setItem('playList', JSON.stringify(newPlayList));
 
                     this.$router.replace({
                         name: 'main',
@@ -200,9 +200,10 @@ export default {
                             pid: li.dataset.pid
                         }
                     });
-                } else {
-                    li.style.backgroundColor = '#fff';
-                }
+                } 
+                // else {
+                //     li.style.backgroundColor = '#fff';
+                // }
             }
         },
         clearInput() {

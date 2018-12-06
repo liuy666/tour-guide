@@ -6,12 +6,10 @@ const app = {
         resourceList: [],
         content: '',
         routeName: '',
-        autoPlay: false,
         fromRouteName: '',
         fromRouteName_detail: '',
         lineStatus: '',
         sId: '',
-        // currentScenic: null,
         playParams: null, // 播放所需参数，包括景点id和音频src
         percent: 0, // 播放进度百分比
         playStatus: '', // 当前播放状态 -- pause/play
@@ -22,6 +20,39 @@ const app = {
         isLastOne: false,
     },
     mutations: {
+        // 保存初始状态
+        SAVE_STATE(state) {
+             let initState = {
+                lineList: [],
+                resourceList: [],
+                content: '',
+                routeName: '',
+                fromRouteName: '',
+                fromRouteName_detail: '',
+                lineStatus: '',
+                sId: '',
+                playParams: null,
+                percent: 0,
+                playStatus: '',
+                isStop: false,
+                isAutoPlay: false,
+                nextMessage: null,
+                hasGetTotal: false,
+                isLastOne: false
+            }
+            localStorage.setItem('initState', JSON.stringify(initState));
+        },
+        // 初始化vuex
+        INIT_STATE(state) {
+            let initState = JSON.parse(localStorage.getItem('initState'));
+            for (let attr in state) {
+                for (let attr2 in initState) {
+                    if (attr == attr2) {
+                        state[attr] = initState[attr2];
+                    }
+                }
+            }
+        },
         // 保存路线列表
         GET_LINE_LIST(state, list) {
             state.lineList = list;
@@ -57,9 +88,9 @@ const app = {
             state.lineStatus = !state.lineStatus;
         },
         // 监听自动播
-        AUTO_PALY(state) {
-            state.autoPlay = !state.autoPlay;
-        },
+        // AUTO_PALY(state) {
+        //     state.autoPlay = !state.autoPlay;
+        // },
         SET_SCENIC_ID(state, val) {
             state.sId = val;
         },
