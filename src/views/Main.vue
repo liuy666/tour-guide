@@ -1134,15 +1134,14 @@
         methods: {
             getCurrentPosition() { 
                 this.isPositioning = true;
-                //if(JSON.stringify(this.locateObj) === '{}'){
-                this.locateObj = this.oMap_main.locate({
-                    setView: false,
+                
+                this.oMap_main.locate({
+                    setView: true,
                     maxZoom: 19,
                     enableHighAccuracy: true,
                     maximumAge: 5000,
                     watch: true
                 })
-                //}
             },
             // 自动定位一次及提示自动提示
             autoGetPositon() {
