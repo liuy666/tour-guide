@@ -198,6 +198,8 @@
                         width: 100px;
                         height: 100px;
                         position: absolute;
+                        left: 0;
+                        top: 0;
                         background: url("../assets/images/playing_detail.gif") no-repeat center center;
                         background-size: 36px 32px;
                     }

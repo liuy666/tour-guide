@@ -824,7 +824,7 @@
             });
 
             // 获取当前地图定位
-            var options = {
+            /*var options = {
                 'showButton': true,//是否显示定位按钮
                 'buttonPosition': 'LB',//定位按钮的位置
                 'buttonOffset': new AMap.Pixel(15, 23),//定位按钮距离对应角落的距离
@@ -868,9 +868,8 @@
                     _self.isTips3 = true;
                     _self.isPositioning = false;
                 })
-            });
+            });*/
 
-            
             // 实例化地图
             let oMap = L.map("wrapper", {
                 center: centerPoint,
