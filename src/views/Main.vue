@@ -942,6 +942,7 @@
                 }else{
                     _self.tipsText3 = "您当前不在景区内";
                     _self.isTips3 = true;
+                    _self.oMap_main.stopLocate();
                 }
             });
             this.oMap_main.on('locationerror', function(e) {
