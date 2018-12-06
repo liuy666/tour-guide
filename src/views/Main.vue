@@ -1703,6 +1703,12 @@
                                 this.changeMapIcon(false);
                             }
                         }
+                    }else{
+                        this.isPlayed = false;
+                        document.querySelector('.pointImg').style.animationPlayState = 'paused';
+                        if(this.resourceType < 3){
+                            this.changeMapIcon(false);
+                        }
                     }
 
                     // 如果之前选了路线 则重新画线路线
@@ -1898,8 +1904,10 @@
                 this.isPlayed_scenic = true;
             },
             pauseAudio_scenic() {
-                document.querySelector('.detail-audio').pause();
-                document.querySelector('.detail-img').style.animationPlayState = 'paused';
+                if(document.querySelector('.main-audio') && !document.querySelector('.main-audio').paused){
+                    document.querySelector('.detail-audio').pause();
+                    document.querySelector('.detail-img').style.animationPlayState = 'paused';
+                }
                 this.isPlayed_scenic = false;
             }
         }
