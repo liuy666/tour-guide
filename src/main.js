@@ -52,7 +52,7 @@ const vm = new Vue({
         let jsapi_ticket = Cookies.get('ticket');
         let noncestr = 'liuy666comwhosyourdaddy';
         let timestamp = Date.now();
-        let url = window.location.href;
+        let url = 'www.rtzhisheng.com';
         let newString = `jsapi_ticket=${jsapi_ticket}&noncestr=${noncestr}&timestamp=${timestamp}&url=${url}`
         let signature = $crypto.getSHA1String(newString);
         wx.config({
