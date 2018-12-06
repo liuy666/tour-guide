@@ -922,13 +922,16 @@
             });
 
             this.oMap_main.on('locationfound', function(e) {
-                alert('回调成功')
                 _self.isPositioning = false;
                 let radius = e.accuracy / 2,
                     cp = e.latlng;
+                alert(cp.lat + ',' + cp.lng);
                 // L.marker(e.latlng).addTo(_self.oMap_main).bindPopup("你就在这个圈内");
                 // L.circle(e.latlng, radius).addTo(_self.oMap_main);
+                
+                alert(_self.oMap_main.maxBounds.contains(L.latlng(cp.lat,cp.lng)));
                 if (_self.oMap_main.maxBounds.contains(cp)) {
+                    alert("1111");
                     _self.oMap_main.setView([cp.lat,cp.lng]);
                     var myIcon = L.icon({
                         iconUrl: './location.gif',
@@ -1151,7 +1154,7 @@
                 this.isPositioning = true;
                 
                 this.oMap_main.locate({
-                    setView: true,
+                    setView: false,
                     maxZoom: 19,
                     enableHighAccuracy: true,
                     maximumAge: 5000,
