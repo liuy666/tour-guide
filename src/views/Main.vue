@@ -824,53 +824,52 @@
             // });
 
             // 获取当前地图定位
-            // var options = {
-            //     'showButton': true,//是否显示定位按钮
-            //     'buttonPosition': 'LB',//定位按钮的位置
-            //     'buttonOffset': new AMap.Pixel(15, 23),//定位按钮距离对应角落的距离
-            //     'showMarker': true,//是否显示定位点
-            //     'markerOptions':{//自定义定位点样式，同Marker的Options
-            //         'offset': new AMap.Pixel(-18, -36),
-            //         'content':'<img src="https://a.amap.com/jsapi_demos/static/resource/img/user.png" style="width:36px;height:36px"/>'
-            //     },
-            //     'showCircle': true,//是否显示定位精度圈
-            //     'circleOptions': {//定位精度圈的样式
-            //         'strokeColor': '#0093FF',
-            //         'noSelect': true,
-            //         'strokeOpacity': 0.5,
-            //         'strokeWeight': 1,
-            //         'fillColor': '#02B0FF',
-            //         'fillOpacity': 0.25
-            //     },
-            //     'panToLocation':false
-            // }
-            // AMap.plugin(["AMap.Geolocation"], function() {
-            //     var geolocation = new AMap.Geolocation(options);
-            //     _self.geolocation = geolocation;
-            //     map_test.addControl(geolocation);
-            //     geolocation.on('complete',function(GeolocationResult) {
-            //         _self.isPositioning = false;
-            //         let cp = GeolocationResult.position;
-            //         if(cp.lat >= imgLeftBottom.lat && cp.lat <= imgRightTop.lat && cp.lng >= imgLeftBottom.lng && cp.lng <= imgRightTop.lng){
-            //             _self.oMap_main.setView([cp.lat,cp.lng]);
-            //             var myIcon = L.icon({
-            //                 iconUrl: './location.gif',
-            //                 className:'my-position'
-            //             });
-            //             L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
-            //         }else{
-            //             _self.tipsText3 = "您当前不在景区内";
-            //             _self.isTips3 = true;
-            //         }
-            //     })
-            //     geolocation.on('error',function(){
-            //         _self.tipsText3 = "定位失败，请确保手机已开启定位";
-            //         _self.isTips3 = true;
-            //         _self.isPositioning = false;
-            //     })
-            // });
+            /*var options = {
+                'showButton': true,//是否显示定位按钮
+                'buttonPosition': 'LB',//定位按钮的位置
+                'buttonOffset': new AMap.Pixel(15, 23),//定位按钮距离对应角落的距离
+                'showMarker': true,//是否显示定位点
+                'markerOptions':{//自定义定位点样式，同Marker的Options
+                    'offset': new AMap.Pixel(-18, -36),
+                    'content':'<img src="https://a.amap.com/jsapi_demos/static/resource/img/user.png" style="width:36px;height:36px"/>'
+                },
+                'showCircle': true,//是否显示定位精度圈
+                'circleOptions': {//定位精度圈的样式
+                    'strokeColor': '#0093FF',
+                    'noSelect': true,
+                    'strokeOpacity': 0.5,
+                    'strokeWeight': 1,
+                    'fillColor': '#02B0FF',
+                    'fillOpacity': 0.25
+                },
+                'panToLocation':false
+            }
+            AMap.plugin(["AMap.Geolocation"], function() {
+                var geolocation = new AMap.Geolocation(options);
+                _self.geolocation = geolocation;
+                map_test.addControl(geolocation);
+                geolocation.on('complete',function(GeolocationResult) {
+                    _self.isPositioning = false;
+                    let cp = GeolocationResult.position;
+                    if(cp.lat >= imgLeftBottom.lat && cp.lat <= imgRightTop.lat && cp.lng >= imgLeftBottom.lng && cp.lng <= imgRightTop.lng){
+                        _self.oMap_main.setView([cp.lat,cp.lng]);
+                        var myIcon = L.icon({
+                            iconUrl: './location.gif',
+                            className:'my-position'
+                        });
+                        L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
+                    }else{
+                        _self.tipsText3 = "您当前不在景区内";
+                        _self.isTips3 = true;
+                    }
+                })
+                geolocation.on('error',function(){
+                    _self.tipsText3 = "定位失败，请确保手机已开启定位";
+                    _self.isTips3 = true;
+                    _self.isPositioning = false;
+                })
+            });*/
 
-            
             // 实例化地图
             let oMap = L.map("wrapper", {
                 center: centerPoint,
