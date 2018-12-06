@@ -764,16 +764,6 @@
                     return;
                 }
 
-                scenicList.data.forEach((item) => {
-                    console.log(item)
-                    item.accessCoverUrl = item.accessCoverUrl ? 'https' + item.accessCoverUrl.slice(4) : item.accessCoverUrl;
-                    item.accessMapUrl = item.accessMapUrl ? 'https' + item.accessMapUrl.slice(4) : item.accessMapUrl;
-                    item.accessUrl = item.accessUrl ? 'https' + item.accessUrl.slice(4) : item.accessUrl;
-                    item.explainOssUrl = item.explainOssUrl ? 'https' + item.explainOssUrl.slice(4) : item.explainOssUrl;
-                    item.qrcode = item.qrcode ? 'https' + item.qrcode.slice(4) : item.qrcode;
-                    item.url = item.url ? 'https://' + item.url : item.url;
-                });
-
                 // 请求成功，开始初始化
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
                 scenicInfo = {...currentScenic};
@@ -925,13 +915,10 @@
                 _self.isPositioning = false;
                 let radius = e.accuracy / 2,
                     cp = e.latlng;
-                alert(cp.lat + ',' + cp.lng);
                 // L.marker(e.latlng).addTo(_self.oMap_main).bindPopup("你就在这个圈内");
                 // L.circle(e.latlng, radius).addTo(_self.oMap_main);
-                
-                alert(_self.oMap_main.maxBounds.contains(L.latlng(cp.lat,cp.lng)));
-                if (_self.oMap_main.maxBounds.contains(cp)) {
-                    alert("1111");
+            
+                if(cp.lat >= imgLeftBottom.lat && cp.lat <= imgRightTop.lat && cp.lng >= imgLeftBottom.lng && cp.lng <= imgRightTop.lng) {
                     _self.oMap_main.setView([cp.lat,cp.lng]);
                     var myIcon = L.icon({
                         iconUrl: './location.gif',
@@ -965,8 +952,7 @@
                 _self.tipsText3 = "定位失败，请确保手机已开启定位";
                 _self.isTips3 = true;
                 _self.isPositioning = false;
-                console.log(e)
-                alert(e.message);
+                _self.oMap_main.stopLocate();
             });
 
             // 获取默认景点列表
@@ -1158,6 +1144,7 @@
                     maxZoom: 19,
                     enableHighAccuracy: true,
                     maximumAge: 5000,
+                    timeout: 5000,
                     watch: true
                 })
             },
@@ -1562,10 +1549,6 @@
                     this.isTips1 = true;
                     return;
                 }
-                res.page.list.forEach((item) => {
-                    item.guideUrl = item.guideUrl ? 'https' + item.guideUrl.slice(4) : item.guideUrl;
-                    item.url = item.url ? 'https' + item.url.slice(4) : item.url;
-                });
 
                 // 判断是否是初始化页面 还是回退进入本页面
                 const fromRouteName = this.$store.state.app.fromRouteName;
