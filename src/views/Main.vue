@@ -145,7 +145,9 @@
                     flex-direction: row;
                     box-sizing: border-box;
                     margin: 0 29px 0 30px;
-                    border-top: 1px solid #f8f8f8;
+                    border-top: 1px solid #f8f8f8; 
+                    // background: url("../assets/images/rightline.png") no-repeat right center ;
+                    box-shadow: 1px 0px 2px rgba(255,255,255,.2) inset;
                     li {
                         margin-right: 10px;
                         display: flex;
@@ -663,15 +665,15 @@
             <section class="function-btn QJ" @click="gotoPage('full-view')"></section>
             <section class="function-btn ZD" @click="changeAuto" :class="isAuto ? '' : 'NO'"></section>
             <!-- 自定义弹窗 -->
-            <div id="tips" v-show="isTips4">
+            <!-- <div id="tips" v-show="isTips4">
                 <p>点这里可以自动导游</p>
-            </div>
+            </div> -->
         </section>
         <!-- 底部景区简介弹窗 -->
         <section v-show="isOpenDetail" class="introDetail">
-            <audio preload="auto" style="display: none;" class="detail-audio">
+            <!-- <audio preload="auto" style="display: none;" class="detail-audio">
                 <source src="../assets/test.mp3" type="audio/mpeg" />
-            </audio>
+            </audio> -->
             <div class="scenic-detail-header">
                 <div class="scenic-img">
                     <img class="ignore detail-img" style="width:100%;height:100%;border-radius:100%;" :src="scenicImg"/>
@@ -726,15 +728,9 @@
             this.$store.commit('setFromRouteName_detail', to.name);
             next();
         },
-        // 在当前路由改变，但是该组件被复用时调用 可以访问组件实例 `this`
-        beforeRouteUpdate (to, from, next) { 
-            next();
-        },
         created() {
             console.log('created');
-
             this.isShowLoading = true;
-            
             if (sessionStorage.getItem('isAuto') && sessionStorage.getItem('isAuto') == "true") {
                 this.isAuto = true;
             } else {
@@ -982,7 +978,7 @@
                 resourceType: 1, // 景区资源类型 默认 1 -- 景点
                 isTips1: false,
                 isTips3: false,
-                isTips4: false,
+                // isTips4: false,
                 tipsText1: '',
                 tipsText3: '',
                 isShowMenu: false,
@@ -1079,27 +1075,10 @@
             '$route'(to, from) {
                 // 关闭菜单并展开对应信息窗体
                 if (from.name === 'scenic-spot' && to.name === 'main' && to.params.pid) {
-                    const currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-                    this.scenicPointImg = currentPoint.url;
-                    this.scenicPointName = currentPoint.name;
-                    this.scenicPointId = currentPoint.resource_id;
-
-                    this.mapClickPointId = to.params.pid;
-                    sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
-    
+                    // this.mapClickPointId = to.params.pid;
+                    // sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
                     this.getMarkerIndex(to.params.pid);
                     this.markers[this.indexOfMarkers].openPopup();
-                    if (document.querySelector('detail-audio') && !document.querySelector('detail-audio').paused) {
-                        this.pauseAudio_scenic();
-                    }
-                    document.addEventListener('WeixinJSBridgeReady',function(){
-                        alert(565)
-                    },false);
-                    this.playAudio({
-                        _src: currentPoint.guideUrl,
-                        _id: to.params.pid,
-                        type: 2
-                    });
                     this.isShowMenu = false;
                 }
                 if (from.name === 'scenic-resource' && to.name === 'main' && to.params.rid) {
@@ -1152,32 +1131,53 @@
             // 自动定位一次及提示自动提示
             autoGetPositon() {
                 if(!sessionStorage.getItem("hasPosition")){
-                    this.isTips4 = true;
-                    setTimeout(() => {
-                        this.isTips4 = false;
-                    }, 2000);
-                    //this.geolocation.getCurrentPosition();
-                    this.getCurrentPosition();
-                    sessionStorage.setItem("hasPosition", true);
                     this.$nextTick(() => {
-                        if (!this.$route.query.pid) {
-                            this.isOpenDetail = true;
-                            wx.ready(() => {
-                                if (document.querySelector('main-audio') && !document.querySelector('main-audio').paused) {
-                                    this.pauseAudio();
+                        wx.ready(() => {
+                            if (document.querySelector('main-audio') && !document.querySelector('main-audio').paused) {
+                                this.pauseAudio();
+                            }
+                            // document.querySelector('.detail-audio').play(); // 还不能播放
+
+                            const detailAudio = document.querySelector('.detail-audio');
+                            const audioContainer = document.querySelector('.introDetail');
+                            if (detailAudio) { // 当前正在播放时 切换了音频
+                                if (!detailAudio.paused) {
+                                    detailAudio.pause();
                                 }
-                                document.querySelector('.detail-audio').play(); // 还不能播放
-                                document.querySelector('.detail-img').style.animationPlayState = 'running';
+                                audioContainer.removeChild(detailAudio);
+                            }
+                            
+                            let audioDom = document.createElement('audio');
+                            let sourceDom = document.createElement('source');
+                            sourceDom.type = 'audio/mpeg';
+                            sourceDom.src = JSON.parse(sessionStorage.getItem('currentScenic')).explainOssUrl;
+                            audioDom.preload = 'auto';
+                            audioDom.dataset.sid = JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id;
+                            audioDom.appendChild(sourceDom);
+                            audioDom.className = 'detail-audio';
+                            audioDom.style.display = 'none';
+                            audioContainer.appendChild(audioDom);
+                            audioDom.addEventListener('ended', (e) => {
+                                document.querySelector('.detail-img').style.animationPlayState = 'paused';
+                                this.isPlayed_scenic = false;
                             });
-                            this.isPlayed_scenic = true;
-                        } else {
-                            this.isOpenDetail = false;
-                        }
-                        document.querySelector('.detail-audio').addEventListener('ended', (e) => {
-                            document.querySelector('.detail-img').style.animationPlayState = 'paused';
-                            this.isPlayed_scenic = false;
+                            audioDom.load();
+
+                            if (!this.$route.query.pid) {
+                                audioDom.oncanplay = (e) => {
+                                    let _audioDom = e.target;
+                                    _audioDom.play();
+                                    this.isPlayed_scenic = true;
+                                    document.querySelector('.detail-img').style.animationPlayState = 'running';
+                                    this.isOpenDetail = true;
+                                }
+                            } else {
+                                this.isOpenDetail = false;
+                            }
                         });
                     });
+                    this.getCurrentPosition();
+                    sessionStorage.setItem("hasPosition", true);
                 }
             },
             // 初始化图标菜单
@@ -1365,9 +1365,8 @@
             ...mapMutations([
                 'SAVE_RESOURCE_LIST', // 保存资源列表
                 'SET_ROUTE_NAME', // 设置to路由name
-                'AUTO_PALY', // 自动连播
+                // 'AUTO_PALY', // 自动连播
                 'SET_FROM_ROUTE_NAME', // 设置from路由name
-                // 'SET_CURRENT_SCENIC', // 设置当前景区信息
                 'START_PLAY', // 开始播放,
                 'CLEAR_CURRENT_INTERVAL', // 清除当前定时器
                 'START_NEW_INTERVAL', // 开始新的定时器
