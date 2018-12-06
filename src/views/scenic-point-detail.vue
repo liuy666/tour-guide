@@ -631,10 +631,21 @@ export default {
             this.totalTime = sessionStorage.getItem("totalTime");
             let m = (this.totalTime%60).toFixed(0) < 10 ? '0'+(this.totalTime%60).toFixed(0) : (this.totalTime%60).toFixed(0);
             this.totalTimeStr = Math.floor(this.totalTime/60) + ":" + m;
+
+            this.currentTime = document.querySelector(".main-audio").currentTime;
+            let cf = Math.floor(this.currentTime/60);
+            let cm = (this.currentTime%60).toFixed(0) < 10 ? '0'+(this.currentTime%60).toFixed(0) : (this.currentTime%60).toFixed(0);
+            this.currentTimeStr = cf + ":" + cm;
+            this.progress = this.currentTime/this.totalTime*100;
+            document.querySelector(".circle").style.left = "calc("+this.progress+"% - 8px)";
+
         }else{
             this.isPlayed = false;
             this.audioPlay = false;
             this.setAudio();
+            if(mainAudio && !mainAudio.paused){
+                this.audioPlay = true;
+            }
         }
 
         this.$nextTick(function(){
