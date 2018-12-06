@@ -764,6 +764,16 @@
                     return;
                 }
 
+                scenicList.data.forEach((item) => {
+                    console.log(item)
+                    item.accessCoverUrl = item.accessCoverUrl ? 'https' + item.accessCoverUrl.slice(4) : item.accessCoverUrl;
+                    item.accessMapUrl = item.accessMapUrl ? 'https' + item.accessMapUrl.slice(4) : item.accessMapUrl;
+                    item.accessUrl = item.accessUrl ? 'https' + item.accessUrl.slice(4) : item.accessUrl;
+                    item.explainOssUrl = item.explainOssUrl ? 'https' + item.explainOssUrl.slice(4) : item.explainOssUrl;
+                    item.qrcode = item.qrcode ? 'https' + item.qrcode.slice(4) : item.qrcode;
+                    item.url = item.url ? 'https://' + item.url : item.url;
+                });
+
                 // 请求成功，开始初始化
                 let currentScenic = scenicList.data.filter(item => item.scenery_id === query.sid)[0];
                 scenicInfo = {...currentScenic};
@@ -1549,6 +1559,10 @@
                     this.isTips1 = true;
                     return;
                 }
+                res.page.list.forEach((item) => {
+                    item.guideUrl = item.guideUrl ? 'https' + item.guideUrl.slice(4) : item.guideUrl;
+                    item.url = item.url ? 'https' + item.url.slice(4) : item.url;
+                });
 
                 // 判断是否是初始化页面 还是回退进入本页面
                 const fromRouteName = this.$store.state.app.fromRouteName;

@@ -39,28 +39,31 @@ const vm = new Vue({
     async mounted() {
         this.$store.commit('INIT_CONTENT'); // 初始化设置消息详情内容
         console.log(wx);
-        // let a = $crypto.getSHA1String('jsapi_ticket=kgt8ON7yVITDhtdwci0qearGJDdcPw58HL1KLAheDgj9XWSD_SEk0Xa6x8drtytJKa9mXFHDTLQ3aU69EPGU0w&noncestr=liuy666comwhosyourdaddy&timestamp=1544077236&url=http://localhost:8086/dev/')
-        // console.log(a)
-        // 410445c2fed20d96aa619e52de813b9f493fe600
-
-        // 410445c2fed20d96aa619e52de813b9f493fe600
+        alert(encodeURIComponent(location.href.split('#')[0]))
         // 注入wx config
-        Cookies.remove('ticket');
+        // Cookies.remove('ticket');
 
-        if (!Cookies.get('ticket')) {
-            alert('还没有ticket！')
-            const GET_JS_SDK = await this.$http.get(this.$base + '/hqyatu-navigator/app/getWxAccessToken');
-            console.log(GET_JS_SDK);
-            if (!GET_JS_SDK) {
-                console.log('获取jsapi_ticket失败！');
-            }
-            Cookies.set('ticket', GET_JS_SDK.ticket, {expires: parseInt(GET_JS_SDK.expires_in) / 3600 / 24});
+        // if (!Cookies.get('ticket')) {
+        //     alert('还没有ticket！')
+        //     const GET_JS_SDK = await this.$http.get(this.$base + '/hqyatu-navigator/app/getWxAccessToken');
+        //     console.log(GET_JS_SDK);
+        //     if (!GET_JS_SDK) {
+        //         console.log('获取jsapi_ticket失败！');
+        //     }
+        //     Cookies.set('ticket', GET_JS_SDK.ticket, {expires: parseInt(GET_JS_SDK.expires_in) / 3600 / 24});
+        // }
+
+        const GET_JS_SDK = await this.$http.get(this.$base + '/hqyatu-navigator/app/getWxAccessToken');
+        console.log(GET_JS_SDK);
+        if (!GET_JS_SDK) {
+            alert('获取jsapi_ticket失败！');
         }
         
-        let jsapi_ticket = Cookies.get('ticket');
+        // let jsapi_ticket = Cookies.get('ticket');
+        let jsapi_ticket = GET_JS_SDK.ticket;
         let noncestr = 'liuy666comwhosyourdaddy';
-        let timestamp = Date.now();
-        let url = 'https://www.rtzhisheng.com/webchat/';
+        let timestamp = 1544077236;
+        let url = location.href.split('#')[0];
         let newString = `jsapi_ticket=${jsapi_ticket}&noncestr=${noncestr}&timestamp=${timestamp}&url=${url}`
         let signature = $crypto.getSHA1String(newString);
         wx.config({
@@ -79,9 +82,9 @@ const vm = new Vue({
                 title: '青川智能语音导游', // 分享标题
                 desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！', // 分享描述
                 link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: './50x50.png', // 分享图标
+                imgUrl: 'https://www.rtzhisheng.com/hqyatu-navigator/img/50x50.png', // 分享图标
                 success: function () {
-                    alert('分享到QQ设置成功')
+                    alert('分享到QQ或朋友设置成功')
                 },
                 fail: function (e) {
                     alert('分享到QQ设置失败')
@@ -90,9 +93,9 @@ const vm = new Vue({
             wx.updateTimelineShareData({ 
                 title: '青川智能语音导游', // 分享标题
                 link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: './50x50.png', // 分享图标
+                imgUrl: 'https://www.rtzhisheng.com/hqyatu-navigator/img/50x50.png', // 分享图标
                 success: function () {
-                  alert('分享到QQ空间设置成功')
+                  alert('分享到QQ空间或朋友圈设置成功')
                 },
                 fail: function (e) {
                     alert('分享到QQ空间设置失败')

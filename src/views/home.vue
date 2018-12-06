@@ -179,6 +179,15 @@
                     return;
                 }
                 if(scenicList.data && scenicList.data.length && scenicList.data.length>0){
+                    scenicList.data.forEach((item) => {
+                        console.log(item)
+                        item.accessCoverUrl = item.accessCoverUrl ? 'https' + item.accessCoverUrl.slice(4) : item.accessCoverUrl;
+                        item.accessMapUrl = item.accessMapUrl ? 'https' + item.accessMapUrl.slice(4) : item.accessMapUrl;
+                        item.accessUrl = item.accessUrl ? 'https' + item.accessUrl.slice(4) : item.accessUrl;
+                        item.explainOssUrl = item.explainOssUrl ? 'https' + item.explainOssUrl.slice(4) : item.explainOssUrl;
+                        item.qrcode = item.qrcode ? 'https' + item.qrcode.slice(4) : item.qrcode;
+                        item.url = item.url ? 'https://' + item.url : item.url;
+                    });
                     sessionStorage.setItem('scenicList',JSON.stringify(scenicList.data));
                     scenicList.data.forEach((v,i) => {
                         let myIcon = L.divIcon({
