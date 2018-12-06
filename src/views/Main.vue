@@ -940,16 +940,22 @@
                         })
                     }
                 }else{
-                    _self.tipsText3 = "您当前不在景区内";
-                    _self.isTips3 = true;
-                    _self.oMap_main.stopLocate();
+                    _self.count += 1;
+                    if(_self.count <= 1){
+                        _self.tipsText3 = "您当前不在景区内";
+                        _self.isTips3 = true;
+                        _self.oMap_main.stopLocate();
+                    }
                 }
             });
             this.oMap_main.on('locationerror', function(e) {
-                _self.tipsText3 = "定位失败，请确保手机已开启定位";
-                _self.isTips3 = true;
-                _self.isPositioning = false;
-                _self.oMap_main.stopLocate();
+                _self.count += 1;
+                if(_self.count <= 1){
+                    _self.tipsText3 = "定位失败，请确保手机已开启定位";
+                    _self.isTips3 = true;
+                    _self.isPositioning = false;
+                    _self.oMap_main.stopLocate();
+                }
             });
 
             // 获取默认景点列表
@@ -963,6 +969,7 @@
         },
         data () {
             return {
+                count:0,
                 bl:0,//当前屏幕大小与375的比例 用于动态设置信息弹窗的偏移
                 geolocation:{},//定位对象
                 longlati: '', // 当前定位经纬度坐标
@@ -1118,7 +1125,7 @@
         methods: {
             getCurrentPosition() { 
                 this.isPositioning = true;
-                
+                this.count = 0;
                 this.oMap_main.locate({
                     setView: false,
                     maxZoom: 19,
