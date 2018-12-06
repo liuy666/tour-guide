@@ -362,6 +362,7 @@ export default {
                 }
             }
         },
+        //播放最终结束（未自动时单音频播放完成 || 自动时整个播放列表播放完成）
         isStop (val) {
             if (val) {
                 this.isPlayed = false;
@@ -372,7 +373,8 @@ export default {
                 }
             }
         },
-        isAutoPlay (val) { //自动播放
+        //自动播放
+        isAutoPlay (val) { 
             if (val) {
                 //设置应该显示的景点信息 
                 this.showPoint = this.$store.state.app.nextMessage.nextPoint;
@@ -382,6 +384,8 @@ export default {
                 this.pointCaption = this.showPoint.commentary;
                 this.currentTimeStr = "0:00";
                 this.getCurrentImgList();
+
+                
                 this.START_NEW_INTERVAL();
                 this.isPlayed = true;
                 this.audioPlay = true;

@@ -172,7 +172,7 @@
             async getScenicList () {
                 let _self = this;
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
-                    domainUrl: window.location.hostname
+                    domainUrl: 'www.qxgz.com' //window.location.hostname
                 });
                 if(!scenicList){
                     this.isTips = true;

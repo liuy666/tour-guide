@@ -874,8 +874,8 @@
             // 实例化地图
             let oMap = L.map("wrapper", {
                 center: centerPoint,
-                zoom: zoom,
-                minZoom: zoom,
+                zoom: zoom-1,
+                minZoom: zoom-1,
                 maxZoom: 19,
                 attributionControl: false,
                 zoomControl: false,
@@ -895,8 +895,8 @@
                     _self.isShowLoading = false;
                     _self.autoGetPositon();
                 }
-                //_self.oMap_main.setZoom(zoom);
-                //_self.oMap_main.setMinZoom(zoom);
+                _self.oMap_main.setZoom(zoom);
+                _self.oMap_main.setMinZoom(zoom);
             });
 
             this.oMap_main = oMap;
@@ -948,10 +948,12 @@
                     _self.isTips3 = true;
                 }
             });
-            this.oMap_main.on('locationerror', function(e) { 
+            this.oMap_main.on('locationerror', function(e) {
                 _self.tipsText3 = "定位失败，请确保手机已开启定位";
                 _self.isTips3 = true;
                 _self.isPositioning = false;
+                console.log(e)
+                alert(e.message);
             });
 
             // 获取默认景点列表
@@ -1137,15 +1139,14 @@
         methods: {
             getCurrentPosition() { 
                 this.isPositioning = true;
-                //if(JSON.stringify(this.locateObj) === '{}'){
-                this.locateObj = this.oMap_main.locate({
-                    setView: false,
+                
+                this.oMap_main.locate({
+                    setView: true,
                     maxZoom: 19,
                     enableHighAccuracy: true,
                     maximumAge: 5000,
                     watch: true
                 })
-                //}
             },
             // 自动定位一次及提示自动提示
             autoGetPositon() {
