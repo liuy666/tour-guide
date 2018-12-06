@@ -750,7 +750,7 @@
             const query = this.$route.query;
             if (query.sid) {
                 const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
-                    domainUrl: window.location.hostname // 域名改成获取
+                    domainUrl: 'www.qxgz.com' // window.location.hostname // 域名改成获取
                 });
 
                 // 请求失败，跳转404 并传递返回的url
