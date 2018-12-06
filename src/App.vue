@@ -120,7 +120,7 @@
             },
             // 监听路由 回退到home页 则停止播放
             '$route'(to, from) {
-                if (to.path === '/' && from.name) {
+                if (to.path === '/' && from.name && document.querySelector('.main-audio')) {
                     this.CLEAR_CURRENT_INTERVAL();
                     document.querySelector('.main-audio').pause();
                 }
