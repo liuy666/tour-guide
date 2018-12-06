@@ -155,8 +155,7 @@ export default {
                 const formData = new FormData();
                 formData.append('image_file', file);
                 const res = await this.$http.post(this.$base + '/hqyatu-navigator/app/img/recognition', formData, 'multipart/form-data');
-
-                if (!res) {
+                if (!res && !res.data) {
                     this.isShowLoading = false;
                     changeEvent.target.value = '';
                     this.tipsText1 = '请求失败';
@@ -165,7 +164,7 @@ export default {
                 }
 
                 this.isShowLoading = false;
-                let descOrder = res.response.identify_results.sort((a, b) => b.probability - a.probability);
+                let descOrder = res.data.response.identify_results.sort((a, b) => b.probability - a.probability);
                 if (descOrder[0].probability.toFixed(2) > 0.7) {
                     this.tipsText2 = '识别成功';
                     this.isTips2 = true;
