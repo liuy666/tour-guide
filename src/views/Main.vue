@@ -1170,12 +1170,12 @@
                         audioDom.load();
 
                         if (!this.$route.query.pid) {
+                            this.isOpenDetail = true;
                             audioDom.oncanplay = (e) => {
                                 let _audioDom = e.target;
                                 _audioDom.play();
                                 this.isPlayed_scenic = true;
                                 document.querySelector('.detail-img').style.animationPlayState = 'running';
-                                this.isOpenDetail = true;
                             }
                         } else {
                             this.isOpenDetail = false;
