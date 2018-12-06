@@ -515,7 +515,7 @@ export default {
                     let title = (i+1)+'/'+len;
                     let obj = {
                         url : 'javascript:',
-                        img : v,
+                        img : v ? 'https' + v.slice(4) : v,
                         title : title
                     }
                     list.push(obj);
