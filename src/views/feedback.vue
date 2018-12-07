@@ -302,7 +302,7 @@ export default {
                 const formData = new FormData();
                 formData.append('file', file);
                 const res = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/upload', formData, 'multipart/form-data');
-                if (!res) {
+                if (!res.status) {
                     this.isShowLoading2 = false;
                     this.tipsText1 = '上传失败';
                     this.isTips1 = true;
@@ -321,7 +321,7 @@ export default {
                 imgDom.style.width = '100%';
                 imgDom.style.height = '100%';
                 imgDom.style.borderRadius = '8.3%';
-                sectionDom.dataset.imgId = res.ossEntity.id;
+                sectionDom.dataset.imgId = res.data.ossEntity.id;
                 sectionDom.classList.add('upload-120-120-base', 'upload-hasImage');
 
                 // 给关闭按钮添加点击关闭事件
@@ -335,7 +335,7 @@ export default {
                         // 获取当前事件源的图片id
                         const _ID = parentNode.dataset.imgId;
                         const del = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/delete', [_ID]);
-                        if (!del) {
+                        if (!del.stauts) {
                             this.isShowLoading = false;
                             this.tipsText1 = '删除失败';
                             this.isTips1 = true;
@@ -364,7 +364,7 @@ export default {
                     imgDom.src = loadEvent.target.result;
                     imgDom.file = file;
                     this.uploadImageList.push({
-                        id: res.ossEntity.id,
+                        id: res.data.ossEntity.id,
                         url: loadEvent.target.result
                     });
                     sectionDom.appendChild(imgDom);

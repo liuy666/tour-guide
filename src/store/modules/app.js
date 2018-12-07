@@ -143,8 +143,10 @@ const app = {
             });
             console.log(lineList);
 
-            if (!lineList) {
+            if (!lineList || !lineList.page || !lineList.page.list || !lineList.page.list.length) {
                 _this.isShowLoading = false;
+                _this.tipsText1 = "请求失败";
+                _this.isTips1 = true;
                 return;
             }
             commit('GET_LINE_LIST', lineList.page.list);

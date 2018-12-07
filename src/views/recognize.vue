@@ -155,7 +155,7 @@ export default {
                 const formData = new FormData();
                 formData.append('image_file', file);
                 const res = await this.$http.post(this.$base + '/hqyatu-navigator/app/img/recognition', formData, 'multipart/form-data');
-                if (!res && !res.data) {
+                if (!res.status) {
                     this.isShowLoading = false;
                     changeEvent.target.value = '';
                     this.tipsText1 = '请求失败';

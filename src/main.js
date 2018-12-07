@@ -58,6 +58,7 @@ const vm = new Vue({
         let url = location.href.split('#')[0];
         let newString = `jsapi_ticket=${jsapi_ticket}&noncestr=${noncestr}&timestamp=${timestamp}&url=${url}`
         let signature = $crypto.getSHA1String(newString);
+        console.log(wx)
         wx.config({
             debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
             appId: 'wx32ec1b2c78c4270a', // 必填，公众号的唯一标识
@@ -70,16 +71,17 @@ const vm = new Vue({
             ] 
         });
         wx.ready(function () { //需在用户可能点击分享按钮前就先调用 
+            console.log('ready')
             wx.updateAppMessageShareData({ 
                 title: '青川智能语音导游', // 分享标题
                 desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！', // 分享描述
                 link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
                 imgUrl: 'https://www.rtzhisheng.com/hqyatu-navigator/img/50x50.png', // 分享图标
                 success: function () {
-                    // alert('分享到QQ或朋友设置成功')
+                    console.log('分享到QQ或朋友设置成功')
                 },
                 fail: function (e) {
-                    // alert('分享到QQ设置失败')
+                    console.log('分享到QQ设置失败')
                 }
             });  
             wx.updateTimelineShareData({ 
@@ -87,12 +89,15 @@ const vm = new Vue({
                 link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
                 imgUrl: 'https://www.rtzhisheng.com/hqyatu-navigator/img/50x50.png', // 分享图标
                 success: function () {
-                  // alert('分享到QQ空间或朋友圈设置成功')
+                    console.log('分享到QQ空间或朋友圈设置成功')
                 },
                 fail: function (e) {
-                    // alert('分享到QQ空间设置失败')
+                    console.log('分享到QQ空间设置失败')
                 }
             });
+        });
+        wx.error(function () {
+            console.log('error')
         });
     }
 }).$mount('#app');

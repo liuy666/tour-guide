@@ -138,7 +138,8 @@
                 padding: 0;
                 right: 20px;
                 bottom: 36px;
-                padding: 0 20px;
+                box-sizing: border-box;
+                padding: 4px 20px 0 20px;
                 border-radius: 20px;
                 left: auto;
                 font-size: 28px;

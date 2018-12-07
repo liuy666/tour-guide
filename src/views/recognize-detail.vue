@@ -19,7 +19,7 @@ export default {
     mounted() {
         const params = this.$route.params;
         if(!Object.keys(params).length) {
-            this.$router.push({
+            this.$router.replace({
                 name: 'recognize'
             });
             return;
@@ -31,11 +31,18 @@ export default {
             }
             let iframe = document.createElement('iframe');
             iframe.src = 'https' + params.src.slice(4);
+            iframe.name = 'newIframe';
             iframe.frameBorder = '0';
             iframe.height = '100%';
             iframe.width = '100%';
             iframe.classList.add('ifm');
             contaier.appendChild(iframe);
+            // console.log(document.querySelector('.ifm').contentWindow.document)
+            // iframe.onload = function(e) {
+            //     console.log(iframe.contentWindow)
+            //    //  ['newIframe'].document.body.innerHTML
+            // }
+            // iframe.contentWindow.document.getElementById('user-pic').src = 'https://www.baidu.com' /// ???
         }
     }
 }
