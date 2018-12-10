@@ -1125,6 +1125,7 @@
                             this.isOpenDetail = true;
                             // 非 iOS直接播放, iOS由于系统限制无法自动播放
                             if (!this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
+                                console.log('开始景区播放')
                                 audioDom.oncanplay = (e) => {
                                     let _audioDom = e.target;
                                     _audioDom.play();
