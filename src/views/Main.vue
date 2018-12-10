@@ -869,25 +869,78 @@
             // 给地图添加定位失败和成功的回调处理
             this.oMap_main.on('locationfound', function(e) {
                 _self.isPositioning = false;
+                
+                //如果是扫描播放
+                if(this.$route.query && this.$route.query.pid){
+                    return;
+                }
                 let radius = e.accuracy / 2,
                     cp = e.latlng;
                 // L.marker(e.latlng).addTo(_self.oMap_main).bindPopup("你就在这个圈内");
                 // L.circle(e.latlng, radius).addTo(_self.oMap_main);
             
                 if(cp.lat >= imgLeftBottom.lat && cp.lat <= imgRightTop.lat && cp.lng >= imgLeftBottom.lng && cp.lng <= imgRightTop.lng) {
+                    //设置定位点为地图显示中心点 并在地图上添加对应标记
                     _self.oMap_main.setView([cp.lat,cp.lng]);
                     var myIcon = L.icon({
                         iconUrl: './location.gif',
                         className:'my-position'
                     });
                     L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
-                    
+
+                    //如果自动播放并且当时地图显示的是所有的景点
                     if(_self.isAuto && _self.resourceType < 3){
                         _self.markers.forEach((v,i) => {
                             let latlng = L.latlng(v._latlng.lat,v._latlng.lng);
                             if(cp.distanceTo(latlng) < 20){
-                                let point_dw = _self.pointList.filter(item => item.resource_id === v._icon.children[0].dataset.id)[0];
+
+                                const pointList = JSON.parse(sessionStorage.getItem("pointList"));
+                                const point_dw = pointList.filter(item => item.resource_id === v._icon.children[0].dataset.id)[0];
+                                let newPlayList = [];
+
                                 if(_self.scenicPointId != point_dw.resource_id){
+                                    //更新播放列表
+                                    //如果不存在路线 播放列表为完整景点中 包含当前定位点之后的景点们
+                                    //如果存在路线  1.当前定位点在路线中 播放列表为路线中包含当前定位点之后的景点们  
+                                    //             2.当前定位点不在路线中 播放列表为当前定位点+完整的路线景点
+                                    const currLineId = sessionStorage.getItem('lineId');
+                                    const lineList = JSON.parse(sessionStorage.getItem('lineList'));
+                                    let currentLineList =  lineList.filter(item => item.lineId === currLineId)[0].lineDetailList;
+                                    let pidList = currentLineList.map(item => item.resourceId);
+
+                                    if(!currLineId){//不存在路线
+                                        const index_dw = pointList.findIndex(item => item.resource_id === v._icon.children[0].dataset.id);
+                                        newPlayList = pointList.slice(index_dw).map(item => {
+                                            return {
+                                                aSrc : item.guideUrl,
+                                                aId : item.resource_id
+                                            }
+                                        })
+                                    }else if(_self.$tool.isExist(point_dw.resource_id, pidList)){//存在路线 且当前定位点在路线中
+                                        const index_dw_line = pidList.findIndex(item => item === point_dw.resource_id);
+                                        newPlayList = currentLineList.slice(index_dw_line).map(item => {
+                                            return {
+                                                aSrc : item.guideUrl,
+                                                aId : item.resourceId
+                                            }
+                                        })
+                                    }else{
+                                        let linePlayList = currentLineList.map(item => {
+                                            return {
+                                                aSrc : item.guideUrl,
+                                                aId : item.resourceId
+                                            }
+                                        })
+                                        newPlayList = [{aSrc : point_dw.guideUrl,aId : point_dw.resource_id}].concat(linePlayList);
+                                    }
+                                    sessionStorage.setItem("playList",JSON.stringify(newPlayList));
+
+                                    //如果景区音频正在播放 暂停掉
+                                    let detailAudio = document.querySelector(".detail-Audio");
+                                    if(detailAudio && !detailAudio.paused) {
+                                        this.pauseAudio_scenic();
+                                    }
+                                    //播放当前定位点的音频
                                     _self.playAudio({
                                         type : 2,
                                         _src : point_dw.guideUrl,
