@@ -935,6 +935,9 @@
                                         _src : point_dw.guideUrl,
                                         _id : point_dw.resource_id
                                     })
+                                    _self.scenicPointImg = point_dw.url;
+                                    _self.scenicPointName = point_dw.name;
+                                    _self.scenicPointId = point_dw.resource_id;
                                     sessionStorage.setItem("currentPoint",JSON.stringify(point_dw));
                                     sessionStorage.setItem("mapClickPointId",point_dw.resource_id);
                                 }
