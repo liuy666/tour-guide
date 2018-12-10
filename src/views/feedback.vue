@@ -335,7 +335,8 @@ export default {
                         // 获取当前事件源的图片id
                         const _ID = parentNode.dataset.imgId;
                         const del = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/delete', [_ID]);
-                        if (!del.stauts) {
+                        console.log(del);
+                        if (!del.status) {
                             this.isShowLoading = false;
                             this.tipsText1 = '删除失败';
                             this.isTips1 = true;

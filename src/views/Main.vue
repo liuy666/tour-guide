@@ -65,6 +65,11 @@
             }
         }
 
+        // confirm 弹窗
+        .vux-confirm {
+            
+        }
+
         // 地图容器
         #wrapper {
             width: 100%;
@@ -599,6 +604,9 @@
         <!-- 提示弹窗 -->
         <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
         <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
+        <confirm v-model="isShowConfirm" title=" " @on-confirm="onConfirm" confirm-text="播放" mask-z-index="1002">
+            <p style="text-align:center;">你发现一条景区介绍快来听听吧！</p>
+        </confirm>
         <!-- 地图容器 -->
         <section id="wrapper"></section>
         <!-- 图标菜单弹窗 -->
@@ -717,13 +725,14 @@
 </template>
 
 <script>
-    import { XCircle, Toast, Loading } from 'vux';
+    import { XCircle, Toast, Loading, Confirm } from 'vux';
     import { mapActions, mapMutations, mapState } from 'vuex';
     export default {
         components: {
             XCircle,
             Toast,
-            Loading
+            Loading,
+            Confirm
         },
         // 导航离开该组件的对应路由时调用 可以访问组件实例 `this`
         beforeRouteLeave(to, from, next){
@@ -829,11 +838,13 @@
 
             // 给图层添加load事件
             mapImg.on('load',function(){
-                _self.isHasMapImage = true;
-                if (_self.isHasPointList && _self.isHasWeather) { // 表明天气/资源列表/地图图片都已请求完成(不一定成功) 关闭loading 开始定位
-                    _self.isShowLoading = false;
-                    _self.autoGetPositon();
-                }
+                // _self.isHasMapImage = true;
+                // if (_self.isHasPointList && _self.isHasWeather) { // 表明天气/资源列表/地图图片都已请求完成(不一定成功) 关闭loading 开始定位
+                //     _self.isShowLoading = false;
+                //     _self.autoGetPositon();
+                // }
+                _self.isShowLoading = false;
+                _self.autoGetPositon();
                 _self.oMap_main.setZoom(zoom); // 解决图片图层加载过程中而弹出景区介绍时 造成停止渲染的问题
                 _self.oMap_main.setMinZoom(zoom);
             });
@@ -1060,11 +1071,12 @@
                 ],
                 region: '', // 景点所属地区
                 indexOfMarkers : 0,
-                isHasWeather: false,
-                isHasPointList: false,
-                isHasMapImage: false,
-                isFirst: true,
-                locateObj: {}
+                // isHasWeather: false,
+                // isHasPointList: false,
+                // isHasMapImage: false,
+                // isFirst: true,
+                locateObj: {},
+                isShowConfirm: true,
             }
         },
         computed: {
@@ -1176,11 +1188,11 @@
                             this.isPlayed_scenic = false;
                         });
                         audioDom.load();
-
-                        if (!this.$route.query.pid) { // 如果不是景点播放扫码 则自动播放景区介绍
-                            this.isOpenDetail = true;
+                        
+                        if (!this.$route.query.pid) { // 如果不是景点播放扫码 则自动播放景区介绍 
                             // 非 iOS直接播放, iOS由于系统限制无法自动播放
                             if (!this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
+                                this.isOpenDetail = true;
                                 console.log('开始景区播放')
                                 audioDom.oncanplay = (e) => {
                                     let _audioDom = e.target;
@@ -1189,7 +1201,12 @@
                                     document.querySelector('.detail-img').classList.remove('d_stop');
                                     document.querySelector('.detail-img').classList.add('d_start');
                                 }
+                            } else {
+                                // 引导点击播放
+                                console.log('引导点击播放')
+
                             }
+
                         } else {
                             this.isOpenDetail = false;
                         }
@@ -1225,11 +1242,11 @@
                     }
                 ]);
                 if (!getListAndWheather) {
-                    this.isHasWeather = true;
-                    if (this.isHasMapImage && this.isHasPointList) {
-                        this.isShowLoading = false;
-                        this.autoGetPositon();
-                    }
+                    // this.isHasWeather = true;
+                    // if (this.isHasMapImage && this.isHasPointList) {
+                    //     this.isShowLoading = false;
+                    //     this.autoGetPositon();
+                    // }
                     if (!this.isTips1) {
                         this.tipsText1 = "请求失败";
                         this.isTips1 = true;
@@ -1276,11 +1293,11 @@
                 // 初始化默认第一个子页面是景点列表页
                 this.SET_ROUTE_NAME('scenic-spot');
 
-                this.isHasWeather = true;
-                if (this.isHasMapImage && this.isHasPointList) {
-                    this.isShowLoading = false;
-                    this.autoGetPositon();
-                }
+                // this.isHasWeather = true;
+                // if (this.isHasMapImage && this.isHasPointList) {
+                //     this.isShowLoading = false;
+                //     this.autoGetPositon();
+                // }
             },
             // 打开图标菜单
             openMenu() {
@@ -1560,11 +1577,11 @@
                 // 根据资源类型获取资源列表
                 const res = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${arg.resourceType}&limit=500`);
                 if(!res || !res.page.list || !res.page.list.length){
-                    this.isHasPointList = true;
-                    if (this.isHasMapImage && this.isHasWeather) {
-                        this.isShowLoading = false;
-                        this.autoGetPositon();
-                    }
+                    // this.isHasPointList = true;
+                    // if (this.isHasMapImage && this.isHasWeather) {
+                    //     this.isShowLoading = false;
+                    //     this.autoGetPositon();
+                    // }
                     if (!this.isTips1) { // 如果当前另一个请求也失败了,则不用重复弹窗
                         this.tipsText1 = "请求失败";
                         this.isTips1 = true;
@@ -1613,7 +1630,7 @@
                             });
                             sessionStorage.setItem('playList',JSON.stringify(newPlayList));
 
-                            // 播放当前扫码景点的解说音频
+                            // 播放当前扫码景点的解说音频 区分ios并做引导
                             wx.ready(() => {
                                 console.log('解说音频');
 
@@ -1740,11 +1757,11 @@
                     } 
                 }
 
-                this.isHasPointList = true;
-                if (this.isHasMapImage && this.isHasWeather) {
-                    this.isShowLoading = false;
-                    this.autoGetPositon();
-                }
+                // this.isHasPointList = true;
+                // if (this.isHasMapImage && this.isHasWeather) {
+                //     this.isShowLoading = false;
+                //     this.autoGetPositon();
+                // }
             },
             //清除点标记
             removeMarker(type) {
@@ -1915,10 +1932,37 @@
                 if (mainAudio && !mainAudio.paused) {
                     this.pauseAudio();
                 }
-                if (!detailAudio) {
-                    alert('bug--还没有音频元素');
+                if (!detailAudio) { // 如果不存在 则去创建并播放 主要解决页面切换后无音频的情况
+                    // alert('bug--还没有音频元素');
+                    const audioContainer = document.querySelector('.introDetail');
+                    let audioDom = document.createElement('audio');
+                    let sourceDom = document.createElement('source');
+                    sourceDom.type = 'audio/mpeg';
+                    sourceDom.src = JSON.parse(sessionStorage.getItem('currentScenic')).explainOssUrl;
+                    audioDom.preload = 'auto';
+                    audioDom.dataset.sid = JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id;
+                    audioDom.appendChild(sourceDom);
+                    audioDom.className = 'detail-audio';
+                    audioDom.style.display = 'none';
+                    audioContainer.appendChild(audioDom);
+
+                    // 为景区音频添加播放完毕的监听事件
+                    audioDom.addEventListener('ended', (e) => {
+                        document.querySelector('.detail-img').classList.remove('d_start');
+                        document.querySelector('.detail-img').classList.add('d_stop');
+                        this.isPlayed_scenic = false;
+                    });
+                    audioDom.load();
+                    audioDom.oncanplay = (e) => {
+                        let _audioDom = e.target;
+                        _audioDom.play();
+                        this.isPlayed_scenic = true;
+                        document.querySelector('.detail-img').classList.remove('d_stop');
+                        document.querySelector('.detail-img').classList.add('d_start');
+                    }
+                } else { // 如果存在 则续播
+                    detailAudio.play();
                 }
-                detailAudio.play();
                 detailImg.classList.add('d_start');
                 detailImg.classList.remove('d_stop');
                 this.isPlayed_scenic = true;
@@ -1934,6 +1978,9 @@
                     detailImg.classList.add('d_stop');
                 }
                 this.isPlayed_scenic = false;
+            },
+            onConfirm() {
+
             }
         }
     }
