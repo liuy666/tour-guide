@@ -65,6 +65,12 @@
                     animation-iteration-count: infinite;
                     //animation-play-state: paused;
                 }
+                .p_start {
+                    animation-play-state: running;
+                }
+                .p_stop {
+                    animation-play-state: paused;
+                }
                 .iwrap {
                     width: 112px;
                     height: 112px;
@@ -580,14 +586,12 @@ export default {
             }
         },
         running () {
+            //document.querySelector(".animateImg").classList.remove("p_stop")
             document.querySelector(".scenicImg").classList.add("animateImg");
         },
         animatePause () {
-            // let siteImg = document.querySelector(".scenicImg").css('transform')  //获取当前元素的动画改变，transform的值
-            // let siteWp = document.querySelector('.audio-area-img').css('transform')
-            // document.querySelector('.audio-area-img').css('transform',siteWp === 'none' ? siteImg : siteImg.concat('',siteWp))  
-            //由于父元素没有动画，所以每次赋值的时候，需要将上次父元素的状态加上
             document.querySelector(".scenicImg").classList.remove('animateImg');
+            //document.querySelector(".animateImg").classList.add("p_stop");
         }
     },
     created() {
