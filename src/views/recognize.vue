@@ -162,7 +162,7 @@ export default {
                     this.isTips1 = true;
                     return;
                 }
-
+                debugger
                 this.isShowLoading = false;
                 let descOrder = res.data.response.identify_results.sort((a, b) => b.probability - a.probability);
                 if (descOrder[0].probability.toFixed(2) > 0.7) {
@@ -172,7 +172,10 @@ export default {
                         this.$router.push({
                             name: 'recognize-detail',
                             params: {
-                                src: descOrder[0].detail_url
+                                //src: descOrder[0].detail_url
+                                name: descOrder[0].name,
+                                img: descOrder[0].reference_url,
+                                desc: descOrder[0].desc
                             }
                         });
                     }, 2000);
