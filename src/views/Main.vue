@@ -853,8 +853,8 @@
                 maxZoom: 19,
                 attributionControl: false,
                 zoomControl: false,
-                //maxBounds : [imgLeftBottom1, imgRightTop1],
-                //maxBoundsViscosity : 0.7,
+                maxBounds : [imgLeftBottom1, imgRightTop1],
+                maxBoundsViscosity : 0.7,
                 closePopupOnClick :false
             });
             

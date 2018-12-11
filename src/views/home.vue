@@ -129,30 +129,37 @@
             //获取屏幕大小 动态设置不同手机的地图zoom
             const containerWidth = document.querySelector('#wrapper_home').clientWidth;
             const containerHeight = document.querySelector('#wrapper_home').clientHeight; 
-            let zoom = 9; //地图缩放
+            let zoom = 10; //地图缩放
             if(containerWidth > 600){
-                zoom = 10;
+                zoom = 11;
             }
             if(containerWidth > 800){
-                zoom = 11;
+                zoom = 12;
             }
             this.bl = parseFloat((containerWidth/375).toFixed(2));
             
             //地图
             let oMap = L.map("wrapper_home", {
                 center: [32.526044, 105.019557],
-                zoom: zoom,
-                minZoom: zoom,
+                zoom: zoom-1,
+                minZoom: zoom-1,
                 maxZoom: 18,
                 attributionControl: false,
                 zoomControl: false,
                 maxBounds : [[31.459197, 104.49496], [33.573508, 105.725429]],
-                maxBoundsViscosity : 0.8
+                maxBoundsViscosity : 0.7
             });
-            let imageUrl = './qcx.jpg',
-            imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
-            L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
             this.oMap_home = oMap;
+
+            let imageUrl = './qcx.jpg',
+                imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
+            let mapImg = L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
+
+            mapImg.on('load',function(){
+                _self.oMap_home.setZoom(zoom); // 解决图片图层加载过程中而弹出景区介绍时 造成停止渲染的问题
+                _self.oMap_home.setMinZoom(zoom);
+            });
+            
             this.getScenicList();
         },
         data () {
