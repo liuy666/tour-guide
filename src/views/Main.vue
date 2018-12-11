@@ -1709,19 +1709,20 @@
                     let marker = L.marker([v.latitude, v.longitude], {icon: myIcon}).addTo(this.oMap_main)
                                     .bindPopup(infoContent,{className:"info-content-new"})
                                     .on('click',(e) => { 
-                                    $this.isShowMenu = false;
-                                    $this.isOpenDetail = false;
+                                        //document.querySelector(".info-scenic-dec").style.lineHeight = 16 * $this.bl + 'px';
+                                        $this.isShowMenu = false;
+                                        $this.isOpenDetail = false;
 
-                                    $this.mapClickPointId = v.resource_id;
-                                    sessionStorage.setItem("mapClickPointId",$this.mapClickPointId);
+                                        $this.mapClickPointId = v.resource_id;
+                                        sessionStorage.setItem("mapClickPointId",$this.mapClickPointId);
 
-                                    let currentPlayBtn = e.target._popup._contentNode.children[0].children[1].children[0];
-                                    if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId == v.resource_id){
-                                        currentPlayBtn.classList.add("playing")
-                                    }else{
-                                        currentPlayBtn.classList.remove("playing")
-                                    }
-                                });
+                                        let currentPlayBtn = e.target._popup._contentNode.children[0].children[1].children[0];
+                                        if(document.querySelector(".main-audio") && !document.querySelector(".main-audio").paused && this.scenicPointId == v.resource_id){
+                                            currentPlayBtn.classList.add("playing")
+                                        }else{
+                                            currentPlayBtn.classList.remove("playing")
+                                        }
+                                    });
                     this.markers.push(marker);
                 }); 
                 
