@@ -162,7 +162,7 @@ export default {
                     this.isTips1 = true;
                     return;
                 }
-                debugger
+
                 this.isShowLoading = false;
                 let descOrder = res.data.response.identify_results.sort((a, b) => b.probability - a.probability);
                 if (descOrder[0].probability.toFixed(2) > 0.7) {
