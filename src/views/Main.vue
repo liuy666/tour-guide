@@ -66,8 +66,28 @@
         }
 
         // confirm 弹窗
-        .vux-confirm {
-            
+        .d_confirm.vux-confirm .weui-dialog {
+            width: 541px;
+            max-width: 541px;
+            .weui-dialog__bd {
+                padding-bottom: 52px;
+                p {
+                    font-size: 36px;
+                    font-weight: bold;
+                    color: #333;
+                    line-height: 60px;
+                }
+            }
+            .weui-dialog__hd {
+                padding: 52px 0 0 0;
+            }
+            .weui-dialog__ft {
+                line-height: 100px;
+                a {
+                    font-size: 36px;
+                    font-weight: 400;
+                }
+            }
         }
 
         // 地图容器
@@ -604,8 +624,8 @@
         <!-- 提示弹窗 -->
         <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
         <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
-        <confirm v-model="isShowConfirm" title=" " @on-confirm="onConfirm" confirm-text="播放" mask-z-index="1002">
-            <p style="text-align:center;">你发现一条景区介绍快来听听吧！</p>
+        <confirm class="d_confirm" v-model="isShowConfirm" title=" " @on-confirm="onConfirm" confirm-text="播放" mask-z-index="1002">
+            <p style="text-align:center;">你发现一条景区介绍<br/>快来听听吧！</p>
         </confirm>
         <!-- 地图容器 -->
         <section id="wrapper"></section>
@@ -1073,7 +1093,7 @@
                 // isHasMapImage: false,
                 // isFirst: true,
                 locateObj: {},
-                isShowConfirm: true,
+                isShowConfirm: false,
             }
         },
         computed: {
@@ -1201,7 +1221,7 @@
                             } else {
                                 // 引导点击播放
                                 console.log('引导点击播放')
-
+                                this.isShowConfirm = true;
                             }
 
                         } else {
@@ -1628,9 +1648,11 @@
                             sessionStorage.setItem('playList',JSON.stringify(newPlayList));
 
                             // 播放当前扫码景点的解说音频 区分ios并做引导
-                            wx.ready(() => {
-                                console.log('解说音频');
-
+                            // wx.ready(() => {
+                                
+                            // });
+                            console.log('解说音频');
+                            if (!this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
                                 //扫码播放景点时设置交互效果 打开对应信息弹窗
                                 //设置id 用于对应信息弹窗的播放跳动  
                                 this.mapClickPointId = arg.query.pid;
@@ -1645,7 +1667,10 @@
                                     _id: QRCODE_CURRENT_POINT.resource_id,
                                     type: 2
                                 });
-                            });
+                            } else {
+                                //弹框提示播放
+                                
+                            }    
                         } else { // 否则默认取第一个景点
                             sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
                             this.scenicPointImg = res.page.list[0].url;
@@ -1977,7 +2002,12 @@
                 this.isPlayed_scenic = false;
             },
             onConfirm() {
-
+                console.log('开始景区播放')
+                this.isOpenDetail = true;
+                document.querySelector('.detail-audio').play();
+                this.isPlayed_scenic = true;
+                document.querySelector('.detail-img').classList.remove('d_stop');
+                document.querySelector('.detail-img').classList.add('d_start');
             }
         }
     }
