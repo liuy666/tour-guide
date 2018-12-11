@@ -172,7 +172,10 @@ export default {
                         this.$router.push({
                             name: 'recognize-detail',
                             params: {
-                                src: descOrder[0].detail_url
+                                //src: descOrder[0].detail_url
+                                name: descOrder[0].name,
+                                img: descOrder[0].reference_url,
+                                desc: descOrder[0].desc
                             }
                         });
                     }, 2000);
