@@ -509,7 +509,7 @@ export default {
             this.isShowLoading = true;
             let _self = this;
             this.imageList = [];
-            const imgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/getSowingPictures/'+ _self.currentPointId);
+            const imgList = await this.$http.get(this.$base + '/app/resource/getSowingPictures/'+ _self.currentPointId);
             if(!imgList){
                 this.isShowLoading = false;
                 this.isTips = true;

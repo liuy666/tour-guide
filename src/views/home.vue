@@ -97,7 +97,7 @@
             Toast
         },
         async created() {
-            const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
+            const getMsgList = await this.$http.get(this.$base + '/app/hqarticle/list', {
                 domainUrl: 'www.qxgz.com', // window.location.hostname
                 limit: 500
             });
@@ -178,7 +178,7 @@
         methods: {
             async getScenicList () {
                 let _self = this;
-                const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
+                const scenicList = await this.$http.get(this.$base + '/app/scenery/list', {
                     domainUrl: 'www.qxgz.com' // window.location.hostname
                 });
                 if(!scenicList){

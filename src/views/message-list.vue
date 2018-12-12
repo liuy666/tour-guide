@@ -10,14 +10,17 @@
                 overflow: hidden;
                 li {
                     overflow: hidden;
+                    padding-bottom: 10px;
                     .msg-date {
                         width: 168px;
                         height: 36px;
                         background-color: #dbdbdb;
                         border-radius: 18px;
-                        font-size: 20px;
+                        font-size: 24px;
                         font-weight: 400;
                         line-height: 36px;
+                        box-sizing: border-box;
+                        padding-top: 3px;
                         color: #fff;
                         margin: 22px auto;
                         text-align: center;
@@ -27,9 +30,12 @@
                         overflow: hidden;
                         width: 690px;
                         margin: 0 auto;
+                        background-color: #fff;
+                        box-shadow:0px 0px 10px 0px rgba(0, 0, 0, 0.24);
                         dt {
                             width: 690px;
                             height: 310px;
+                            margin-bottom: 30px;
                             img {
                                 width: 100%;
                                 height: 100%;
@@ -37,14 +43,17 @@
                         }
                         dd {
                             overflow: hidden;
-                            background-color: #fff;
                             h2 {
                                 
-                                font-size: 30px;
+                                font-size: 32px;
                                 font-weight: 500;
                                 line-height: 70px;
                                 margin-bottom: 8px;
-                                padding-left: 20px;
+                                padding: 0 20px;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                                box-sizing: border-box;
+                                overflow: hidden;
                             }
                             section {
                                 overflow: hidden;
@@ -55,7 +64,7 @@
                                     overflow: hidden;
                                     span {
                                         float: left;
-                                        font-size: 24px;
+                                        font-size: 28px;
                                         font-weight:400;
                                         color: #888;
                                         &:nth-child(1) {
@@ -65,7 +74,7 @@
                                 }
                                 a {
                                     float: right;
-                                    font-size: 24px;
+                                    font-size: 28px;
                                     color: #FE5100;
                                     font-weight: 400;
                                     padding-right: 23px;
@@ -216,7 +225,7 @@ export default {
     },
     async created() {
         this.isShowLoading = true;
-        const getMsgList = await this.$http.get(this.$base + '/hqyatu-navigator/app/hqarticle/list', {
+        const getMsgList = await this.$http.get(this.$base + '/app/hqarticle/list', {
             domainUrl: 'www.qxgz.com', // 上线改成获取域名
             limit: 500
         });

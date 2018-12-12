@@ -138,7 +138,7 @@ const app = {
         async getLineList({ commit }, { _this, sceneryId }) {
             _this.isShowLoading = true;
             console.log(vm)
-            const lineList = await vm.$http.get(vm.$base + '/hqyatu-navigator/app/line/getLineList', {
+            const lineList = await vm.$http.get(vm.$base + '/app/line/getLineList', {
                 sceneryId
             });
             console.log(lineList);

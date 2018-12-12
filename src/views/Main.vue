@@ -820,7 +820,7 @@
             const query = this.$route.query;
             // 只有扫码直接进入时会发起请求,从其他页回退的情况不再请求
             if (query.sid && this.$store.state.app.fromRouteName == 'root') {
-                const scenicList = await this.$http.get(this.$base + '/hqyatu-navigator/app/scenery/list', {
+                const scenicList = await this.$http.get(this.$base + '/app/scenery/list', {
                     domainUrl: 'www.qxgz.com' // window.location.hostname
                 });
 
@@ -1451,14 +1451,14 @@
                 const getListAndWheather = await this.$http.all([
                     {
                         type: 'get',
-                        url: this.$base + '/hqyatu-navigator/app/resource/getSelectMenue',
+                        url: this.$base + '/app/resource/getSelectMenue',
                         urlParams: {
                             sceneryId: this.sceneryId
                         }
                     },
                     {
                         type: 'get',
-                        url: this.$base + '/hqyatu-navigator/app/weather/getWeatherData',
+                        url: this.$base + '/app/weather/getWeatherData',
                         urlParams: {
                             longitude: currentScenic.longitude,
                             latitude: currentScenic.latitude
@@ -1803,7 +1803,7 @@
                 this.markers = [];
 
                 // 根据资源类型获取资源列表
-                const res = await this.$http.get(this.$base + `/hqyatu-navigator/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${arg.resourceType}&limit=500`);
+                const res = await this.$http.get(this.$base + `/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${arg.resourceType}&limit=500`);
                 if(!res || !res.page.list || !res.page.list.length){
                     // this.isHasPointList = true;
                     // if (this.isHasMapImage && this.isHasWeather) {

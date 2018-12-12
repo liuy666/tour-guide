@@ -301,7 +301,7 @@ export default {
                 this.isShowLoading2 = true;
                 const formData = new FormData();
                 formData.append('file', file);
-                const res = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/upload', formData, 'multipart/form-data');
+                const res = await this.$http.post(this.$base + '/app/oss/upload', formData, 'multipart/form-data');
                 if (!res.status) {
                     this.isShowLoading2 = false;
                     this.tipsText1 = '上传失败';
@@ -334,7 +334,7 @@ export default {
                         this.isShowLoading = true;
                         // 获取当前事件源的图片id
                         const _ID = parentNode.dataset.imgId;
-                        const del = await this.$http.post(this.$base + '/hqyatu-navigator/app/oss/delete', [_ID]);
+                        const del = await this.$http.post(this.$base + '/app/oss/delete', [_ID]);
                         console.log(del);
                         if (!del.status) {
                             this.isShowLoading = false;
@@ -454,7 +454,7 @@ export default {
                     sceneryId: this.sId,
                     ...imgList
                 }
-                const submitFeedback = await this.$http.post(this.$base + '/hqyatu-navigator/app/sys/saveSuggestion', bodyParams);
+                const submitFeedback = await this.$http.post(this.$base + '/app/sys/saveSuggestion', bodyParams);
                 console.log(submitFeedback)
                 if (!submitFeedback.status) {
                     this.isShowLoading = false;

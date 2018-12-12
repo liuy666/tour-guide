@@ -211,7 +211,7 @@ export default {
         },
         async searchInput() {
             this.isShowLoading = true;
-            const result = await this.$http.get(this.$base + '/hqyatu-navigator/app/resource/list', {
+            const result = await this.$http.get(this.$base + '/app/resource/list', {
                 sceneryId: this.sceneryId,
                 resourceType: 1,
                 name: this.text

@@ -52,7 +52,7 @@
             border-radius: 20px;
             width: 690px;
             height: 866px;
-            margin: 31px auto 78px;
+            margin: 31px auto 58px;
         }
         .camera-wraper {
             display: flex;
@@ -154,7 +154,7 @@ export default {
             if (imgType === 'image/png' || imgType === 'image/jpeg') {
                 const formData = new FormData();
                 formData.append('image_file', file);
-                const res = await this.$http.post(this.$base + '/hqyatu-navigator/app/img/recognition', formData, 'multipart/form-data');
+                const res = await this.$http.post(this.$base + '/app/img/recognition', formData, 'multipart/form-data');
                 if (!res.status) {
                     this.isShowLoading = false;
                     changeEvent.target.value = '';

@@ -28,7 +28,7 @@ Vue.prototype.$QS = QS;
 Vue.prototype.$tool = utils;
 Vue.prototype.$http = https;
 // Vue.prototype.$lodash = lodash;
-Vue.prototype.$base = process.env.NODE_ENV === "production" ? '' : '/api';
+Vue.prototype.$base = process.env.NODE_ENV === "production" ? '/qcx-navigator' : '/api/qcx-navigator';
 const VueTouch = require('vue-touch');
 Vue.use(VueTouch, { name: 'v-touch' })
 
@@ -45,7 +45,7 @@ const vm = new Vue({
 
         // 注入wx config
         if (!Cookies.get('ticket')) {
-            const GET_JS_SDK = await this.$http.get(this.$base + '/hqyatu-navigator/app/getWxAccessToken');
+            const GET_JS_SDK = await this.$http.get(this.$base + '/app/getWxAccessToken');
             if (!GET_JS_SDK) {
                 alert('获取jsapi_ticket失败！');
             }
@@ -76,7 +76,7 @@ const vm = new Vue({
                 title: '青川智能语音导游', // 分享标题
                 desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！', // 分享描述
                 link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: 'https://www.rtzhisheng.com/hqyatu-navigator/img/50x50.png', // 分享图标
+                imgUrl: 'https://www.rtzhisheng.com/qcx-navigator/img/50x50.png', // 分享图标
                 success: function () {
                     console.log('分享到QQ或朋友设置成功')
                 },
@@ -87,7 +87,7 @@ const vm = new Vue({
             wx.updateTimelineShareData({ 
                 title: '青川智能语音导游', // 分享标题
                 link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: 'https://www.rtzhisheng.com/hqyatu-navigator/img/50x50.png', // 分享图标
+                imgUrl: 'https://www.rtzhisheng.com/qcx-navigator/img/50x50.png', // 分享图标
                 success: function () {
                     console.log('分享到QQ空间或朋友圈设置成功')
                 },
