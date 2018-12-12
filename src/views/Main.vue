@@ -1839,7 +1839,7 @@
                         sessionStorage.removeItem('lineId');
                         sessionStorage.removeItem('otherPointList');
 
-                        if (arg.query && arg.query.pid) { // 如果通过二维码扫码进入页面则使用指定景点
+                        if (arg.query && arg.query.pid && fromRouteName === 'root') { // 如果通过二维码扫码进入页面则使用指定景点
                             const QRCODE_CURRENT_POINT = res.page.list.filter(item => item.resource_id === arg.query.pid)[0];
 
                             // 存储当前扫码景点的信息
@@ -1858,32 +1858,34 @@
                             });
                             sessionStorage.setItem('playList',JSON.stringify(newPlayList));
 
-                            // 播放当前扫码景点的解说音频 区分ios并做引导
-                            // wx.ready(() => {
-                                
-                            // });
-                            console.log('解说音频');
-                            this.pid = arg.query.pid;
-                            this.src = QRCODE_CURRENT_POINT.guideUrl;
-                            if (!this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
-                                //扫码播放景点时设置交互效果 打开对应信息弹窗
-                                //设置id 用于对应信息弹窗的播放跳动  
-                                this.mapClickPointId = arg.query.pid;
-                                sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
+                            // 播放当前扫码景点的解说音频 针对ios做弹窗引导
+                            if (!sessionStorage.getItem('hasPlayQrCode')) {
+                                console.log('解说音频');
+                                this.pid = arg.query.pid;
+                                this.src = QRCODE_CURRENT_POINT.guideUrl;
+                                if (!this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
+                                    //扫码播放景点时设置交互效果 打开对应信息弹窗
+                                    //设置id 用于对应信息弹窗的播放跳动  
+                                    this.mapClickPointId = arg.query.pid;
+                                    sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
 
-                                //打开扫码景点对应的信息弹窗
-                                this.getMarkerIndex(arg.query.pid);
-                                this.markers[this.indexOfMarkers].openPopup();
+                                    //打开扫码景点对应的信息弹窗
+                                    this.getMarkerIndex(arg.query.pid);
+                                    this.markers[this.indexOfMarkers].openPopup();
 
-                                this.playAudio({
-                                    _src: QRCODE_CURRENT_POINT.guideUrl,
-                                    _id: QRCODE_CURRENT_POINT.resource_id,
-                                    type: 2
-                                });
-                            } else {
-                                //弹框提示播放
-                                this.isShowConfirm2 = true;
-                            }    
+                                    this.playAudio({
+                                        _src: QRCODE_CURRENT_POINT.guideUrl,
+                                        _id: QRCODE_CURRENT_POINT.resource_id,
+                                        type: 2
+                                    });
+                                } else {
+                                    //弹框提示播放
+                                    this.isShowConfirm2 = true;
+                                }
+
+                                // 只有第一次扫码会去自动播放或弹窗播放 刷新后则不再播放
+                                sessionStorage.setItem('hasPlayQrCode', true);
+                            }  
                         } else { // 否则默认取第一个景点
                             sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
                             this.scenicPointImg = res.page.list[0].url;
