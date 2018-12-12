@@ -1834,10 +1834,10 @@
                         console.log('init');
 
                         // 移除部分其他资源页的类型/路线列表/路线id/其他资源列表
-                        sessionStorage.removeItem('currentResource');
-                        sessionStorage.removeItem('lineList');
-                        sessionStorage.removeItem('lineId');
-                        sessionStorage.removeItem('otherPointList');
+                        // sessionStorage.removeItem('currentResource'); // 改为后面处理
+                        // sessionStorage.removeItem('lineList'); // 改为复现路线
+                        // sessionStorage.removeItem('lineId'); // 改为复现路线
+                        // sessionStorage.removeItem('otherPointList'); // 改为后面处理
 
                         if (arg.query && arg.query.pid && fromRouteName === 'root') { // 如果通过二维码扫码进入页面则使用指定景点
                             const QRCODE_CURRENT_POINT = res.page.list.filter(item => item.resource_id === arg.query.pid)[0];
@@ -1880,7 +1880,9 @@
                                     });
                                 } else {
                                     //弹框提示播放
-                                    this.isShowConfirm2 = true;
+                                    this.$nextTick(() => {
+                                        this.isShowConfirm2 = true;
+                                    });
                                 }
 
                                 // 只有第一次扫码会去自动播放或弹窗播放 刷新后则不再播放
@@ -1938,19 +1940,16 @@
                     this.markers.push(marker);
                 }); 
                 
-                //扫码播放景点时设置交互效果 打开对应信息弹窗 -- 备注：这部分已经移到上面那个相同的判断中
-                // if (arg.query && arg.query.pid) {
-                    
-                // }     
+                // 处理回退的情况
+                if (fromRouteName === 'scenic-point-detail' || fromRouteName === 'feedback' || fromRouteName === 'recognize') {
 
-                // 如果是从景点详情页回退的情况
-                if (fromRouteName === 'scenic-point-detail') {
-
-                    // 重新渲染当前景点信息
-                    let currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
-                    this.scenicPointImg = currentPoint.url;
-                    this.scenicPointName = currentPoint.name;
-                    this.scenicPointId = currentPoint.resource_id;
+                    if (fromRouteName === 'scenic-point-detail') { // 如果是从景点详情页回退的情况
+                        // 重新渲染当前景点信息
+                        let currentPoint = JSON.parse(sessionStorage.getItem('currentPoint'));
+                        this.scenicPointImg = currentPoint.url;
+                        this.scenicPointName = currentPoint.name;
+                        this.scenicPointId = currentPoint.resource_id;
+                    }
 
                     // 重新渲染当前播放状态 解决回退后音频可视状态未同步的问题
                     let currAu = document.querySelector('.main-audio');
@@ -1970,7 +1969,7 @@
                                 this.changeMapIcon(false);
                             }
                         }
-                    }else{ // 音频不在
+                    } else { // 音频不在
                         this.isPlayed = false;
                         document.querySelector('.pointImg').classList.remove('p_start');
                         document.querySelector('.pointImg').classList.add('p_stop');
@@ -1989,7 +1988,7 @@
                         sessionStorage.removeItem('currentResource');
                         sessionStorage.removeItem('otherPointList');
                     }
-                } else{ // 如果不是从景点详情页回退 则视情况更换icon图标
+                } else { // 其他情况回退 则视情况更换icon图标
                     if(this.resourceType < 3) { // 只有景点或路线才需要更换icon图标
                         this.changeMapIcon(this.isPlayed);
                     } 
