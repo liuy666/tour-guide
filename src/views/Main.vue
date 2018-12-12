@@ -778,6 +778,7 @@
         },
         async mounted() {
             console.log('mounted');
+            let _self = this;
             let scenicInfo = null;
 
             // 扫码进入页面,先获取该域名下的景区列表,并根据获取的景区sid获取景区详情
@@ -845,165 +846,7 @@
                 zoom = mapZoom + 1;
             } 
             
-            // 实例化地图
-            let oMap = L.map("wrapper", {
-                center: centerPoint,
-                zoom: zoom-1,
-                minZoom: zoom-1,
-                maxZoom: 19,
-                attributionControl: false,
-                zoomControl: false,
-                maxBounds : [imgLeftBottom1, imgRightTop1],
-                maxBoundsViscosity : 0.7,
-                closePopupOnClick :false
-            });
-            
-            let _self = this;
-
-            // 添加自定义地图图层
-            let mapImg = L.imageOverlay(scenicBgImg, [imgLeftBottom1,imgRightTop1]).addTo(oMap);
-
-            // 给图层添加load事件
-            mapImg.on('load',function(){
-                // _self.isHasMapImage = true;
-                // if (_self.isHasPointList && _self.isHasWeather) { // 表明天气/资源列表/地图图片都已请求完成(不一定成功) 关闭loading 开始定位
-                //     _self.isShowLoading = false;
-                //     _self.autoGetPositon();
-                // }
-                _self.isShowLoading = false;
-                _self.autoGetPositon();
-                _self.oMap_main.setZoom(zoom); // 解决图片图层加载过程中而弹出景区介绍时 造成停止渲染的问题
-                _self.oMap_main.setMinZoom(zoom);
-            });
-
-            this.oMap_main = oMap;
-
-            // 给地图添加click事件
-            this.oMap_main.on('click',function(e) {
-                _self.pauseAudio_scenic();
-
-                // 如果点击地图时 当前路由是景点/路线其他资源点则会退到main页
-                if (_self.$route.name === 'scenic-spot' || _self.$route.name === 'scenic-line' || _self.$route.name === 'scenic-resource') {
-                    _self.$router.replace({
-                        name: 'main'
-                    });
-                }
-                _self.oMap_main.closePopup();
-                _self.isShowMenu = false;
-                _self.isOpenDetail = false;
-            });
-
-            // 给地图添加定位失败和成功的回调处理
-            this.oMap_main.on('locationfound', function(e) {
-                _self.isPositioning = false;
-                
-                //如果是扫描播放
-                if(_self.$route.query && _self.$route.query.pid){
-                    return;
-                }
-                let radius = e.accuracy / 2,
-                    cp = e.latlng;
-
-                if(cp.lat >= imgLeftBottom1[0] && cp.lat <= imgRightTop1[0] && cp.lng >= imgLeftBottom1[1] && cp.lng <= imgRightTop1[1]) {
-                    
-                    //设置定位点为地图显示中心点 并在地图上添加对应标记
-                    if(JSON.stringify(_self.locationPoint) != '{}'){
-                        _self.locationPoint.remove();
-                    }
-                    _self.oMap_main.setView([cp.lat,cp.lng]);
-                    let myIcon = L.divIcon({
-                        html: `<div class="icon"></div>`,
-                        className: 'my-position'
-                    });
-                    _self.locationPoint = L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
-
-                    //如果自动播放并且当时地图显示的是所有的景点
-                    if(_self.isAuto && _self.resourceType < 3){
-                        _self.markers.forEach((v,i) => {
-                            let latlng = L.latlng(v._latlng.lat,v._latlng.lng);
-                            if(cp.distanceTo(latlng) < 20){
-
-                                const pointList = JSON.parse(sessionStorage.getItem("pointList"));
-                                const point_dw = pointList.filter(item => item.resource_id === v._icon.children[0].dataset.id)[0];
-                                let newPlayList = [];
-                                alert("当前景点：" + point_dw.name);
-                                if(_self.scenicPointId != point_dw.resource_id){
-                                    //更新播放列表
-                                    //如果不存在路线 播放列表为完整景点中 包含当前定位点之后的景点们
-                                    //如果存在路线  1.当前定位点在路线中 播放列表为路线中包含当前定位点之后的景点们  
-                                    //             2.当前定位点不在路线中 播放列表为当前定位点+完整的路线景点
-                                    const currLineId = sessionStorage.getItem('lineId');
-                                    const lineList = JSON.parse(sessionStorage.getItem('lineList'));
-                                    let currentLineList =  lineList.filter(item => item.lineId === currLineId)[0].lineDetailList;
-                                    let pidList = currentLineList.map(item => item.resourceId);
-
-                                    if(!currLineId){//不存在路线
-                                        const index_dw = pointList.findIndex(item => item.resource_id === v._icon.children[0].dataset.id);
-                                        newPlayList = pointList.slice(index_dw).map(item => {
-                                            return {
-                                                aSrc : item.guideUrl,
-                                                aId : item.resource_id
-                                            }
-                                        })
-                                    }else if(_self.$tool.isExist(point_dw.resource_id, pidList)){//存在路线 且当前定位点在路线中
-                                        const index_dw_line = pidList.findIndex(item => item === point_dw.resource_id);
-                                        newPlayList = currentLineList.slice(index_dw_line).map(item => {
-                                            return {
-                                                aSrc : item.guideUrl,
-                                                aId : item.resourceId
-                                            }
-                                        })
-                                    }else{
-                                        let linePlayList = currentLineList.map(item => {
-                                            return {
-                                                aSrc : item.guideUrl,
-                                                aId : item.resourceId
-                                            }
-                                        })
-                                        newPlayList = [{aSrc : point_dw.guideUrl,aId : point_dw.resource_id}].concat(linePlayList);
-                                    }
-                                    sessionStorage.setItem("playList",JSON.stringify(newPlayList));
-
-                                    //如果景区音频正在播放 暂停掉
-                                    let detailAudio = document.querySelector(".detail-Audio");
-                                    if(detailAudio && !detailAudio.paused) {
-                                        _self.pauseAudio_scenic();
-                                    }
-                                    //播放当前定位点的音频
-                                    _self.playAudio({
-                                        type : 2,
-                                        _src : point_dw.guideUrl,
-                                        _id : point_dw.resource_id
-                                    })
-                                    _self.scenicPointImg = point_dw.url;
-                                    _self.scenicPointName = point_dw.name;
-                                    _self.scenicPointId = point_dw.resource_id;
-                                    sessionStorage.setItem("currentPoint",JSON.stringify(point_dw));
-                                    sessionStorage.setItem("mapClickPointId",point_dw.resource_id);
-                                }
-                            }
-                        })
-                    }
-                }else{
-                    _self.count += 1;
-                    if(_self.count <= 1){
-                        _self.tipsText3 = "您当前不在景区内";
-                        _self.isTips3 = true;
-                        _self.oMap_main.stopLocate();
-                    }
-                }
-            });
-            this.oMap_main.on('locationerror', function(e) {
-                _self.count += 1;
-                if(_self.count <= 1){
-                    _self.tipsText3 = "定位失败，请确保手机已开启定位";
-                    _self.isTips3 = true;
-                    _self.isPositioning = false;
-                    _self.oMap_main.stopLocate();
-                }
-            });
-
-
+            //高德定位
             let map_test = new AMap.Map('map_test', {
                 showBuildingBlock: true,
                 pitchEnable: false,
@@ -1148,7 +991,160 @@
                 })
             });
 
+            // 实例化地图
+            let oMap = L.map("wrapper", {
+                center: centerPoint,
+                zoom: zoom-1,
+                minZoom: zoom-1,
+                maxZoom: 19,
+                attributionControl: false,
+                zoomControl: false,
+                maxBounds : [imgLeftBottom1, imgRightTop1],
+                maxBoundsViscosity : 0.7,
+                closePopupOnClick :false
+            });
+            this.oMap_main = oMap;
+            
 
+            // 添加自定义地图图层
+            let mapImg = L.imageOverlay(scenicBgImg, [imgLeftBottom1,imgRightTop1]).addTo(oMap);
+
+            // 给图层添加load事件
+            mapImg.on('load',function(){
+                // _self.isHasMapImage = true;
+                // if (_self.isHasPointList && _self.isHasWeather) { // 表明天气/资源列表/地图图片都已请求完成(不一定成功) 关闭loading 开始定位
+                //     _self.isShowLoading = false;
+                //     _self.autoGetPositon();
+                // }
+                _self.isShowLoading = false;
+                _self.autoGetPositon();
+                _self.oMap_main.setZoom(zoom); // 解决图片图层加载过程中而弹出景区介绍时 造成停止渲染的问题
+                _self.oMap_main.setMinZoom(zoom);
+            });
+            // 给地图添加click事件
+            this.oMap_main.on('click',function(e) {
+                _self.pauseAudio_scenic();
+
+                // 如果点击地图时 当前路由是景点/路线其他资源点则会退到main页
+                if (_self.$route.name === 'scenic-spot' || _self.$route.name === 'scenic-line' || _self.$route.name === 'scenic-resource') {
+                    _self.$router.replace({
+                        name: 'main'
+                    });
+                }
+                _self.oMap_main.closePopup();
+                _self.isShowMenu = false;
+                _self.isOpenDetail = false;
+            });
+
+            // 给地图添加定位失败和成功的回调处理
+            this.oMap_main.on('locationfound', function(e) {
+                _self.isPositioning = false;
+                
+                //如果是扫描播放
+                if(_self.$route.query && _self.$route.query.pid){
+                    return;
+                }
+                let radius = e.accuracy / 2,
+                    cp = e.latlng;
+
+                if(cp.lat >= imgLeftBottom1[0] && cp.lat <= imgRightTop1[0] && cp.lng >= imgLeftBottom1[1] && cp.lng <= imgRightTop1[1]) {
+                    
+                    //设置定位点为地图显示中心点 并在地图上添加对应标记
+                    if(JSON.stringify(_self.locationPoint) != '{}'){
+                        _self.locationPoint.remove();
+                    }
+                    _self.oMap_main.setView([cp.lat,cp.lng]);
+                    let myIcon = L.divIcon({
+                        html: `<div class="icon"></div>`,
+                        className: 'my-position'
+                    });
+                    _self.locationPoint = L.marker([cp.lat,cp.lng],{icon:myIcon}).addTo(_self.oMap_main);
+
+                    //如果自动播放并且当时地图显示的是所有的景点
+                    if(_self.isAuto && _self.resourceType < 3){
+                        _self.markers.forEach((v,i) => {
+                            let latlng = L.latlng(v._latlng.lat,v._latlng.lng);
+                            if(cp.distanceTo(latlng) < 20){
+
+                                const pointList = JSON.parse(sessionStorage.getItem("pointList"));
+                                const point_dw = pointList.filter(item => item.resource_id === v._icon.children[0].dataset.id)[0];
+                                let newPlayList = [];
+                                alert("当前景点：" + point_dw.name);
+                                if(_self.scenicPointId != point_dw.resource_id){
+                                    //更新播放列表
+                                    //如果不存在路线 播放列表为完整景点中 包含当前定位点之后的景点们
+                                    //如果存在路线  1.当前定位点在路线中 播放列表为路线中包含当前定位点之后的景点们  
+                                    //             2.当前定位点不在路线中 播放列表为当前定位点+完整的路线景点
+                                    const currLineId = sessionStorage.getItem('lineId');
+                                    const lineList = JSON.parse(sessionStorage.getItem('lineList'));
+                                    let currentLineList =  lineList.filter(item => item.lineId === currLineId)[0].lineDetailList;
+                                    let pidList = currentLineList.map(item => item.resourceId);
+
+                                    if(!currLineId){//不存在路线
+                                        const index_dw = pointList.findIndex(item => item.resource_id === v._icon.children[0].dataset.id);
+                                        newPlayList = pointList.slice(index_dw).map(item => {
+                                            return {
+                                                aSrc : item.guideUrl,
+                                                aId : item.resource_id
+                                            }
+                                        })
+                                    }else if(_self.$tool.isExist(point_dw.resource_id, pidList)){//存在路线 且当前定位点在路线中
+                                        const index_dw_line = pidList.findIndex(item => item === point_dw.resource_id);
+                                        newPlayList = currentLineList.slice(index_dw_line).map(item => {
+                                            return {
+                                                aSrc : item.guideUrl,
+                                                aId : item.resourceId
+                                            }
+                                        })
+                                    }else{
+                                        let linePlayList = currentLineList.map(item => {
+                                            return {
+                                                aSrc : item.guideUrl,
+                                                aId : item.resourceId
+                                            }
+                                        })
+                                        newPlayList = [{aSrc : point_dw.guideUrl,aId : point_dw.resource_id}].concat(linePlayList);
+                                    }
+                                    sessionStorage.setItem("playList",JSON.stringify(newPlayList));
+
+                                    //如果景区音频正在播放 暂停掉
+                                    let detailAudio = document.querySelector(".detail-Audio");
+                                    if(detailAudio && !detailAudio.paused) {
+                                        _self.pauseAudio_scenic();
+                                    }
+                                    //播放当前定位点的音频
+                                    _self.playAudio({
+                                        type : 2,
+                                        _src : point_dw.guideUrl,
+                                        _id : point_dw.resource_id
+                                    })
+                                    _self.scenicPointImg = point_dw.url;
+                                    _self.scenicPointName = point_dw.name;
+                                    _self.scenicPointId = point_dw.resource_id;
+                                    sessionStorage.setItem("currentPoint",JSON.stringify(point_dw));
+                                    sessionStorage.setItem("mapClickPointId",point_dw.resource_id);
+                                }
+                            }
+                        })
+                    }
+                }else{
+                    _self.count += 1;
+                    if(_self.count <= 1){
+                        _self.tipsText3 = "您当前不在景区内";
+                        _self.isTips3 = true;
+                        _self.oMap_main.stopLocate();
+                    }
+                }
+            });
+            this.oMap_main.on('locationerror', function(e) {
+                _self.count += 1;
+                if(_self.count <= 1){
+                    _self.tipsText3 = "定位失败，请确保手机已开启定位";
+                    _self.isTips3 = true;
+                    _self.isPositioning = false;
+                    _self.oMap_main.stopLocate();
+                }
+            });
 
             // 获取默认景点列表 异步方法
             this.getScenicPointList({
