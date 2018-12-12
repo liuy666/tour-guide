@@ -67,10 +67,11 @@
 
         // confirm 弹窗
         .d_confirm.vux-confirm .weui-dialog {
+            border-radius: 20px;
             width: 541px;
             max-width: 541px;
             .weui-dialog__bd {
-                padding-bottom: 52px;
+                padding-bottom: 40px;
                 p {
                     font-size: 36px;
                     font-weight: bold;
@@ -79,10 +80,41 @@
                 }
             }
             .weui-dialog__hd {
-                padding: 52px 0 0 0;
+                padding-top: 36px;
             }
             .weui-dialog__ft {
-                line-height: 100px;
+                line-height: 80px;
+                a {
+                    font-size: 36px;
+                    font-weight: 400;
+                }
+            }
+        }
+
+        .p_confirm.vux-confirm .weui-dialog {
+            border-radius: 20px;
+            width: 541px;
+            max-width: 541px;
+            .weui-dialog__hd {
+                padding-top: 32px;
+                .weui-dialog__title {
+                    font-size: 36px;
+                    font-weight: bold;
+                    color: #333;
+                }
+            }
+            .weui-dialog__bd {
+                padding-bottom: 32px;
+                p {
+                    font-size: 28px;
+                    color: #333;
+                    font-weight: 400;
+                    line-height: 40px;
+                }
+                
+            }
+            .weui-dialog__ft {
+                line-height: 80px;
                 a {
                     font-size: 36px;
                     font-weight: 400;
@@ -630,7 +662,10 @@
         <toast class="short" v-model="isTips1" type="cancel" :text="tipsText1" :is-show-mask="true"></toast>
         <toast class="long" v-model="isTips3" type="text" :text="tipsText3" :is-show-mask="true"></toast>
         <confirm class="d_confirm" v-model="isShowConfirm" title=" " @on-confirm="onConfirm" confirm-text="播放" mask-z-index="1002">
-            <p style="text-align:center;">你发现一条景区介绍<br/>快来听听吧！</p>
+            <p style="text-align:center;">您发现一条景区介绍<br/>快来听听吧！</p>
+        </confirm>
+        <confirm class="p_confirm" v-model="isShowConfirm2" title="是否播放当前景点" @on-confirm="onConfirm2" confirm-text="播放" mask-z-index="1002">
+            <p style="text-align:center;">通过二维码识别到当前景点<br/>快来听听吧！</p>
         </confirm>
         <!-- 地图容器 -->
         <section id="wrapper"></section>
@@ -1255,6 +1290,9 @@
                 // isFirst: true,
                 locateObj: {},
                 isShowConfirm: false,
+                isShowConfirm2: false,
+                pid: '',
+                src: ''
             }
         },
         computed: {
@@ -1599,7 +1637,11 @@
                 'CLEAR_CURRENT_INTERVAL', // 清除当前定时器
                 'START_NEW_INTERVAL', // 开始新的定时器
                 'NOTICE_STOP', // 通知是否结束播放
-                'NOTICE_AUTO_PLAY' // 通知是否开始连播
+                'NOTICE_AUTO_PLAY', // 通知是否开始连播
+                'NOTICE_STOP',
+                'NOTICE_AUTO_PLAY',
+                'SET_HAS_GET_TOTAL',
+                'START_PLAY'
             ]),
             /**
              * 初始化音频播放
@@ -1825,6 +1867,8 @@
                                 
                             // });
                             console.log('解说音频');
+                            this.pid = arg.query.pid;
+                            this.src = QRCODE_CURRENT_POINT.guideUrl;
                             if (!this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
                                 //扫码播放景点时设置交互效果 打开对应信息弹窗
                                 //设置id 用于对应信息弹窗的播放跳动  
@@ -1842,7 +1886,7 @@
                                 });
                             } else {
                                 //弹框提示播放
-                                
+                                this.isShowConfirm2 = true;
                             }    
                         } else { // 否则默认取第一个景点
                             sessionStorage.setItem("currentPoint",JSON.stringify(res.page.list[0]));
@@ -2182,6 +2226,69 @@
                 this.isPlayed_scenic = true;
                 document.querySelector('.detail-img').classList.remove('d_stop');
                 document.querySelector('.detail-img').classList.add('d_start');
+            },
+            onConfirm2() {
+                console.log('开始景点播放')
+                //扫码播放景点时设置交互效果 打开对应信息弹窗
+                //设置id 用于对应信息弹窗的播放跳动  
+                this.mapClickPointId = this.pid;
+                sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
+
+                //打开扫码景点对应的信息弹窗
+                this.getMarkerIndex(this.pid);
+                this.markers[this.indexOfMarkers].openPopup();
+
+                if (document.querySelector('.detail-audio') && !document.querySelector('.detail-audio').paused) {
+                    this.pauseAudio_scenic();
+                }
+
+                // const mainAudio = document.querySelector('.main-audio');
+                const audioContainer = document.querySelector('#app');
+                // if (mainAudio) { // 当前正在播放时 切换了音频
+                //     clearInterval(this.timer);
+                //     if (!mainAudio.paused) {
+                //         mainAudio.pause();
+                //     }
+                //     audioContainer.removeChild(mainAudio);
+                //     this.audioPercent = 0;
+                //     this.SET_PERCENT(0);
+                //     this.timer = '';
+                // }
+                let audioDom = document.createElement('audio');
+                let sourceDom = document.createElement('source');
+                sourceDom.type = 'audio/mpeg';
+                sourceDom.src = this.src;
+                audioDom.preload = 'auto';
+                audioDom.dataset.id = this.pid;
+                audioDom.appendChild(sourceDom);
+                audioDom.className = 'main-audio';
+                audioDom.style.display = 'none';
+                audioContainer.appendChild(audioDom);
+                audioDom.load();
+
+                audioDom.oncanplay = (e) => {
+                    let _audioDom = e.target;
+                    this.totalTime = _audioDom.duration;
+                    _audioDom.play();
+                    sessionStorage.setItem("totalTime",_audioDom.duration);
+                    this.NOTICE_STOP(false); // 通知是否结束播放 -- 否
+                    this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
+                    this.SET_HAS_GET_TOTAL(true);
+                }
+                audioDom.onplay = (e) => {
+                    // this.changeProgress();
+                    // 开始播放
+                    this.START_PLAY({
+                        isQrCode: true
+                    });
+                }
+                this.START_NEW_INTERVAL(); // 开始定时器
+                this.isPlayed = true;
+                if(this.resourceType < 3){
+                    this.changeMapIcon(true);
+                }
+                document.querySelector('.pointImg').classList.remove('p_stop');
+                document.querySelector('.pointImg').classList.add('p_start');
             }
         }
     }

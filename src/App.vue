@@ -30,42 +30,48 @@
             // 监听播放参数(src、id)  开始新的播放
             playParams(params) {
                 if (params) {
-                    const mainAudio = document.querySelector('.main-audio');
-                    const audioContainer = document.querySelector('#app');
-                    if (mainAudio) { // 当前正在播放时 切换了音频
-                        clearInterval(this.timer);
-                        if (!mainAudio.paused) {
-                            mainAudio.pause();
-                        }
-                        audioContainer.removeChild(mainAudio);
-                        this.audioPercent = 0;
-                        this.SET_PERCENT(0);
-                        this.timer = '';
-                    }
-                    let audioDom = document.createElement('audio');
-                    let sourceDom = document.createElement('source');
-                    sourceDom.type = 'audio/mpeg';
-                    sourceDom.src = params.src;
-                    audioDom.preload = 'auto';
-                    audioDom.dataset.id = params.id;
-                    audioDom.appendChild(sourceDom);
-                    audioDom.className = 'main-audio';
-                    audioDom.style.display = 'none';
-                    audioContainer.appendChild(audioDom);
-                    audioDom.load();
 
-                    audioDom.oncanplay = (e) => {
-                        let _audioDom = e.target;
-                        this.totalTime = _audioDom.duration;
-                        _audioDom.play();
-                        sessionStorage.setItem("totalTime",_audioDom.duration);
-                        this.NOTICE_STOP(false); // 通知是否结束播放 -- 否
-                        this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
-                        this.SET_HAS_GET_TOTAL(true);
-                    }
-                    audioDom.onplay = (e) => {
+                    // 如果是扫码播放 则不在这里创建音频 ，只开启进度条
+                    if (!params.isQrCode) {
+                        const mainAudio = document.querySelector('.main-audio');
+                        const audioContainer = document.querySelector('#app');
+                        if (mainAudio) { // 当前正在播放时 切换了音频
+                            clearInterval(this.timer);
+                            if (!mainAudio.paused) {
+                                mainAudio.pause();
+                            }
+                            audioContainer.removeChild(mainAudio);
+                            this.audioPercent = 0;
+                            this.SET_PERCENT(0);
+                            this.timer = '';
+                        }
+                        let audioDom = document.createElement('audio');
+                        let sourceDom = document.createElement('source');
+                        sourceDom.type = 'audio/mpeg';
+                        sourceDom.src = params.src;
+                        audioDom.preload = 'auto';
+                        audioDom.dataset.id = params.id;
+                        audioDom.appendChild(sourceDom);
+                        audioDom.className = 'main-audio';
+                        audioDom.style.display = 'none';
+                        audioContainer.appendChild(audioDom);
+                        audioDom.load();
+
+                        audioDom.oncanplay = (e) => {
+                            let _audioDom = e.target;
+                            this.totalTime = _audioDom.duration;
+                            _audioDom.play();
+                            sessionStorage.setItem("totalTime",_audioDom.duration);
+                            this.NOTICE_STOP(false); // 通知是否结束播放 -- 否
+                            this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
+                            this.SET_HAS_GET_TOTAL(true);
+                        }
+                        audioDom.onplay = (e) => {
+                            this.changeProgress();
+                        }
+                    } else {
                         this.changeProgress();
-                    }
+                    }   
                 }
             },
             // 监听播放状态 及时清除定时器
@@ -140,6 +146,7 @@
             // 播放进度
             changeProgress() {
                 this.timer = setInterval(() => {
+                    this.totalTime = this.totalTime || sessionStorage.getItem("totalTime");
                     let currentTime = document.querySelector('.main-audio').currentTime;
                     this.audioPercent = currentTime / this.totalTime * 100;
                     console.log('播放进度：' + currentTime / this.totalTime * 100 + '%');
