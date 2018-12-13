@@ -19,6 +19,7 @@
     "postcss-url": "^8.0.0",
     "postcss-viewport-units": "^0.1.4",
     "postcss-write-svg": "^3.0.1",
+    "shave": "^2.5.2",
     "vue": "^2.5.17",
     "vue-amap": "^0.5.8",
     "vue-router": "^3.0.1",
