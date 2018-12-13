@@ -917,7 +917,8 @@
                     'fillColor': '#02B0FF',
                     'fillOpacity': 0.25
                 },
-                'panToLocation':false
+                'panToLocation':false,
+                'noIpLocate':3
             }
             AMap.plugin(["AMap.Geolocation"], function() {
                 var geolocation = new AMap.Geolocation(options);
