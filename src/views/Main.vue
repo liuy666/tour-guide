@@ -2287,6 +2287,7 @@
                     _self.NOTICE_STOP(false); // 通知是否结束播放 -- 否
                     _self.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
                     _self.SET_HAS_GET_TOTAL(true);
+                    _self.countPlayTimes(JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id, _self.locationPointInfo.resource_id);
                 }
                 audioDom.onplay = (e) => {
                     // this.changeProgress();
