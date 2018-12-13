@@ -517,9 +517,10 @@
             bottom: 0;
             background: #fff;
             width: 690px;
-            padding: 20px 30px;
+            padding: 20px 30px 16px;
             border-radius: 20px 20px 0 0 ;
             box-sizing: border-box;
+            box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.24);
             .scenic-detail-header{
                 display: flex;
                 .scenic-img{
@@ -596,6 +597,36 @@
                 background: url('../assets/images/icon_close_black@2x.png') no-repeat center center / 100% 100%;
             }
         }
+        .newIntroDetail {
+            height: 98%;
+            position: absolute;
+            box-sizing: border-box;
+            z-index: 1002;
+            left: 30px;
+            bottom: 0;
+            background: #fff;
+            width: 690px;
+            border-radius: 20px 20px 0 0;
+            padding: 38px 30px 16px;
+            box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.24);
+            .close-btn{
+                width: 34px;
+                height: 34px;
+                position: absolute;
+                right: 10px;
+                top: 10px;
+                background: url('../assets/images/icon_close_black@2x.png') no-repeat center center / 100% 100%;
+            }
+            .dec-content {
+                font-size: 28px;
+                font-weight: 400;
+                color: #888;
+                line-height: 36px;
+                overflow-y: auto;
+                -webkit-overflow-scrolling : touch;
+                height: calc(~"100%-70px");
+            }
+        }
         .scenic-address-time{
             padding: 40px 0 30px;
             font-size: 30px;
@@ -646,7 +677,22 @@
                 overflow: hidden;
                 word-break: break-all;
                 overflow: hidden;
-                max-height: 540px;
+                height: 144px;
+                position: relative;
+                span {
+                    position: absolute;
+                    right: 0;
+                    bottom: 0;
+                    color: #FE5100;
+                    font-size: 28px;
+                    line-height: 36px;
+                    font-weight: 400;
+                    padding-right: 20px;
+                    margin-right: 6px;
+                    background: #fff url("../assets/images/icon_right@3x.png") no-repeat;
+                    background-size: 12px 24px;
+                    background-position: right 4px;
+                }
             }
         }
     }
@@ -778,7 +824,18 @@
             <div class="scenic-dec">
                 <div class="dec-title">景区介绍</div>
                 <!-- 最大限制字数340 -->
-                <div class="dec-content font-color-888">{{scenicDec}}</div>
+                <div class="dec-content font-color-888">
+                    {{shortScenicDec}}
+                    <span @click="spreadDetail">查看全部</span>
+                </div>
+            </div>
+        </section>
+        <section v-show="isOpenNewDetail" class="newIntroDetail">
+            <div class="close-btn" @click="seeIntroduce2"></div>
+            <div class="dec-title">景区介绍</div>
+            <!-- 最大限制字数340 -->
+            <div class="dec-content font-color-888">
+                {{scenicDec}}
             </div>
         </section>
     </div>
@@ -860,6 +917,7 @@
             this.scenicOpenTime = scenicInfo.opening_time;
             this.scenicDec = scenicInfo.introduce;
             this.sceneryId = scenicInfo.scenery_id;
+            document.querySelector('#name').text = scenicInfo.name;
 
             // 获取地图初始化信息
             const scenicBgImg = scenicInfo.accessMapUrl,//'./'+scenicInfo.file_name, // 图片图层
@@ -1069,6 +1127,7 @@
                 _self.oMap_main.closePopup();
                 _self.isShowMenu = false;
                 _self.isOpenDetail = false;
+                _self.isOpenNewDetail = false;
             });
 
             // 给地图添加定位失败和成功的回调处理
@@ -1288,10 +1347,14 @@
                 isShowConfirm: false,
                 isShowConfirm2: false,
                 pid: '',
-                src: ''
+                src: '',
+                isOpenNewDetail: false,
             }
         },
         computed: {
+            shortScenicDec() {
+                return this.scenicDec.slice(0, 84) + '...';
+            },
             ...mapState({
                 watchLine: state => state.app.lineStatus, // 监听取消路线选择
                 audioPercent: state => state.app.percent, // 监听播放进度
@@ -1775,6 +1838,11 @@
                     this.pauseAudio_scenic();
                 }
                 this.isOpenDetail = !this.isOpenDetail;
+                this.oMap_main.closePopup();
+                this.isShowMenu = false;
+            },
+            seeIntroduce2() {
+                this.isOpenNewDetail = !this.isOpenNewDetail;
                 this.oMap_main.closePopup();
                 this.isShowMenu = false;
             },
@@ -2271,6 +2339,8 @@
                     this.NOTICE_STOP(false); // 通知是否结束播放 -- 否
                     this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
                     this.SET_HAS_GET_TOTAL(true);
+                    // 添加次数统计
+                    this.countPlayTimes(JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id,this.pid);
                 }
                 audioDom.onplay = (e) => {
                     // this.changeProgress();
@@ -2286,6 +2356,19 @@
                 }
                 document.querySelector('.pointImg').classList.remove('p_stop');
                 document.querySelector('.pointImg').classList.add('p_start');
+            },
+            spreadDetail() {
+                this.isOpenDetail = false;
+                this.isOpenNewDetail = true;
+            },
+            async countPlayTimes(sid, pid) {
+                const increaseTimes = await this.$http.get(this.$base + '/app/sys/playerVoice',{
+                    sceneryId: parseInt(sid),
+                    resourceId: parseInt(pid)
+                });
+                if (!increaseTimes) {
+                    return;
+                }
             }
         }
     }

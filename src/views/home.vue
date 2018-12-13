@@ -261,6 +261,7 @@
 
                 // 更新当前景区信息
                 sessionStorage.setItem('currentScenic',JSON.stringify(this.currentInfo));
+                document.querySelector('#name').text = this.currentInfo.name;
                 this.$router.push({
                     path : '/main'
                 })
