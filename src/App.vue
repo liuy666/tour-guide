@@ -65,6 +65,8 @@
                             this.NOTICE_STOP(false); // 通知是否结束播放 -- 否
                             this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
                             this.SET_HAS_GET_TOTAL(true);
+                            // 添加次数统计
+                            this.countPlayTimes(JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id, params.id);
                         }
                         audioDom.onplay = (e) => {
                             this.changeProgress();
@@ -169,6 +171,15 @@
                     }
                 }
             },
+            async countPlayTimes(sid, pid) {
+                const increaseTimes = await this.$http.get(this.$base + '/app/sys/playerVoice',{
+                    sceneryId: parseInt(sid),
+                    resourceId: parseInt(pid)
+                });
+                if (!increaseTimes) {
+                    return;
+                }
+            }
         }
     }
 </script>
