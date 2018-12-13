@@ -35,7 +35,7 @@
                         dt {
                             width: 690px;
                             height: 310px;
-                            margin-bottom: 30px;
+                            margin-bottom: 14px;
                             img {
                                 width: 100%;
                                 height: 100%;
