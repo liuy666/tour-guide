@@ -1,32 +1,16 @@
-# daolan
+# 青川导游助手
 
-## Project setup
+## 安装项目依赖
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### 构建开发环境
 ```
-npm run serve
+npm start
 ```
 
-### Compiles and minifies for production
+### 构建生产环境
 ```
 npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### 导游导览微信公众号9999
-```
-
-hellow world
 ```
