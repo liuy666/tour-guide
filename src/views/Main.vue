@@ -1291,7 +1291,7 @@
                     this.isPositioning = true;
                     this.geolocation.getCurrentPosition();
                     console.log("setInterval")
-                },60000)
+                },20000)
             },
             // 自动定位一次并弹出景区介绍同时播放
             autoGetPositon() {
