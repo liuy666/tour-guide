@@ -1791,8 +1791,8 @@
                                     sessionStorage.setItem("mapClickPointId",this.mapClickPointId);
 
                                     //打开扫码景点对应的信息弹窗
-                                    this.getMarkerIndex(arg.query.pid);
-                                    this.markers[this.indexOfMarkers].openPopup();
+                                    // this.getMarkerIndex(arg.query.pid);
+                                    // this.markers[this.indexOfMarkers].openPopup();
 
                                     this.playAudio({
                                         _src: QRCODE_CURRENT_POINT.guideUrl,
@@ -1859,8 +1859,14 @@
                                         }
                                     });
                     this.markers.push(marker);
-                }); 
-                
+                });
+
+                if (arg.query && arg.query.pid && fromRouteName === 'root' && arg.resourceType == 1) {
+                    //打开扫码景点对应的信息弹窗
+                    this.getMarkerIndex(arg.query.pid);
+                    this.markers[this.indexOfMarkers].openPopup();
+                }
+
                 // 处理回退的情况
                 if (fromRouteName === 'scenic-point-detail' || fromRouteName === 'feedback' || fromRouteName === 'recognize') {
 
