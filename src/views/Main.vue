@@ -989,6 +989,7 @@
                     _self.isPositioning = false;
                     //如果是扫描播放
                     if(_self.$route.query && _self.$route.query.pid){
+                        
                         return;
                     }
                     let cp = GeolocationResult.position;
@@ -1064,13 +1065,13 @@
 
             // 给图层添加load事件
             mapImg.on('load',function(){
-                _self.isHasMapImage = true;
+                // _self.isHasMapImage = true;
                 // if (_self.isHasPointList && _self.isHasWeather) { // 表明天气/资源列表/地图图片都已请求完成(不一定成功) 关闭loading 开始定位
                 //     _self.isShowLoading = false;
                 //     _self.autoGetPositon();
                 // }
-                // _self.isShowLoading = false;
-                // _self.autoGetPositon();
+                _self.isShowLoading = false;
+                _self.autoGetPositon();
                 _self.oMap_main.setZoom(zoom); // 解决图片图层加载过程中而弹出景区介绍时 造成停止渲染的问题
                 _self.oMap_main.setMinZoom(zoom);
             });
@@ -1191,9 +1192,9 @@
                 ],
                 region: '', // 景点所属地区
                 indexOfMarkers : 0,
-                isHasWeather: false,
-                isHasPointList: false,
-                isHasMapImage: false,
+                // isHasWeather: false,
+                // isHasPointList: false,
+                // isHasMapImage: false,
                 // isFirst: true,
                 locateObj: {},
                 isShowConfirm: false,
@@ -1205,9 +1206,6 @@
             }
         },
         computed: {
-            isStartPosition() {
-                return this.isHasWeather && this.isHasPointList && this.isHasMapImage;
-            },
             shortScenicDec() {
                 return this.scenicDec.slice(0, 84) + '...';
             },
@@ -1219,12 +1217,6 @@
             })
         },
         watch: {
-            isStartPosition(val) {
-                if (val) {
-                    this.isShowLoading = false;
-                    this.autoGetPositon();
-                }
-            },
             watchLine(val) {
                 // 清除当前路线
                 this.removeMarker(2);
@@ -1306,6 +1298,10 @@
             autoGetPositon() {
                 if (!sessionStorage.getItem("hasPosition")) { // 定位一次后则不再触发 直到清除 sessionStorage --> hasPosition
                     this.$nextTick(() => {
+                        // 如果当前还存在某个景点播放则暂停
+                        if (document.querySelector('.main-audio') && !document.querySelector('.main-audio').paused) {
+                            this.pauseAudio();
+                        }
                         const detailAudio = document.querySelector('.detail-audio');
                         const audioContainer = document.querySelector('.introDetail');
                         if (detailAudio) { // 当前正在播放时 切换了音频
@@ -1335,10 +1331,6 @@
                         audioDom.load();
                         
                         if (!this.$route.query.pid) { // 如果不是景点播放扫码 则自动播放景区介绍 
-                            // 如果当前还存在某个景点播放则暂停
-                            if (document.querySelector('.main-audio') && !document.querySelector('.main-audio').paused) {
-                                this.pauseAudio();
-                            }
                             // 非 iOS直接播放, iOS由于系统限制无法自动播放
                             if (!this.$tool.validateReg.isiOS(window.navigator.userAgent)) {
                                 this.isOpenDetail = true;
@@ -1391,7 +1383,7 @@
                     }
                 ]);
                 if (!getListAndWheather) {
-                    this.isHasWeather = true;
+                    // this.isHasWeather = true;
                     // if (this.isHasMapImage && this.isHasPointList) {
                     //     this.isShowLoading = false;
                     //     this.autoGetPositon();
@@ -1442,7 +1434,7 @@
                 // 初始化默认第一个子页面是景点列表页
                 this.SET_ROUTE_NAME('scenic-spot');
 
-                this.isHasWeather = true;
+                // this.isHasWeather = true;
                 // if (this.isHasMapImage && this.isHasPointList) {
                 //     this.isShowLoading = false;
                 //     this.autoGetPositon();
@@ -1735,7 +1727,7 @@
                 // 根据资源类型获取资源列表
                 const res = await this.$http.get(this.$base + `/app/resource/list?sceneryId=${this.sceneryId}&resourceType=${arg.resourceType}&limit=500`);
                 if(!res || !res.page.list || !res.page.list.length){
-                    this.isHasPointList = true;
+                    // this.isHasPointList = true;
                     // if (this.isHasMapImage && this.isHasWeather) {
                     //     this.isShowLoading = false;
                     //     this.autoGetPositon();
@@ -1930,7 +1922,7 @@
                     } 
                 }
 
-                this.isHasPointList = true;
+                // this.isHasPointList = true;
                 // if (this.isHasMapImage && this.isHasWeather) {
                 //     this.isShowLoading = false;
                 //     this.autoGetPositon();
