@@ -859,6 +859,9 @@
             clearInterval(this.locationTimer);
             this.locationTimer = '';
             this.$store.commit('setFromRouteName_detail', to.name);
+            if(to.name == "index"){
+                document.querySelector('#name').text = "青川导游"
+            }
             next();
         },
         created() {
