@@ -5,6 +5,7 @@ const app = {
         lineList: [],
         resourceList: [],
         content: '',
+        msgParams: {},
         routeName: '',
         fromRouteName: '',
         fromRouteName_detail: '',
@@ -22,10 +23,11 @@ const app = {
     mutations: {
         // 保存初始状态
         SAVE_STATE(state) {
-             let initState = {
+            let initState = {
                 lineList: [],
                 resourceList: [],
                 content: '',
+                msgParams: {},
                 routeName: '',
                 fromRouteName: '',
                 fromRouteName_detail: '',
@@ -63,13 +65,15 @@ const app = {
             sessionStorage.setItem('otherPointList', JSON.stringify(rlist));
         },
         // 保存消息详情内容
-        SAVE_CONTENT(state, val) {
-            state.content = val;
-            sessionStorage.setItem('msgContent', val);
+        SAVE_CONTENT(state, params) {
+            //state.content = val;
+            state.msgParams = params;
+            sessionStorage.setItem('msgContent', JSON.stringify(params));
         },
         // 初始化设置消息详情内容
         INIT_CONTENT(state) {
-            state.content = sessionStorage.getItem('msgContent');
+            //state.content = sessionStorage.getItem('msgContent');
+            state.msgParams = JSON.parse(sessionStorage.getItem('msgContent'));
         },
         // 设置当前所在路由的名字 用于区分景点/路线/其他资源点
         SET_ROUTE_NAME(state, val) {

@@ -42,9 +42,9 @@ const vm = new Vue({
             if (!GET_JS_SDK) {
                 alert('获取jsapi_ticket失败！');
             }
-            Cookies.set('ticket', GET_JS_SDK.ticket, {expires: parseInt(GET_JS_SDK.expires_in) / 3600 / 24});
+            Cookies.set('ticket', GET_JS_SDK.ticket, { expires: parseInt(GET_JS_SDK.expires_in) / 3600 / 24 });
         }
-        
+
         let jsapi_ticket = Cookies.get('ticket');
         let noncestr = 'liuy666comwhosyourdaddy';
         let timestamp = 1544077236;
@@ -57,39 +57,39 @@ const vm = new Vue({
             appId: 'wx32ec1b2c78c4270a', // 必填，公众号的唯一标识
             timestamp: timestamp, // 必填，生成签名的时间戳
             nonceStr: noncestr, // 必填，生成签名的随机串
-            signature: signature,// 必填，签名
+            signature: signature, // 必填，签名
             jsApiList: [ // 必填，需要使用的JS接口列表
                 'updateAppMessageShareData', // 自定义“分享给朋友”及“分享到QQ”按钮的分享内容
                 'updateTimelineShareData' // 自定义“分享到朋友圈”及“分享到QQ空间”按钮的分享内容
-            ] 
+            ]
         });
-        wx.ready(function () { //需在用户可能点击分享按钮前就先调用 
+        wx.ready(function() { //需在用户可能点击分享按钮前就先调用 
             console.log('ready')
-            wx.updateAppMessageShareData({ 
+            wx.updateAppMessageShareData({
                 title: '青川智能语音导游', // 分享标题
                 desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！', // 分享描述
                 link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
                 imgUrl: 'https://www.rtzhisheng.com/qcx-navigator/img/50x50.png', // 分享图标
-                success: function () {
+                success: function() {
                     console.log('分享到QQ或朋友设置成功')
                 },
-                fail: function (e) {
+                fail: function(e) {
                     console.log('分享到QQ设置失败')
                 }
-            });  
-            wx.updateTimelineShareData({ 
+            });
+            wx.updateTimelineShareData({
                 title: '青川智能语音导游', // 分享标题
                 link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
                 imgUrl: 'https://www.rtzhisheng.com/qcx-navigator/img/50x50.png', // 分享图标
-                success: function () {
+                success: function() {
                     console.log('分享到QQ空间或朋友圈设置成功')
                 },
-                fail: function (e) {
+                fail: function(e) {
                     console.log('分享到QQ空间设置失败')
                 }
             });
         });
-        wx.error(function () {
+        wx.error(function() {
             console.log('error')
         });
     }

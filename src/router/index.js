@@ -67,6 +67,7 @@ router.beforeEach((to, from, next) => {
             replace: true
         })
     }
+
     next();
 });
 

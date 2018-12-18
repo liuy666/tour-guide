@@ -25,13 +25,16 @@ export default {
         }
     },
     computed: mapState({
-        content: state => state.app.content
+        //content: state => state.app.content
+        msgParams: state => state.app.msgParams
     }),
     mounted() {
         if (this.$route.params.content) {
             document.querySelector('#msg-detail').innerHTML = this.$route.params.content;
+            document.querySelector('#name').text = this.$route.params.msgTitle;
         } else {
-            document.querySelector('#msg-detail').innerHTML = this.content;
+            document.querySelector('#msg-detail').innerHTML = this.msgParams.content;
+            document.querySelector('#name').text = this.msgParams.msgTitle;
         }
         this.$nextTick(() => {
             const imgs = document.querySelectorAll('img');
@@ -54,6 +57,10 @@ export default {
                 parent.removeChild(img);
             }
         });
+    },
+    beforeRouteLeave (to, from , next) {
+        document.querySelector('#name').text = "青川导游";
+        next()
     }
 }
 </script>

@@ -278,9 +278,10 @@ export default {
             'SAVE_CONTENT'
         ]),
         gotoMsgDetail(params) {
+            document.querySelector('#name').text = params.msgTitle;
             // 存储文章
-            this.SAVE_CONTENT(params.content);
-            this.$router.replace({
+            this.SAVE_CONTENT(params);
+            this.$router.push({
                 name: 'msg-detail',
                 params
             });
