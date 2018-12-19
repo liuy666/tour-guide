@@ -4,7 +4,7 @@ const app = {
     state: {
         lineList: [],
         resourceList: [],
-        content: '',
+        // content: '',
         msgParams: {},
         routeName: '',
         fromRouteName: '',
@@ -26,7 +26,7 @@ const app = {
             let initState = {
                 lineList: [],
                 resourceList: [],
-                content: '',
+                // content: '',
                 msgParams: {},
                 routeName: '',
                 fromRouteName: '',

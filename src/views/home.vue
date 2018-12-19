@@ -97,6 +97,7 @@
             Toast
         },
         async created() {
+            document.querySelector('#name').text = "青川导游";
             const getMsgList = await this.$http.get(this.$base + '/app/hqarticle/list', {
                 domainUrl: 'www.qxgz.com', // window.location.hostname
                 limit: 500
@@ -165,14 +166,12 @@
         data () {
             return {
                 oMap_home : {},
-                oInfoWindow : {},
                 isTips : false,
                 tipsText : '请求失败',
                 isHasMsg: false,
                 bl: 0,
                 currentInfo: null,
-                scenicList: [],
-                hh: ''
+                scenicList: []
             }
         },
         methods: {
@@ -187,7 +186,6 @@
                 }
                 if(scenicList.data && scenicList.data.length && scenicList.data.length>0){
                     scenicList.data.forEach((item) => {
-                        console.log(item)
                         item.accessCoverUrl = item.accessCoverUrl ? 'https' + item.accessCoverUrl.slice(4) : item.accessCoverUrl;
                         item.accessMapUrl = item.accessMapUrl ? 'https' + item.accessMapUrl.slice(4) : item.accessMapUrl;
                         item.accessUrl = item.accessUrl ? 'https' + item.accessUrl.slice(4) : item.accessUrl;

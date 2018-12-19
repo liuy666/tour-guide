@@ -14,10 +14,10 @@ export default router;
 
 // 路由前置守卫
 router.beforeEach((to, from, next) => {
-    console.log('***from-to***')
+    console.log('***from***')
     console.log(from);
+    console.log('***to***')
     console.log(to);
-    console.log('***from-to***')
 
     // 从home页进入main页或在main页刷新
     if ((!from.name || from.name === 'index') && to.name === 'main') {

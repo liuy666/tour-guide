@@ -190,7 +190,6 @@
                             </dd>
                         </dl>
                     </template>
-                    
                 </li>
             </ul>
         </div>
@@ -225,6 +224,7 @@ export default {
     },
     async created() {
         this.isShowLoading = true;
+        document.querySelector('#name').text = "青川导游";
         const getMsgList = await this.$http.get(this.$base + '/app/hqarticle/list', {
             domainUrl: 'www.qxgz.com', // 上线改成获取域名
             limit: 500
@@ -256,19 +256,13 @@ export default {
 
             return {
                 id: item.articleId,
-                img: item.imgUrl,
+                img: item.imgUrl ? item.imgUrl.replace(/http/, 'https') : item.imgUrl,
                 title: item.title,
                 date1: newDate2,
                 date2: newDate1,
                 date3: newDate3,
                 interval,
                 content: item.content
-            }
-        });
-        let contentList = getMsgList.page.list.map(item => {
-            return {
-                content: item.content,
-                id: item.articleId,
             }
         });
         this.isShowLoading = false;
