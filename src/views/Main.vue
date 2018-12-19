@@ -1011,7 +1011,7 @@
                         if(_self.isAuto && _self.resourceType < 3){
                             _self.markers.forEach((v,i) => {
                                 let latlng = new AMap.LngLat(v._latlng.lng,v._latlng.lat);
-                                if(cp.distance(latlng) < 30){
+                                if(cp.distance(latlng) < 20){
 
                                     const pointList = JSON.parse(sessionStorage.getItem("pointList"));
                                     const point_dw = pointList.filter(item => item.resource_id === v._icon.children[0].dataset.id)[0];
@@ -2294,6 +2294,15 @@
                 
                 //播放当前定位点的音频
                 const audioContainer = document.querySelector('#app');
+                const mainAudio = document.querySelector('.main-audio');
+                if (mainAudio) { // 当前正在播放时 切换了音频
+                    if (!mainAudio.paused) {
+                        mainAudio.pause();
+                    }
+                    audioContainer.removeChild(mainAudio);
+                    _self.SET_PERCENT(0);
+                    _self.CLEAR_CURRENT_INTERVAL();
+                }
                 let audioDom = document.createElement('audio');
                 let sourceDom = document.createElement('source');
                 sourceDom.type = 'audio/mpeg';
