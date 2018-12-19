@@ -876,6 +876,9 @@
         },
         async mounted() {
             console.log('mounted');
+            if (this.$store.state.app.currentEnv === 'miniprogram') {
+                // 显示返回小程序的按钮
+            }
             let _self = this;
             let scenicInfo = null;
 
@@ -1261,8 +1264,8 @@
                 }
             },
             isStop(val) {
-                alert(val);
-                alert(typeof val);
+                // alert(val);
+                // alert(typeof val);
                 if (val) {
                     this.oMap_main.closePopup();
                     this.isPlayed = false;
