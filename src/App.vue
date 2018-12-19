@@ -128,17 +128,16 @@
                         if (next) {
                             // alert('已经获取下一个')
                             this.SET_IS_LAST(false);
-                            // 通知地图页更改当前景点显示信息
-                            this.NOTICE_AUTO_PLAY({
-                                isAutoPlay: true,
-                                nextMessage: next
-                            });
-                            
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
                             // this.AUTO_PALY(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
                             this.START_PLAY({
                                 src: next.nextPlay.aSrc,
                                 id: next.nextPlay.aId
+                            });
+                            // 通知地图页更改当前景点显示信息
+                            this.NOTICE_AUTO_PLAY({
+                                isAutoPlay: true,
+                                nextMessage: next
                             });
                         }else{
                             // alert('最后一个')
