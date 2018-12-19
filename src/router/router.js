@@ -2,8 +2,7 @@ export const appRoutes = [
     {
         path: '/',
         name: 'index',
-        component: () =>
-            import ('@/views/home.vue')
+        component: () => import ('@/views/home.vue')
     },
     {
         path: '/main',
@@ -82,15 +81,11 @@ export const appRoutes = [
     {
         path: '/message-list',
         name: 'message-list',
-        component: () =>
-            import ('@/views/message-list.vue'),
-        meta: {
-            title: '消息'
-        }
+        component: () => import ('@/views/message-list.vue')
     },
     // 消息详情页
     {
-        path: '/msg-detail',
+        path: '/msg-detail/:msgId',
         name: 'msg-detail',
         component: () => import ('@/views/msg-detail.vue')
     },

@@ -35,6 +35,7 @@ const vm = new Vue({
         if (!localStorage.getItem('initState')) {
             this.$store.commit('SAVE_STATE');
         }
+        let _store = this.$store;
 
         // 注入wx config
         if (!Cookies.get('ticket')) {
@@ -90,6 +91,13 @@ const vm = new Vue({
         });
         wx.error(function() {
             console.log('error')
+        });
+        wx.miniProgram.getEnv(function (res) {
+            if (res.miniprogram) {
+                _store.commit('checkEnv', 'miniprogram');
+            } else {
+                _store.commit('checkEnv', 'browser');
+            }
         });
         window.addEventListener('load', function(e) {
             console.log(history.length)

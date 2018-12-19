@@ -275,7 +275,7 @@ export default {
             document.querySelector('#name').text = params.msgTitle;
             // 存储文章
             this.SAVE_CONTENT(params);
-            this.$router.push({
+            this.$router.replace({
                 name: 'msg-detail',
                 params
             });

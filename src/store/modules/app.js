@@ -40,7 +40,8 @@ const app = {
                 isAutoPlay: false,
                 nextMessage: null,
                 hasGetTotal: false,
-                isLastOne: false
+                isLastOne: false,
+                currentEnv: ''
             }
             localStorage.setItem('initState', JSON.stringify(initState));
         },
@@ -136,6 +137,11 @@ const app = {
         },
         SET_IS_LAST(state, isLastOne) {
             state.isLastOne = isLastOne;
+        },
+
+        // 检查当前网页运行环境
+        checkEnv(state, val) {
+            state.currentEnv = val;
         }
     },
     actions: {
