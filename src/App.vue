@@ -1,6 +1,7 @@
 <template>
-    <div id="app">
+    <div id="app" style="position:relative;">
         <router-view />
+        <div id="test" style="width: 100%;height: 30px;position:absolute;"></div>
     </div>
 </template>
 
@@ -89,7 +90,7 @@
             audioPercent(percent) {
                 if (percent >= 100) {
                     const currentAudio = document.querySelector('.main-audio');
-
+                    alert('isStop:' + this.$store.state.app.isStop)
                     // 通知地图页 更换icon图标/关闭弹窗/更改播放按钮状态
                     this.NOTICE_STOP(true);
 
@@ -158,7 +159,8 @@
                     this.totalTime = this.totalTime || sessionStorage.getItem("totalTime");
                     let currentTime = document.querySelector('.main-audio').currentTime;
                     this.audioPercent = currentTime / this.totalTime * 100;
-                    alert('播放进度：' + currentTime / this.totalTime * 100 + '%');
+                    console.log('播放进度：' + currentTime / this.totalTime * 100 + '%');
+                    document.querySelector('#test').innerHTML = '播放进度：' + currentTime / this.totalTime * 100 + '%';
                     this.SET_PERCENT(this.audioPercent);
                 },1000);
             },
