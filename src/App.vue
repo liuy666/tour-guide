@@ -1,6 +1,7 @@
 <template>
     <div id="app">
         <router-view />
+        <!-- <div id="test" style="width: 100%;height: 30px;position:absolute;"></div> -->
     </div>
 </template>
 
@@ -172,6 +173,7 @@
                     let currentTime = document.querySelector('.main-audio').currentTime;
                     this.audioPercent = currentTime / this.totalTime * 100;
                     console.log('播放进度：' + currentTime / this.totalTime * 100 + '%');
+                    // document.querySelector('#test').innerHTML = '播放进度：' + currentTime / this.totalTime * 100 + '%';
                     this.SET_PERCENT(this.audioPercent);
                 },1000);
             },
