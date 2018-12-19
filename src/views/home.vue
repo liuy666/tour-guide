@@ -266,7 +266,7 @@
             },
             gotoMsgList() {
                 this.$router.push({
-                    path: '/message-list'
+                    name: 'message-list'
                 });
             }
         }

@@ -29,13 +29,15 @@ export default {
         msgParams: state => state.app.msgParams
     }),
     mounted() {
-        if (this.$route.params.content) {
-            document.querySelector('#msg-detail').innerHTML = this.$route.params.content;
-            document.querySelector('#name').text = this.$route.params.msgTitle;
-        } else {
-            document.querySelector('#msg-detail').innerHTML = this.msgParams.content;
-            document.querySelector('#name').text = this.msgParams.msgTitle;
-        }
+        // if (this.$route.params.content) {
+        //     document.querySelector('#msg-detail').innerHTML = this.$route.params.content;
+        //     document.querySelector('#name').text = this.$route.params.msgTitle;
+        // } else {
+        //     document.querySelector('#msg-detail').innerHTML = this.msgParams.content;
+        //     document.querySelector('#name').text = this.msgParams.msgTitle;
+        // }
+        document.querySelector('#msg-detail').innerHTML = this.msgParams.content;
+        document.querySelector('#name').text = this.msgParams.msgTitle;
         this.$nextTick(() => {
             const imgs = document.querySelectorAll('img');
             const container = document.querySelector('#msg-detail');

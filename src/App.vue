@@ -63,7 +63,19 @@
                             alert('音频就绪')
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
-                            _audioDom.play();
+                            function ready() {
+                                alert('开始播放')
+                                _audioDom.play();
+                            }
+                            if (!window.WeixinJSBridge || !WeixinJSBridge.invoke) {
+                                alert('没有WeixinJSBridgeReady')
+                                document.removeEventListener('WeixinJSBridgeReady', ready, false);
+                                document.addEventListener('WeixinJSBridgeReady', ready, false)
+                            } else {
+                                alert('有WeixinJSBridgeReady')
+                                ready()
+                            } 
+                            // _audioDom.play();
                             sessionStorage.setItem("totalTime",_audioDom.duration);
                             this.NOTICE_STOP(false); // 通知是否结束播放 -- 否
                             this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
