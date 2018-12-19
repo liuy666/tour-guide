@@ -1261,6 +1261,8 @@
                 }
             },
             isStop(val) {
+                alert(val);
+                alert(typeof val);
                 if (val) {
                     this.oMap_main.closePopup();
                     this.isPlayed = false;

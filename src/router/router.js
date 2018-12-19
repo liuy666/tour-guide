@@ -90,7 +90,7 @@ export const appRoutes = [
     },
     // 消息详情页
     {
-        path: '/msg-detail/:msgId',
+        path: '/msg-detail',
         name: 'msg-detail',
         component: () => import ('@/views/msg-detail.vue')
     },

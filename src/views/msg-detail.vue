@@ -58,9 +58,9 @@ export default {
             }
         });
     },
-    beforeRouteLeave (to, from , next) {
-        document.querySelector('#name').text = "青川导游";
-        next()
-    }
+    // beforeRouteLeave (to, from , next) {
+    //     document.querySelector('#name').text = "青川导游";
+    //     next()
+    // }
 }
 </script>
