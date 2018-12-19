@@ -1,7 +1,6 @@
 <template>
-    <div id="app" style="position:relative;">
+    <div id="app">
         <router-view />
-        <div id="test" style="width: 100%;height: 30px;position:absolute;"></div>
     </div>
 </template>
 
@@ -31,9 +30,9 @@
             // 监听播放参数(src、id)  开始新的播放
             playParams(params) {
                 if (params) {
+
                     // 如果是扫码播放 则不在这里创建音频 ，只开启进度条
                     if (!params.isQrCode) {
-                        alert('进入播放')
                         const mainAudio = document.querySelector('.main-audio');
                         const audioContainer = document.querySelector('#app');
                         if (mainAudio) { // 当前正在播放时 切换了音频
@@ -57,10 +56,8 @@
                         audioDom.style.display = 'none';
                         audioContainer.appendChild(audioDom);
                         audioDom.load();
-                        alert('音频创建完成')
 
                         audioDom.oncanplay = (e) => {
-                            alert('音频就绪')
                             let _audioDom = e.target;
                             this.totalTime = _audioDom.duration;
                             _audioDom.play();
@@ -90,12 +87,11 @@
             audioPercent(percent) {
                 if (percent >= 100) {
                     const currentAudio = document.querySelector('.main-audio');
-                    alert('isStop:' + this.$store.state.app.isStop)
+
                     // 通知地图页 更换icon图标/关闭弹窗/更改播放按钮状态
                     this.NOTICE_STOP(true);
 
                     if (!currentAudio.paused || !currentAudio.ended) { // 如果当前音频还有最后一点点没播完则直接停止 针对获取的总时长比实际时长短一点点的问题
-                        alert('暂停')
                         currentAudio.pause();
                     }
                     this.audioPercent = 0;
@@ -105,15 +101,12 @@
                     let currentId = currentAudio.dataset.id;
                     const app = document.querySelector('#app');
                     app.removeChild(currentAudio);
-                    alert(document.querySelector('.main-audio'))
                     
                     // 如果开启了自动连播
                     const isAuto = sessionStorage.getItem('isAuto');
                     if (isAuto && isAuto == "true") {
-                        alert('自动播')
                         let next = this.getNext(currentId);
                         if (next) {
-                            alert('已经获取下一个')
                             this.SET_IS_LAST(false);
                             // 通知地图页更改当前景点显示信息
                             this.NOTICE_AUTO_PLAY({
@@ -128,7 +121,6 @@
                                 id: next.nextPlay.aId
                             });
                         }else{
-                            alert('最后一个')
                             this.SET_IS_LAST(true);
                         }
                     }
@@ -160,7 +152,6 @@
                     let currentTime = document.querySelector('.main-audio').currentTime;
                     this.audioPercent = currentTime / this.totalTime * 100;
                     console.log('播放进度：' + currentTime / this.totalTime * 100 + '%');
-                    document.querySelector('#test').innerHTML = '播放进度：' + currentTime / this.totalTime * 100 + '%';
                     this.SET_PERCENT(this.audioPercent);
                 },1000);
             },
