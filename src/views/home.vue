@@ -25,7 +25,7 @@
                 .name{
                     white-space: nowrap;
                     position: absolute;
-                    padding: 10px 20px;
+                    // padding: 10px 20px;
                     background: url("../assets/images/icon_bg@3x.png") no-repeat center center / 100% 100%;
                     font-weight: bold;
                     color: #572b12;
@@ -33,6 +33,10 @@
                     margin-left: 33px;
                     text-align: center;
                     font-size: 24px;
+                    width: 254px;
+                    height: 96px;
+                    line-height: 110px;
+                    margin-top: -16px;
                 }
             }
             .leaflet-popup-content-wrapper{
