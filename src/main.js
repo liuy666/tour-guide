@@ -99,15 +99,15 @@ const vm = new Vue({
                 _store.commit('checkEnv', 'browser');
             }
         });
-        window.addEventListener('load', function(e) {
-            console.log(history.length)
-            console.log('load')
-        })
-        window.addEventListener('popstate', function(e) {
-            console.log(window)
-            console.log(history.length)
-            console.log('popstate')
-        })
+        // window.addEventListener('load', function(e) {
+        //     console.log(history.length)
+        //     console.log('load')
+        // })
+        // window.addEventListener('popstate', function(e) {
+        //     console.log(window)
+        //     console.log(history.length)
+        //     console.log('popstate')
+        // })
     }
 }).$mount('#app');
 
