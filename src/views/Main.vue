@@ -701,6 +701,7 @@
 
 <template>
     <div id="main">
+        <div style="position:absolute;z-index: 10005;width:100%;height:20px;text-align:center;">{{audioPercent}}</div>
         <section id="map_test"></section>
         <!-- 网络请求loading层 -->
         <loading :show="isShowLoading" :text="loadText" position="absolute"></loading>

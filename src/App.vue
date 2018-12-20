@@ -100,7 +100,7 @@
             },
             // 播放进度监听
             audioPercent(percent) {
-                if (percent >= 100) {
+                if (percent > 99) { // 实际获取的时长可能比实际时长短 1s 左右,这里判断 99% 就算播完了
                     const currentAudio = document.querySelector('.main-audio');
                     // alert('isStop:' + this.$store.state.app.isStop)
                     // 通知地图页 更换icon图标/关闭弹窗/更改播放按钮状态
@@ -135,7 +135,11 @@
                             
                             sessionStorage.setItem('currentPoint',JSON.stringify(next.nextPoint));
                             // this.AUTO_PALY(); // 同步通知景点列表更改状态--假如景点列表当前未打开?待测试
-                            this.START_PLAY({
+                            // this.START_PLAY({
+                            //     src: next.nextPlay.aSrc,
+                            //     id: next.nextPlay.aId
+                            // });
+                            this.startPlay({
                                 src: next.nextPlay.aSrc,
                                 id: next.nextPlay.aId
                             });
@@ -165,6 +169,49 @@
                 'SET_HAS_GET_TOTAL',
                 'SET_IS_LAST'
             ]),
+            startPlay(options) {
+                    alert('进入播放')
+                    const mainAudio = document.querySelector('.main-audio');
+                    const audioContainer = document.querySelector('#app');
+                    if (mainAudio) { // 当前正在播放时 切换了音频
+                        clearInterval(this.timer);
+                        if (!mainAudio.paused) {
+                            mainAudio.pause();
+                        }
+                        audioContainer.removeChild(mainAudio);
+                        this.audioPercent = 0;
+                        this.SET_PERCENT(0);
+                        this.timer = '';
+                    }
+                    let audioDom = document.createElement('audio');
+                    let sourceDom = document.createElement('source');
+                    sourceDom.type = 'audio/mpeg';
+                    sourceDom.src = options.src;
+                    audioDom.preload = 'auto';
+                    audioDom.dataset.id = options.id;
+                    audioDom.appendChild(sourceDom);
+                    audioDom.className = 'main-audio';
+                    audioDom.style.display = 'none';
+                    audioContainer.appendChild(audioDom);
+                    audioDom.load();
+
+                    audioDom.oncanplay = (e) => {
+                        let _audioDom = e.target;
+                        this.totalTime = _audioDom.duration;
+                        alert('111')
+                        _audioDom.play();
+                        alert('222')
+                        sessionStorage.setItem("totalTime",_audioDom.duration);
+                        this.NOTICE_STOP(false); // 通知是否结束播放 -- 否
+                        this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
+                        this.SET_HAS_GET_TOTAL(true);
+                        // 添加次数统计
+                        this.countPlayTimes(JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id, options.id);
+                    }
+                    audioDom.onplay = (e) => {
+                        this.changeProgress();
+                    }
+            },
             // 播放进度
             changeProgress() {
                 this.timer = setInterval(() => {
