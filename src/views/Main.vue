@@ -164,7 +164,7 @@
                         top: -37px;
                     }
                     .weather {
-                        width: 191px;
+                        width: 231px;
                         margin-right: 29px;
                         display: flex;
                         flex-direction: row;
