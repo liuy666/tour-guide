@@ -129,7 +129,7 @@
                 this.isHasMsg = false;
             }
         },
-        mounted() {
+        async mounted() {
             const _self  = this;
             //获取屏幕大小 动态设置不同手机的地图zoom
             const containerWidth = document.querySelector('#wrapper_home').clientWidth;
@@ -156,7 +156,13 @@
             });
             this.oMap_home = oMap;
 
-            let imageUrl = './qcx.jpg',
+            const imgObj = await this.$http.get(this.$base + '/app/getHomePicture');
+            if(!imgObj || !imgObj.url || imgObj.url == ""){
+                this.isTips = true;
+                this.tipsText = "青川县地图请求失败";
+                return;
+            }
+            let imageUrl = 'https' + imgObj.url.slice(4),
                 imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
             let mapImg = L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
 
@@ -186,6 +192,7 @@
                 });
                 if(!scenicList){
                     this.isTips = true;
+                    this.tipsText = "请求失败";
                     return;
                 }
                 if(scenicList.data && scenicList.data.length && scenicList.data.length>0){
