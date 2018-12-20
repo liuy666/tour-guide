@@ -162,7 +162,7 @@
                 this.tipsText = "青川县地图请求失败";
                 return;
             }
-            let imageUrl = 'https' + imgObj.url.slice(4),
+            let imageUrl = imgObj.url,
                 imageBounds = [[31.459197, 104.49496], [33.573508, 105.725429]];    
             let mapImg = L.imageOverlay(imageUrl, imageBounds).addTo(oMap);
 
