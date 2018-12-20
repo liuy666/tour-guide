@@ -245,7 +245,7 @@
                     this.NOTICE_AUTO_PLAY(false); // 通知是否开始连播 -- 否
                     this.SET_HAS_GET_TOTAL(true);
                     // 添加次数统计
-                    this.countPlayTimes(JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id, options.id);
+                    this.countPlayTimes(JSON.parse(sessionStorage.getItem('currentScenic')).scenery_id, this.nextPoint.nextPlay.aId);
                 }
                 audioDom.onplay = (e) => {
                     this.changeProgress();
