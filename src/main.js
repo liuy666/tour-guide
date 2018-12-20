@@ -59,38 +59,93 @@ const vm = new Vue({
             nonceStr: noncestr, // 必填，生成签名的随机串
             signature: signature, // 必填，签名
             jsApiList: [ // 必填，需要使用的JS接口列表
-                'updateAppMessageShareData', // 自定义“分享给朋友”及“分享到QQ”按钮的分享内容
-                'updateTimelineShareData' // 自定义“分享到朋友圈”及“分享到QQ空间”按钮的分享内容
+                'checkJsApi',
+                'updateAppMessageShareData', // 自定义“分享给朋友”及“分享到QQ”按钮的分享内容(新接口)
+                'updateTimelineShareData', // 自定义“分享到朋友圈”及“分享到QQ空间”按钮的分享内容(新接口)
+                'onMenuShareTimeline', // 分享到朋友圈(旧接口-即将废弃)
+                'onMenuShareAppMessage', // 分享给朋友(旧接口-即将废弃)
+                'onMenuShareQQ', // 分享到QQ(旧接口-即将废弃)
+                'onMenuShareQZone' // 分享到QQ空间(旧接口-即将废弃)
             ]
         });
+        const shareData = {
+            title: '青川智能语音导游', // 分享标题
+            link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+            imgUrl: 'https://www.rtzhisheng.com/qcx-navigator/img/50x50.png' // 分享图标
+        }
         wx.ready(function() { //需在用户可能点击分享按钮前就先调用 
-            console.log('ready')
-            wx.updateAppMessageShareData({
-                title: '青川智能语音导游', // 分享标题
-                desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！', // 分享描述
-                link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: 'https://www.rtzhisheng.com/qcx-navigator/img/50x50.png', // 分享图标
-                success: function() {
-                    console.log('分享到QQ或朋友设置成功')
-                },
-                fail: function(e) {
-                    console.log('分享到QQ设置失败')
+            wx.checkJsApi({
+                jsApiList: [ // 需要检测的JS接口列表
+                    'updateAppMessageShareData',
+                    'updateTimelineShareData',
+                    'onMenuShareTimeline',
+                    'onMenuShareAppMessage',
+                    'onMenuShareQQ',
+                    'onMenuShareQZone'
+                ],
+                success: function(res) {
+                    // 以键值对的形式返回，可用的api值true，不可用为false
+                    // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+                    if (wx.onMenuShareAppMessage) { // 如果旧版接口仍可用
+                        if (res.checkResult.onMenuShareTimeline) { // 如果当前微信客户端版本支持此接口
+                            wx.onMenuShareTimeline({
+                                ...shareData,
+                                success: function () {
+                                    // 用户点击了分享后执行的回调函数
+                                }
+                            });
+                        }
+                        if (res.checkResult.onMenuShareAppMessage) { // 如果当前微信客户端版本支持此接口
+                            wx.onMenuShareAppMessage({
+                                ...shareData,
+                                desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！',
+                                type: 'link',
+                                dataUrl: '',
+                                success: function () {
+                                    // 用户点击了分享后执行的回调函数
+                                }
+                            });
+                        }
+                        if (res.checkResult.onMenuShareQQ) { // 如果当前微信客户端版本支持此接口
+                            wx.onMenuShareQQ({
+                                ...shareData,
+                                desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！',
+                                success: function () {
+                                    // 用户确认分享后执行的回调函数
+                                }
+                            });
+                        }
+                        if (res.checkResult.onMenuShareQZone) { // 如果当前微信客户端版本支持此接口
+                            wx.onMenuShareQZone({
+                                ...shareData,
+                                desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！',
+                                success: function () {
+                                    // 用户确认分享后执行的回调函数
+                                }
+                            });
+                        }
+                    } else { // 如果旧版接口已废弃
+                        if (res.checkResult.updateAppMessageShareData) {
+                            wx.updateAppMessageShareData({
+                                ...shareData, 
+                                desc: '聆听文化之妙，感受旅行之美，欢迎使用青川智能语音导游！', // 分享描述
+                                success: function() {
+                                    // 分享到QQ或朋友设置成功
+                                }
+                            });
+                        }
+                        if (res.checkResult.updateTimelineShareData) {
+                            wx.updateTimelineShareData({
+                                ...shareData, 
+                                success: function() {
+                                    // 分享到QQ空间或朋友圈设置成功
+                                }
+                            });
+                        }
+                    }
                 }
             });
-            wx.updateTimelineShareData({
-                title: '青川智能语音导游', // 分享标题
-                link: 'https://www.rtzhisheng.com/webchat/share.html', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: 'https://www.rtzhisheng.com/qcx-navigator/img/50x50.png', // 分享图标
-                success: function() {
-                    console.log('分享到QQ空间或朋友圈设置成功')
-                },
-                fail: function(e) {
-                    console.log('分享到QQ空间设置失败')
-                }
-            });
-        });
-        wx.error(function() {
-            console.log('error')
+            
         });
         wx.miniProgram.getEnv(function (res) {
             if (res.miniprogram) {
@@ -99,15 +154,6 @@ const vm = new Vue({
                 _store.commit('checkEnv', 'browser');
             }
         });
-        // window.addEventListener('load', function(e) {
-        //     console.log(history.length)
-        //     console.log('load')
-        // })
-        // window.addEventListener('popstate', function(e) {
-        //     console.log(window)
-        //     console.log(history.length)
-        //     console.log('popstate')
-        // })
     }
 }).$mount('#app');
 
