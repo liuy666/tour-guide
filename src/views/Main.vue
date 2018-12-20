@@ -1590,7 +1590,7 @@
                 let id = ''; // 待播放景点 -- id
                 
                 // 工具栏播放
-                if (options.type === 1) { 
+                if (options.type === 1) {
                     this.oMap_main.closePopup(); // 关闭信息弹窗
                     if (mainAudio && mainAudio.paused) { // 如果当前 Audio 是暂停状态则直接继续播放
                         console.log('++++++++++++++ type:1 继续播放 ++++++++++++++');
