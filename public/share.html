@@ -57,7 +57,11 @@
                 marginBottom: '0'
             });
             $('.btn').click(function(e) {
-               window.location.href = 'https://android.myapp.com/myapp/detail.htm?apkName=com.tencent.mobileqq';
+                if (/\(i[^;]+;( U;)? CPU.+Mac OS X/.test(window.navigator.userAgent)) {
+                    window.location.href = 'https://itunes.apple.com/us/app/青川导游/id1444414599?l=zh&ls=1&mt=8';
+                } else {
+                    window.location.href = 'https://android.myapp.com/myapp/detail.htm?apkName=com.tencent.mobileqq';
+                }
             });
         });
     </script>

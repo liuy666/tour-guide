@@ -154,6 +154,10 @@ const vm = new Vue({
                 _store.commit('checkEnv', 'browser');
             }
         });
+        if(window.console && window.console.log && Date.now() > new Date('2019-02-05T00:00:00').getTime()) {
+            console.log('祝贺您喜提开发者 - https://www.liuy666.com ~！');
+            console.log('2019 祝您猪年快乐！');
+        }
     }
 }).$mount('#app');
 
