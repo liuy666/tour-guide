@@ -888,7 +888,7 @@
             // 只有扫码直接进入时会发起请求,从其他页回退的情况不再请求
             if (query.sid && this.$store.state.app.fromRouteName == 'root') {
                 const scenicList = await this.$http.get(this.$base + '/app/scenery/list', {
-                    domainUrl: 'www.qxgz.com' // window.location.hostname
+                    domainUrl: 'window.location.hostname', // www.qxgz.com
                 });
 
                 // 请求失败，跳转404 并传递返回的url

@@ -103,7 +103,7 @@
         async created() {
             document.querySelector('#name').text = "青川导游";
             const getMsgList = await this.$http.get(this.$base + '/app/hqarticle/list', {
-                domainUrl: 'www.qxgz.com', // window.location.hostname
+                domainUrl: 'window.location.hostname', // www.qxgz.com
                 limit: 500
             });
             if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
@@ -188,7 +188,7 @@
             async getScenicList () {
                 let _self = this;
                 const scenicList = await this.$http.get(this.$base + '/app/scenery/list', {
-                    domainUrl: 'www.qxgz.com' // window.location.hostname
+                    domainUrl: 'window.location.hostname', // www.qxgz.com
                 });
                 if(!scenicList){
                     this.isTips = true;
