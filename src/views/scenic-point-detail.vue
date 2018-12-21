@@ -42,6 +42,16 @@
             margin: 22px 0 0 0;
             font-size: 28px;
         }
+        // 纯文字信息提示
+        .long.vux-toast .weui-toast{ // 提示框
+            top: @toast-top;
+            width: auto!important;
+        }
+        .long.vux-toast .weui-toast__content { // 提示框文本信息
+            margin: 0;
+            font-size: 28px;
+            padding: 25px 20px 15px;
+        }
 
         .weui-progress__bar{
             background:rgba(254,226,213,1);
