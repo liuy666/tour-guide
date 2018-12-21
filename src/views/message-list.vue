@@ -226,7 +226,7 @@ export default {
         this.isShowLoading = true;
         document.querySelector('#name').text = "青川导游";
         const getMsgList = await this.$http.get(this.$base + '/app/hqarticle/list', {
-            domainUrl: 'www.qxgz.com', // 上线改成获取域名
+            domainUrl: 'window.location.hostname', // www.qxgz.com
             limit: 500
         });
         if (!getMsgList || !getMsgList.page || !getMsgList.page.list || !getMsgList.page.list.length) {
